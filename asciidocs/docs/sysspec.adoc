@@ -31,6 +31,8 @@ DnD ist ein Pen-and-Paper-Spiel, bei dem man ein Roleplay-Abenteuer erlebt, wobe
 Aktuell kann man diese Charaktere manuell in Form von Stift und Papier verfassen oder online einen Charakter erstellen, mit verschiedensten Fähigkeiten und Eigenschaften. Dabei muss man für die Erstellung selbst viel recherchieren, welche Klassen oder Völker welche Eigenschaften haben.
 
 === Problemstellung
+Es gibt nur wenige qualitativ hochwertige D&D Character Builder. Noch dazu sind die kostenlosen Varianten unübersichtlich und veraltet. Das Erstellen von D&D Characteren ist mit Papier und Bleistift sehr fehleranfällig und zeitaufwändig.
+
 === Aufgabenstellung
 ==== Funktionale Anforderungen
 
@@ -46,6 +48,9 @@ Superclass:  | { "java.lang.Object " | [Browse...] }
 @endsalt
 ----
 ==== Nichtfunktionale Anforderungen (NFA)
+Der Character Builder soll den Benutzer Schritt für Schritt durch den Erstellungsprozess führen. Die Benutzeroberfläche soll sich optisch am D&D Farbschema orientieren. Die UI soll so gestaltet sein damit auch Einsteiger
+ohne großartige Vorkenntnissen einen Charakter erstellen können
+
 === Ziele
 Die Ziele des Projekts sind, die Charaktererstellung für den Benutzer zu vereinfachen und übersichtlich zu gestalten. Durch eine geführte Erstellung ist kaum Vorwissen erforderlich. Die strukturierte Darstellung ermöglicht eine schnelle Charaktererstellung und reduziert sowohl den Zeit- als auch den Rechercheaufwand im Vergleich zur manuellen Erstellung mit Stift und Papier.
 
