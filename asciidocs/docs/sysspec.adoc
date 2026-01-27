@@ -28,10 +28,14 @@ endif::backend-html5[]
 DnD ist ein Pen-and-Paper-Spiel, bei dem man ein Roleplay-Abenteuer erlebt, wobei die Möglichkeiten sehr vielseitig und beinahe grenzenlos sind. Es bietet eine große Vielfalt bei der Charaktererstellung, zum Beispiel in Bezug auf Klassen, Völker, Hintergründe usw.
 
 === Istzustand
+
 Aktuell kann man diese Charaktere manuell in Form von Stift und Papier verfassen oder online einen Charakter erstellen, mit verschiedensten Fähigkeiten und Eigenschaften. Dabei muss man für die Erstellung selbst viel recherchieren, welche Klassen oder Völker welche Eigenschaften haben.
 
 === Problemstellung
 === Aufgabenstellung
+
+Es soll ein Charakter-Editor entwickelt werden, welcher als übersichtliches Werkzeug für die Erstellung von Spielfiguren dient. Zusätzlich soll der Editor neue Spieler dabei unterstützen, ein besseres Verständnis für die Spielregeln sowie für die einzelnen Funktionen, Fähigkeiten und Eigenschaften ihres Charakters zu erlangen.
+
 ==== Funktionale Anforderungen
 
 [plantuml,wireframe,png]
