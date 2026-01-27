@@ -95,6 +95,11 @@ Durch eine geführte Erstellung ist kaum Vorwissen erforderlich.
 Die strukturierte Darstellung ermöglicht eine schnelle Charaktererstellung und reduziert sowohl den Zeit- als auch den Rechercheaufwand im Vergleich zur manuellen Erstellung mit Stift und Papier.
 
 === Mengengerüst
+* Erwartete Gesamtbenutzerzahl: 50–150 Benutzer
+* Maximale gleichzeitige Benutzer: 20
+* Durchschnittliche Charaktererstellungen pro Tag: 10–30
+* Durchschnittliche Sitzungsdauer: 10–20 Minuten
+* Speicherbedarf pro Charakter: gering 
 
 === Rahmenbedingungen
 
