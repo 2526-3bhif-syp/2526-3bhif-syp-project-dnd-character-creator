@@ -22,49 +22,92 @@ endif::backend-html5[]
 
 == Pflichtenheft "Was mache ich"
 
-
 === Ausgangssituation
 
-DnD ist ein Pen-and-Paper-Spiel, bei dem man ein Roleplay-Abenteuer erlebt, wobei die Möglichkeiten sehr vielseitig und beinahe grenzenlos sind. Es bietet eine große Vielfalt bei der Charaktererstellung, zum Beispiel in Bezug auf Klassen, Völker, Hintergründe usw.
+DnD ist ein Pen-and-Paper-Spiel, bei dem man ein Roleplay-Abenteuer erlebt, wobei die Möglichkeiten sehr vielseitig und beinahe grenzenlos sind.
+Es bietet eine große Vielfalt bei der Charaktererstellung, zum Beispiel in Bezug auf Klassen, Völker, Hintergründe usw.
 
 === Istzustand
-Aktuell kann man diese Charaktere manuell in Form von Stift und Papier verfassen oder online einen Charakter erstellen, mit verschiedensten Fähigkeiten und Eigenschaften. Dabei muss man für die Erstellung selbst viel recherchieren, welche Klassen oder Völker welche Eigenschaften haben.
+
+Aktuell kann man diese Charaktere manuell in Form von Stift und Papier verfassen oder online einen Charakter erstellen, mit verschiedensten Fähigkeiten und Eigenschaften.
+Dabei muss man für die Erstellung selbst viel recherchieren, welche Klassen oder Völker welche Eigenschaften haben.
 
 === Problemstellung
-Es gibt nur wenige qualitativ hochwertige D&D Character Builder. Noch dazu sind die kostenlosen Varianten unübersichtlich und veraltet. Das Erstellen von D&D Characteren ist mit Papier und Bleistift sehr fehleranfällig und zeitaufwändig.
+
+Es gibt nur wenige qualitativ hochwertige D&D Character Builder.
+Noch dazu sind die kostenlosen Varianten unübersichtlich und veraltet.
+Das Erstellen von D&D Characteren ist mit Papier und Bleistift sehr fehleranfällig und zeitaufwändig.
 
 === Aufgabenstellung
+
+Es soll ein Charakter-Editor entwickelt werden, welcher als übersichtliches Werkzeug für die Erstellung von Spielfiguren dient.
+Zusätzlich soll der Editor neue Spieler dabei unterstützen, ein besseres Verständnis für die Spielregeln sowie für die einzelnen Funktionen, Fähigkeiten und Eigenschaften ihres Charakters zu erlangen.
+
 ==== Funktionale Anforderungen
 
 [plantuml,wireframe,png]
 ----
-@startsalt
-{
-Name         | "                 "
-Modifiers:   | { (X) public | () default | () private | () protected
-	            [] abstract | [] final   | [] static }
-Superclass:  | { "java.lang.Object " | [Browse...] }
+@startuml
+actor Benutzer
+
+rectangle "Charakter Editor" {
+  usecase "Charakter erstellen" as createCharacter
+  usecase "Klasse festlegen" as setClass
+  usecase "Rasse festlegen" as setRace
+  usecase "Charakterübersicht anzeigen" as viewCharacters
+
+  usecase "Charakter bearbeiten" as editCharacter
+  usecase "Charakter löschen" as deleteCharacter
+  usecase "Charakter exportieren" as exportCharacter
+  usecase "Regeln und Features lesen" as viewRules
+  usecase "Charakter verwalten" as manageCharacter
+  usecase "Charakterattribute festlegen" as setAttributes
+  usecase "Anmelden" as login
+  usecase "Fehlermeldung anzeigen" as loginError
 }
-@endsalt
+
+Benutzer -- createCharacter
+Benutzer -- viewCharacters
+Benutzer -- exportCharacter
+Benutzer -- viewRules
+Benutzer -- manageCharacter
+Benutzer -- login
+
+createCharacter ..> setClass : <<include>>
+createCharacter ..> setRace : <<include>>
+createCharacter ..> setAttributes : <<include>>
+manageCharacter ..> editCharacter : <<include>>
+manageCharacter ..> deleteCharacter : <<include>>
+
+login <.. loginError : <<extend>>
+@enduml
 ----
 ==== Nichtfunktionale Anforderungen (NFA)
-Der Character Builder soll den Benutzer Schritt für Schritt durch den Erstellungsprozess führen. Die Benutzeroberfläche soll sich optisch am D&D Farbschema orientieren. Die UI soll so gestaltet sein damit auch Einsteiger
-ohne großartige Vorkenntnissen einen Charakter erstellen können
+
+Der Character Builder soll den Benutzer Schritt für Schritt durch den Erstellungsprozess führen.
+Die Benutzeroberfläche soll sich optisch am D&D Farbschema orientieren.
+Die UI soll so gestaltet sein damit auch Einsteiger ohne großartige Vorkenntnissen einen Charakter erstellen können
 
 === Ziele
-Die Ziele des Projekts sind, die Charaktererstellung für den Benutzer zu vereinfachen und übersichtlich zu gestalten. Durch eine geführte Erstellung ist kaum Vorwissen erforderlich. Die strukturierte Darstellung ermöglicht eine schnelle Charaktererstellung und reduziert sowohl den Zeit- als auch den Rechercheaufwand im Vergleich zur manuellen Erstellung mit Stift und Papier.
+
+Die Ziele des Projekts sind, die Charaktererstellung für den Benutzer zu vereinfachen und übersichtlich zu gestalten.
+Durch eine geführte Erstellung ist kaum Vorwissen erforderlich.
+Die strukturierte Darstellung ermöglicht eine schnelle Charaktererstellung und reduziert sowohl den Zeit- als auch den Rechercheaufwand im Vergleich zur manuellen Erstellung mit Stift und Papier.
 
 === Mengengerüst
+
 === Rahmenbedingungen
-Das Projekt wird als Gruppenarbeit von fünf Personen im Rahmen des Schuljahres durchgeführt. Die Umsetzung erfolgt in Java unter Verwendung von JavaFX für die Benutzeroberfläche.
+
+Das Projekt wird als Gruppenarbeit von fünf Personen im Rahmen des Schuljahres durchgeführt.
+Die Umsetzung erfolgt in Java unter Verwendung von JavaFX für die Benutzeroberfläche.
 
 == Entwurf "Wie mache ich es"
+
 === Systemarchitektur
+
 === ...
 
 == Projekthandbuch "Organisatorische Rahmenbedingungen"
-
-
 
 === GANTT-Diagramm
 
@@ -81,8 +124,6 @@ mit User-Stories (definiert in YouTrack)
 [Test prototype 2] starts at [Prototype completed]'s end
 @endgantt
 ----
-
-
 
 * link:minutes-of-meeting.html[Protokollvorlage]
 * link:demo.html[Demo]
