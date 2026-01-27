@@ -1,4 +1,4 @@
-= asciidoctor-html-template
+= DND Character Creator
 Thomas Stütz
 1.0.0, {docdate}
 :imagesdir: img
