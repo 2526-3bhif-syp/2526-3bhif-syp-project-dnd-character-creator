@@ -47,9 +47,11 @@ Superclass:  | { "java.lang.Object " | [Browse...] }
 ----
 ==== Nichtfunktionale Anforderungen (NFA)
 === Ziele
+Die Ziele des Projekts sind, die Charaktererstellung für den Benutzer zu vereinfachen und übersichtlich zu gestalten. Durch eine geführte Erstellung ist kaum Vorwissen erforderlich. Die strukturierte Darstellung ermöglicht eine schnelle Charaktererstellung und reduziert sowohl den Zeit- als auch den Rechercheaufwand im Vergleich zur manuellen Erstellung mit Stift und Papier.
+
 === Mengengerüst
 === Rahmenbedingungen
-zB Vorgaben vom Auftraggeber
+Das Projekt wird als Gruppenarbeit von fünf Personen im Rahmen des Schuljahres durchgeführt. Die Umsetzung erfolgt in Java unter Verwendung von JavaFX für die Benutzeroberfläche.
 
 == Entwurf "Wie mache ich es"
 === Systemarchitektur
