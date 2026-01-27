@@ -1,5 +1,5 @@
 = My Project
-firstname lastname
+Daryan Mamsaleh, Leon Marazovic, Deniz Becer, Marko Trkulja, Ernad Music
 1.0.0, {docdate}: Some notes
 ifndef::imagesdir[:imagesdir: images]
 //:toc-placement!:  // prevents the generation of the doc at this position, so it can be printed afterwards
@@ -25,12 +25,11 @@ endif::backend-html5[]
 
 === Ausgangssituation
 
-Die HTL Leonding ist eine HTL im oö. Zentralraum mit ca. 1000 Schülern und den Fachabteilungen Medientechnik, Informatik, ....
+DnD ist ein Pen-and-Paper-Spiel, bei dem man ein Roleplay-Abenteuer erlebt, wobei die Möglichkeiten sehr vielseitig und beinahe grenzenlos sind. Es bietet eine große Vielfalt bei der Charaktererstellung, zum Beispiel in Bezug auf Klassen, Völker, Hintergründe usw.
 
 === Istzustand
-----
-Beschreibung der speziellen Situation zB in der Abteilung
-----
+Aktuell kann man diese Charaktere manuell in Form von Stift und Papier verfassen oder online einen Charakter erstellen, mit verschiedensten Fähigkeiten und Eigenschaften. Dabei muss man für die Erstellung selbst viel recherchieren, welche Klassen oder Völker welche Eigenschaften haben.
+
 === Problemstellung
 === Aufgabenstellung
 ==== Funktionale Anforderungen
