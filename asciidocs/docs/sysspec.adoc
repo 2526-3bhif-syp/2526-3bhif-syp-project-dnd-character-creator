@@ -40,14 +40,40 @@ Es soll ein Charakter-Editor entwickelt werden, welcher als übersichtliches Wer
 
 [plantuml,wireframe,png]
 ----
-@startsalt
-{
-Name         | "                 "
-Modifiers:   | { (X) public | () default | () private | () protected
-	            [] abstract | [] final   | [] static }
-Superclass:  | { "java.lang.Object " | [Browse...] }
+@startuml
+actor Benutzer
+
+rectangle "Charakter Editor" {
+  usecase "Charakter erstellen" as createCharacter
+  usecase "Klasse festlegen" as setClass
+  usecase "Rasse festlegen" as setRace
+  usecase "Charakterübersicht anzeigen" as viewCharacters
+
+  usecase "Charakter bearbeiten" as editCharacter
+  usecase "Charakter löschen" as deleteCharacter
+  usecase "Charakter exportieren" as exportCharacter
+  usecase "Regeln und Features lesen" as viewRules
+  usecase "Charakter verwalten" as manageCharacter
+  usecase "Charakterattribute festlegen" as setAttributes
+  usecase "Anmelden" as login
+  usecase "Fehlermeldung anzeigen" as loginError
 }
-@endsalt
+
+Benutzer -- createCharacter
+Benutzer -- viewCharacters
+Benutzer -- exportCharacter
+Benutzer -- viewRules
+Benutzer -- manageCharacter
+Benutzer -- login
+
+createCharacter ..> setClass : <<include>>
+createCharacter ..> setRace : <<include>>
+createCharacter ..> setAttributes : <<include>>
+manageCharacter ..> editCharacter : <<include>>
+manageCharacter ..> deleteCharacter : <<include>>
+
+login <.. loginError : <<extend>>
+@enduml
 ----
 ==== Nichtfunktionale Anforderungen (NFA)
 === Ziele
