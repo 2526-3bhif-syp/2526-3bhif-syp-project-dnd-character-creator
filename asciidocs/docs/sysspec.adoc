@@ -24,8 +24,13 @@ endif::backend-html5[]
 
 === Ausgangssituation
 
-DnD ist ein Pen-and-Paper-Spiel, bei dem man ein Roleplay-Abenteuer erlebt, wobei die Möglichkeiten sehr vielseitig und beinahe grenzenlos sind.
-Es bietet eine große Vielfalt bei der Charaktererstellung, zum Beispiel in Bezug auf Klassen, Völker, Hintergründe usw.
+Dungeons & Dragons (D&D) ist ein gemeinsames Rollenspiel, bei dem eine Gruppe eine Geschichte erlebt.
+Eine Person ist der Spielleiter (Dungeon Master), der die Abenteuer erfindet und die Spielwelt leitet.
+Die Mitspieler steuern eigene Charaktere, die sie selbst erstellen.
+Jeder Charakter hat Eigenschaften (z. B. Stärke oder Intelligenz), einen Hintergrund, gehört zu einem Volk (z. B. Mensch, Elf, Zwerg) und wählt eine Klasse.
+Die Klasse bestimmt, was der Charakter gut kann, etwa Kämpfer, Magier oder Schurke.
+Gemeinsam erlebt die Gruppe Abenteuer, trifft Entscheidungen und löst Probleme, die vom Dungeon Master erstellt werden.
+Würfel entscheiden oft darüber, ob Aktionen gelingen, was das Spiel spannend und unvorhersehbar macht.
 
 === Istzustand
 
