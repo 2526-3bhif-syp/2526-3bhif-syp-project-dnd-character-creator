@@ -1,4 +1,4 @@
-= My Project
+= DnD Character Builder
 Daryan Mamsaleh, Leon Marazovic, Deniz Becer, Marko Trkulja, Ernad Music
 1.0.0, {docdate}: Some notes
 ifndef::imagesdir[:imagesdir: images]
@@ -39,9 +39,10 @@ Dabei muss man für die Erstellung selbst viel recherchieren, welche Klassen ode
 
 === Problemstellung
 
-Es gibt nur wenige qualitativ hochwertige D&D Character Builder.
-Noch dazu sind die kostenlosen Varianten unübersichtlich und veraltet.
-Das Erstellen von D&D Characteren ist mit Papier und Bleistift sehr fehleranfällig und zeitaufwändig.
+Es gibt nur wenige qualitativ hochwertige D&D-Character-Builder.
+Zudem sind viele der kostenlosen Varianten unübersichtlich oder veraltet, zum Beispiel fastcharacter.com mit seinem alten Benutzerinterface.
+Hochwertigere Alternativen sind oft kostenpflichtig, etwa D&D Beyond, das zwar modern und komfortabel ist, aber viele Funktionen nur gegen Bezahlung anbietet.
+Das Erstellen von D&D-Charakteren mit Papier und Bleistift ist außerdem sehr fehleranfällig und zeitaufwändig.
 
 === Aufgabenstellung
 
