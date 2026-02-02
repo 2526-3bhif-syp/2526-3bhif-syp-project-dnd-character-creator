@@ -88,6 +88,21 @@ manageCharacter ..> deleteCharacter : <<include>>
 login <.. loginError : <<extend>>
 @enduml
 ----
+
+- Als Benutzer möchte ich einen Charakter erstellen, um einen neuen spielbaren D&D-Charakter anlegen zu können.
+
+- Als Benutzer möchte ich eine Charakterübersicht anzeigen, um alle wichtigen Informationen übersichtlich einsehen zu können.
+
+- Als Benutzer möchte ich einen Charakter exportieren, um meinen Charakter außerhalb der Anwendung nutzen oder weitergeben zu können.
+
+- Als Benutzer möchte ich Regeln und Features lesen, um zu verstehen, wie das Spiel und die Charaktererstellung funktionieren.
+
+- Als Benutzer möchte ich einen Charakter bearbeiten, um Änderungen und Weiterentwicklungen am Charakter durchführen zu können.
+
+- Als Benutzer möchte ich einen Charakter löschen, um nicht mehr benötigte Charaktere zu entfernen.
+
+- Als Benutzer möchte ich mich anmelden, um auf meine gespeicherten Charaktere zugreifen zu können.
+
 ==== Nichtfunktionale Anforderungen (NFA)
 
 Der Character Builder soll den Benutzer Schritt für Schritt durch den Erstellungsprozess führen.
