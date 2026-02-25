@@ -70,6 +70,7 @@ rectangle "Charakter Editor" {
   usecase "Charakterattribute festlegen" as setAttributes
   usecase "Anmelden" as login
   usecase "Fehlermeldung anzeigen" as loginError
+  usecase "Charakterübersicht anzeigen" as viewCharacters
 }
 
 Benutzer -- createCharacter
@@ -84,6 +85,7 @@ createCharacter ..> setRace : <<include>>
 createCharacter ..> setAttributes : <<include>>
 manageCharacter ..> editCharacter : <<include>>
 manageCharacter ..> deleteCharacter : <<include>>
+login ..> viewCharacters : <<include>>
 
 login <.. loginError : <<extend>>
 @enduml
