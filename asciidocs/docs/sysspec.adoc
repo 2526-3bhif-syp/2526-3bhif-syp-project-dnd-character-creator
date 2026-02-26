@@ -111,7 +111,7 @@ Die UI soll so gestaltet sein damit auch Einsteiger ohne großartige Vorkenntnis
 
 === Ziele
 
-Die Ziele des Projekts sind, die Charaktererstellung für den Benutzer zu vereinfachen und übersichtlich zu gestalten.
+Die Ziele des Projekts sind,  die Charaktererstellung für den Benutzer zu vereinfachen und übersichtlich zu gestalten.
 Durch eine geführte Erstellung ist kaum Vorwissen erforderlich.
 Die strukturierte Darstellung ermöglicht eine schnelle Charaktererstellung und reduziert sowohl den Zeit- als auch den Rechercheaufwand im Vergleich zur manuellen Erstellung mit Stift und Papier.
 
