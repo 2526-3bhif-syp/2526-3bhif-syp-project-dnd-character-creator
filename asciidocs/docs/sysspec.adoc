@@ -125,7 +125,7 @@ Die strukturierte Darstellung ermöglicht eine schnelle Charaktererstellung und 
 === Rahmenbedingungen
 
 Das Projekt wird als Gruppenarbeit von fünf Personen im Rahmen des Schuljahres durchgeführt.
-Die Umsetzung erfolgt in Java unter Verwendung von JavaFX für die Benutzeroberfläche.
+Die Umsetzung erfolgt in Java unter Verwendung von JavaFX für die Benutzeroberfläche..
 
 == Entwurf "Wie mache ich es"
 
