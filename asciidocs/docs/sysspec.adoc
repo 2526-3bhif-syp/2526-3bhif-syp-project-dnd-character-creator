@@ -47,7 +47,7 @@ Das Erstellen von D&D-Charakteren mit Papier und Bleistift ist außerdem sehr fe
 === Aufgabenstellung
 
 Es soll ein Charakter-Editor entwickelt werden, welcher als übersichtliches Werkzeug für die Erstellung von Spielfiguren dient.
-Zusätzlich soll der Editor neue Spieler dabei unterstützen, ein besseres Verständnis für die Spielregeln sowie für die einzelnen Funktionen, Fähigkeiten und Eigenschaften ihres Charakters zu erlangen.
+Zusätzlich soll der Editor neue Spieler dabei unterstützen, ein besseres Verständnis für die Funktionen, Fähigkeiten und Eigenschaften ihres eigenen Charakters zu erlangen.
 
 ==== Funktionale Anforderungen
 
@@ -105,15 +105,16 @@ login <.. loginError : <<extend>>
 
 ==== Nichtfunktionale Anforderungen (NFA)
 
-Der Character Builder soll den Benutzer Schritt für Schritt durch den Erstellungsprozess führen.
-Die Benutzeroberfläche soll sich optisch am D&D Farbschema orientieren.
-Die UI soll so gestaltet sein damit auch Einsteiger ohne großartige Vorkenntnissen einen Charakter erstellen können
+Die Benutzeroberfläche muss so intuitiv gestaltet sein, dass Einsteiger ohne Vorkenntnisse einen Charakter erstellen können.
+Optisch orientiert sich das Design am D&D-Farbschema, welches primär aus folgenden vier Farbtönen besteht:
+Pergament-Beige (Hintergrund), Dunkelrot (Überschriften/Akzente), Tusche-Schwarz (Text) und Gold/Messing (Icons/Rahmen).
 
 === Ziele
 
-Die Ziele des Projekts sind,  die Charaktererstellung für den Benutzer zu vereinfachen und übersichtlich zu gestalten.
+Die Ziele des Projekts sind,  die Charaktererstellung für den Neuanfänger zu vereinfachen und übersichtlich zu gestalten.
 Durch eine geführte Erstellung ist kaum Vorwissen erforderlich.
-Die strukturierte Darstellung ermöglicht eine schnelle Charaktererstellung und reduziert sowohl den Zeit- als auch den Rechercheaufwand im Vergleich zur manuellen Erstellung mit Stift und Papier.
+Die strukturierte Darstellung ermöglicht eine schnelle Charaktererstellung und
+reduziert den Zeitaufwand erheblich, da das mühsame Nachschlagen von Regeln, Klassen-Details oder Volks-Eigenschaften komplett entfällt.
 
 === Mengengerüst
 * Erwartete Gesamtbenutzerzahl: 50–150 Benutzer
@@ -127,30 +128,4 @@ Die strukturierte Darstellung ermöglicht eine schnelle Charaktererstellung und 
 Das Projekt wird als Gruppenarbeit von fünf Personen im Rahmen des Schuljahres durchgeführt.
 Die Umsetzung erfolgt in Java unter Verwendung von JavaFX für die Benutzeroberfläche..
 
-== Entwurf "Wie mache ich es"
-
-=== Systemarchitektur
-
-=== ...
-
-== Projekthandbuch "Organisatorische Rahmenbedingungen"
-
-=== GANTT-Diagramm
-
-mit User-Stories (definiert in YouTrack)
-
-[plantuml,gantt-protoype,png]
-----
-@startgantt
-[Test prototype] lasts 10 days
-[Prototype completed] happens at [Test prototype]'s end
-[Setup assembly line] lasts 12 days
-[Setup assembly line] starts at [Test prototype]'s end
-[Test prototype 2] lasts 3 days
-[Test prototype 2] starts at [Prototype completed]'s end
-@endgantt
-----
-
-* link:minutes-of-meeting.html[Protokollvorlage]
-* link:demo.html[Demo]
 
