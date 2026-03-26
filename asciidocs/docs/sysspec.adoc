@@ -117,9 +117,9 @@ Die strukturierte Darstellung ermöglicht eine schnelle Charaktererstellung und
 reduziert den Zeitaufwand erheblich, da das mühsame Nachschlagen von Regeln, Klassen-Details oder Volks-Eigenschaften komplett entfällt.
 
 === Mengengerüst
-* Erwartete Gesamtbenutzerzahl: 50–150 Benutzer
-* Maximale gleichzeitige Benutzer: 20
-* Durchschnittliche Charaktererstellungen pro Tag: 10–30
+* Erwartete Gesamtbenutzerzahl: 1 Benutzer
+* Maximale gleichzeitige Benutzer: 1
+* Durchschnittliche Charaktererstellungen pro Tag: 1-2
 * Durchschnittliche Sitzungsdauer: 10–20 Minuten
 * Speicherbedarf pro Charakter: gering 
 
