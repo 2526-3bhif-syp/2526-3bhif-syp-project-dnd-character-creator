@@ -48,17 +48,13 @@ image::images/beyond1.jpeg[DnD Beyond list of classes]
 image::images/beyond2.jpeg[DnD Beyond Babarian class overreview]
 image::images/beyond3.jpeg[DnD Beyond all stats]
 
-
-
 Bei D&D Beyond ist die Benutzeroberfläche zwar modern, jedoch werden viele Fachbegriffe und Spielmechaniken nicht ausreichend erklärt.
 Begriffe wie Attribute, Modifikatoren oder Saving Throws sind für Anfänger schwer verständlich.
 Auch die Wahl passender Werte und Fähigkeiten ist ohne Vorkenntnisse kompliziert und kann schnell überfordernd wirken.
 Zudem sind viele Inhalte nur gegen Bezahlung verfügbar.
 
-
 image::images/roll1.jpeg[Roll20 list of classes]
 image::images/roll2.jpeg[Roll20 list of races]
-
 
 Bei Roll20 besteht das Problem, dass nicht alle verfügbaren Inhalte vollständig genutzt werden können, obwohl sie im System vorhanden sind.
 Zusätzlich gibt es eine große Auswahl an Klassen und Völkern, deren Unterschiede und Eigenschaften für Einsteiger nicht klar ersichtlich sind.
@@ -69,6 +65,14 @@ Dadurch fällt es schwer zu verstehen, welche Rolle eine Klasse im Spiel überni
 Es soll ein Charakter-Editor entwickelt werden, welcher als übersichtliches Werkzeug für die Erstellung von Spielfiguren dient.
 Zusätzlich soll der Editor neue Spieler dabei unterstützen, ein besseres Verständnis für die Funktionen, Fähigkeiten und Eigenschaften ihres eigenen Charakters zu erlangen.
 Dabei werden die Daten in Form einer Oracle-Datenbank von uns selber zur verfügung gestellt, welche die Informationen vom offiziellen "DnD Player Handbook" original wiedergeben.
+Ebenso soll es möglich sein, einen erstellten Charakter zu speichern und in ein Format (z. B. PDF) zu exportieren.
+Zusätzlich wird es eine Liste aller bereits erstellten Charaktere geben.
+Diese können vom Nutzer jederzeit bearbeitet, angesehen oder gelöscht werden.
+Am Ende soll der Spieler den Charakter in Form eines Charakter-Sheets erhalten mit allen Attributen, Fähigkeiten und Zaubern.
+
+Beispiel eines Charakter-Sheets:
+
+image::images/sheet1.jpg[Example of a character-sheet]
 
 ==== Funktionale Anforderungen
 
