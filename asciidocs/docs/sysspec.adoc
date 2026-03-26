@@ -39,15 +39,36 @@ Dabei muss man für die Erstellung selbst viel recherchieren, welche Klassen ode
 
 === Problemstellung
 
-Es gibt nur wenige qualitativ hochwertige D&D-Character-Builder.
-Zudem sind viele der kostenlosen Varianten unübersichtlich oder veraltet, zum Beispiel fastcharacter.com mit seinem alten Benutzerinterface.
-Hochwertigere Alternativen sind oft kostenpflichtig, etwa D&D Beyond, das zwar modern und komfortabel ist, aber viele Funktionen nur gegen Bezahlung anbietet.
-Das Erstellen von D&D-Charakteren mit Papier und Bleistift ist außerdem sehr fehleranfällig und zeitaufwändig.
+Es gibt nur wenige einsteigerfreundliche D&D-Character-Builder.
+Viele kostenlose Varianten sind unübersichtlich aufgebaut oder bieten nur einen eingeschränkten Funktionsumfang.
+Oft fehlen wichtige Inhalte wie Klassen, Völker oder Fähigkeiten, wodurch die Erstellung eines vollständigen Charakters erschwert wird.
+Zusätzlich ist die Navigation in manchen Tools kompliziert, was besonders für Anfänger den Einstieg erschwert.
+
+image::images/beyond1.jpeg[DnD Beyond list of classes]
+image::images/beyond2.jpeg[DnD Beyond Babarian class overreview]
+image::images/beyond3.jpeg[DnD Beyond all stats]
+
+
+
+Bei D&D Beyond ist die Benutzeroberfläche zwar modern, jedoch werden viele Fachbegriffe und Spielmechaniken nicht ausreichend erklärt.
+Begriffe wie Attribute, Modifikatoren oder Saving Throws sind für Anfänger schwer verständlich.
+Auch die Wahl passender Werte und Fähigkeiten ist ohne Vorkenntnisse kompliziert und kann schnell überfordernd wirken.
+Zudem sind viele Inhalte nur gegen Bezahlung verfügbar.
+
+
+image::images/roll1.jpeg[Roll20 list of classes]
+image::images/roll2.jpeg[Roll20 list of races]
+
+
+Bei Roll20 besteht das Problem, dass nicht alle verfügbaren Inhalte vollständig genutzt werden können, obwohl sie im System vorhanden sind.
+Zusätzlich gibt es eine große Auswahl an Klassen und Völkern, deren Unterschiede und Eigenschaften für Einsteiger nicht klar ersichtlich sind.
+Dadurch fällt es schwer zu verstehen, welche Rolle eine Klasse im Spiel übernimmt.
 
 === Aufgabenstellung
 
 Es soll ein Charakter-Editor entwickelt werden, welcher als übersichtliches Werkzeug für die Erstellung von Spielfiguren dient.
 Zusätzlich soll der Editor neue Spieler dabei unterstützen, ein besseres Verständnis für die Funktionen, Fähigkeiten und Eigenschaften ihres eigenen Charakters zu erlangen.
+Dabei werden die Daten in Form einer Oracle-Datenbank von uns selber zur verfügung gestellt, welche die Informationen vom offiziellen "DnD Player Handbook" original wiedergeben.
 
 ==== Funktionale Anforderungen
 
@@ -81,23 +102,23 @@ manageCharacter ..> deleteCharacter : <<include>>
 
 ==== Nichtfunktionale Anforderungen (NFA)
 
-Die Benutzeroberfläche muss so intuitiv gestaltet sein, dass Einsteiger ohne Vorkenntnisse einen Charakter erstellen können.
+Die Benutzeroberfläche muss so schlicht gestaltet sein, dass Einsteiger ohne Vorkenntnisse einen Charakter erstellen können.
 Optisch orientiert sich das Design am D&D-Farbschema, welches primär aus folgenden vier Farbtönen besteht:
-Pergament-Beige (Hintergrund), Dunkelrot (Überschriften/Akzente), Tusche-Schwarz (Text) und Gold/Messing (Icons/Rahmen).
+Beige (Hintergrund), Dunkelrot (Überschriften/Akzente), Tusche-Schwarz (Text) und Gold/Messing (Icons/Rahmen).
 
 === Ziele
 
-Die Ziele des Projekts sind,  die Charaktererstellung für den Neuanfänger zu vereinfachen und übersichtlich zu gestalten.
+Die Ziele des Projekts sind, die Charaktererstellung für den Neuanfänger zu vereinfachen und übersichtlich zu gestalten.
 Durch eine geführte Erstellung ist kaum Vorwissen erforderlich.
-Die strukturierte Darstellung ermöglicht eine schnelle Charaktererstellung und
-reduziert den Zeitaufwand erheblich, da das mühsame Nachschlagen von Regeln, Klassen-Details oder Volks-Eigenschaften komplett entfällt.
+Die strukturierte Darstellung ermöglicht eine schnelle Charaktererstellung und reduziert den Zeitaufwand erheblich, da das mühsame Nachschlagen von Regeln, Klassen-Details oder Volks-Eigenschaften komplett entfällt.
 
 === Mengengerüst
+
 * Erwartete Gesamtbenutzerzahl: 1 Benutzer
 * Maximale gleichzeitige Benutzer: 1
 * Durchschnittliche Charaktererstellungen pro Tag: 1-2
 * Durchschnittliche Sitzungsdauer: 10–20 Minuten
-* Speicherbedarf pro Charakter: gering 
+* Speicherbedarf pro Charakter: gering
 
 === Rahmenbedingungen
 
