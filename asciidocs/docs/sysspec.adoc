@@ -58,8 +58,6 @@ actor Benutzer
 
 rectangle "Charakter Editor" {
   usecase "Charakter erstellen" as createCharacter
-  usecase "Klasse festlegen" as setClass
-  usecase "Rasse festlegen" as setRace
   usecase "Charakterübersicht anzeigen" as viewCharacters
 
   usecase "Charakter bearbeiten" as editCharacter
@@ -67,9 +65,6 @@ rectangle "Charakter Editor" {
   usecase "Charakter exportieren" as exportCharacter
   usecase "Regeln und Features lesen" as viewRules
   usecase "Charakter verwalten" as manageCharacter
-  usecase "Charakterattribute festlegen" as setAttributes
-  usecase "Anmelden" as login
-  usecase "Fehlermeldung anzeigen" as loginError
 }
 
 Benutzer -- createCharacter
@@ -77,31 +72,12 @@ Benutzer -- viewCharacters
 Benutzer -- exportCharacter
 Benutzer -- viewRules
 Benutzer -- manageCharacter
-Benutzer -- login
 
-createCharacter ..> setClass : <<include>>
-createCharacter ..> setRace : <<include>>
-createCharacter ..> setAttributes : <<include>>
 manageCharacter ..> editCharacter : <<include>>
 manageCharacter ..> deleteCharacter : <<include>>
 
-login <.. loginError : <<extend>>
 @enduml
 ----
-
-- Als Benutzer möchte ich einen Charakter erstellen, um einen neuen spielbaren D&D-Charakter anlegen zu können.
-
-- Als Benutzer möchte ich eine Charakterübersicht anzeigen, um alle wichtigen Informationen übersichtlich einsehen zu können.
-
-- Als Benutzer möchte ich einen Charakter exportieren, um meinen Charakter außerhalb der Anwendung nutzen oder weitergeben zu können.
-
-- Als Benutzer möchte ich Regeln und Features lesen, um zu verstehen, wie das Spiel und die Charaktererstellung funktionieren.
-
-- Als Benutzer möchte ich einen Charakter bearbeiten, um Änderungen und Weiterentwicklungen am Charakter durchführen zu können.
-
-- Als Benutzer möchte ich einen Charakter löschen, um nicht mehr benötigte Charaktere zu entfernen.
-
-- Als Benutzer möchte ich mich anmelden, um auf meine gespeicherten Charaktere zugreifen zu können.
 
 ==== Nichtfunktionale Anforderungen (NFA)
 
