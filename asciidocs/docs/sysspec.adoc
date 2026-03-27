@@ -46,13 +46,14 @@ Zusätzlich ist die Navigation in manchen Tools kompliziert, was besonders für 
 
 image::beyond2.jpeg[DnD Beyond Barbarian class overview]
 image::beyond3.jpeg[DnD Beyond all stats]
-image::roll1.jpeg[Roll20 list of classes]
+
 
 Bei D&D Beyond ist die Benutzeroberfläche zwar modern, jedoch werden viele Fachbegriffe und Spielmechaniken nicht ausreichend erklärt.
 Begriffe wie Attribute, Modifikatoren oder Saving Throws sind für Anfänger schwer verständlich.
 Auch die Wahl passender Werte und Fähigkeiten ist ohne Vorkenntnisse kompliziert und kann schnell überfordernd wirken.
 Zudem sind viele Inhalte nur gegen Bezahlung verfügbar.
 
+image::roll1.jpeg[Roll20 list of classes]
 image::roll2.jpeg[Roll20 list of races]
 
 Bei Roll20 besteht das Problem, dass nicht alle verfügbaren Inhalte vollständig genutzt werden können, obwohl sie im System vorhanden sind.
