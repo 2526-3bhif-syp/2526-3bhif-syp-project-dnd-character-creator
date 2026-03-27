@@ -44,17 +44,16 @@ Viele kostenlose Varianten sind unübersichtlich aufgebaut oder bieten nur einen
 Oft fehlen wichtige Inhalte wie Klassen, Völker oder Fähigkeiten, wodurch die Erstellung eines vollständigen Charakters erschwert wird.
 Zusätzlich ist die Navigation in manchen Tools kompliziert, was besonders für Anfänger den Einstieg erschwert.
 
-image::images/beyond1.jpeg[DnD Beyond list of classes]
-image::images/beyond2.jpeg[DnD Beyond Babarian class overreview]
-image::images/beyond3.jpeg[DnD Beyond all stats]
+image::beyond2.jpeg[DnD Beyond Barbarian class overview]
+image::beyond3.jpeg[DnD Beyond all stats]
+image::roll1.jpeg[Roll20 list of classes]
 
 Bei D&D Beyond ist die Benutzeroberfläche zwar modern, jedoch werden viele Fachbegriffe und Spielmechaniken nicht ausreichend erklärt.
 Begriffe wie Attribute, Modifikatoren oder Saving Throws sind für Anfänger schwer verständlich.
 Auch die Wahl passender Werte und Fähigkeiten ist ohne Vorkenntnisse kompliziert und kann schnell überfordernd wirken.
 Zudem sind viele Inhalte nur gegen Bezahlung verfügbar.
 
-image::images/roll1.jpeg[Roll20 list of classes]
-image::images/roll2.jpeg[Roll20 list of races]
+image::roll2.jpeg[Roll20 list of races]
 
 Bei Roll20 besteht das Problem, dass nicht alle verfügbaren Inhalte vollständig genutzt werden können, obwohl sie im System vorhanden sind.
 Zusätzlich gibt es eine große Auswahl an Klassen und Völkern, deren Unterschiede und Eigenschaften für Einsteiger nicht klar ersichtlich sind.
@@ -72,7 +71,7 @@ Am Ende soll der Spieler den Charakter in Form eines Charakter-Sheets erhalten m
 
 Beispiel eines Charakter-Sheets:
 
-image::images/sheet1.jpg[Example of a character-sheet]
+image::sheet1.jpg[Example of a character-sheet]
 
 ==== Funktionale Anforderungen
 
