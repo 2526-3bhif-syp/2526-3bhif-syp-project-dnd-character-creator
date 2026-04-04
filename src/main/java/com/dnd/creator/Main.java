@@ -11,7 +11,7 @@ public class Main extends Application {
         CharacterModel model = new CharacterModel();
         MainView view = new MainView();
         MainPresenter presenter = new MainPresenter(model, view);
-        Scene scene = new Scene(view.getRoot(), 400, 300);
+        Scene scene = new Scene(view.getRoot(), 800, 600);
         stage.setTitle("D&D Character Creator");
         stage.setScene(scene);
         stage.show();

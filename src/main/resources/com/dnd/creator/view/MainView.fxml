@@ -8,7 +8,7 @@
 
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" style="-fx-background-color: #F5F5DC;">
     <top>
-        <ImageView fitHeight="30" fitWidth="30" pickOnBounds="true" preserveRatio="true">
+        <ImageView fitHeight="40" fitWidth="40" pickOnBounds="true" preserveRatio="true">
             <image>
                 <Image url="@../pics/zahnrad.png"/>
             </image>
@@ -19,7 +19,7 @@
     </top>
     <center>
         <VBox alignment="CENTER">
-            <Button text="Create" style="-fx-background-color: #F5F5DC; -fx-border-color: #C6A664; -fx-border-radius: 10; -fx-background-radius: 10; -fx-text-fill: #8B0000; -fx-border-width: 2; -fx-font-size: 14px;" prefWidth="150" prefHeight="40"/>
+            <Button text="Create" style="-fx-background-color: #F5F5DC; -fx-border-color: #C6A664; -fx-border-radius: 15; -fx-background-radius: 15; -fx-text-fill: #8B0000; -fx-border-width: 3; -fx-font-size: 24px;" prefWidth="300" prefHeight="70"/>
         </VBox>
     </center>
 </BorderPane>
