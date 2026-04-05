@@ -8,6 +8,8 @@ public class CharacterModel {
     private int intelligence;
     private int wisdom;
     private int charisma;
+    private Race race;
+    private String characterClass;
 
     public CharacterModel() {}
 
@@ -84,5 +86,21 @@ public class CharacterModel {
 
     public void setCharisma(int charisma) {
         this.charisma = charisma;
+    }
+
+    public Race getRace() {
+        return race;
+    }
+
+    public void setRace(Race race) {
+        this.race = race;
+    }
+
+    public String getCharacterClass() {
+        return characterClass;
+    }
+
+    public void setCharacterClass(String characterClass) {
+        this.characterClass = characterClass;
     }
 }
