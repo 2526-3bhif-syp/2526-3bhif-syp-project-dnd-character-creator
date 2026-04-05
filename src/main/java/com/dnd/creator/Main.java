@@ -1,6 +1,7 @@
 package com.dnd.creator;
 import com.dnd.creator.model.CharacterModel;
 import com.dnd.creator.presenter.MainPresenter;
+import com.dnd.creator.view.SelectClassView;
 import com.dnd.creator.view.MainView;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -11,11 +12,17 @@ public class Main extends Application {
         CharacterModel model = new CharacterModel();
         MainView view = new MainView();
         MainPresenter presenter = new MainPresenter(model, view);
-        Scene scene = new Scene(view.getRoot(), 400, 300);
+
+        // For testing purposes: start directly in the Class Wizard
+        SelectClassView classView = new SelectClassView();
+        Scene scene = new Scene(classView.getRoot(), 800, 600);
+
         stage.setTitle("D&D Character Creator");
         stage.setScene(scene);
+        stage.setMaximized(true); // <--- Macht die App im Vollbild auf
         stage.show();
     }
+
     public static void main(String[] args) {
         launch(args);
     }
