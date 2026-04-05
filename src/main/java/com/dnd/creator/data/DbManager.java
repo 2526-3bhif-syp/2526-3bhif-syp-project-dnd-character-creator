@@ -1,26 +1,49 @@
 package com.dnd.creator.data;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DbManager {
 
-    private static final String path = "jdbc:sqlite:src/main/data/data.db";
+    private Connection connection;
+    private static final String DB_URL = "jdbc:sqlite:src/main/data/data.db";
 
-    public static void initialize(){
+    public void connect(){
 
-        try(Connection connection = DriverManager.getConnection(path);
-            Statement statement = connection.createStatement()) {
+        try {
+            connection = DriverManager.getConnection(DB_URL);
+            System.out.println("Connection with Database successful!");
+        } catch (SQLException e) {
 
-            statement.execute("CREATE TABLE IF NOT EXISTS races (id INTEGER PRIMARY KEY, name TEXT);");
-            statement.execute("CREATE TABLE IF NOT EXISTS classes (id INTEGER PRIMARY KEY, name TEXT);");
-            statement.execute("CREATE TABLE IF NOT EXISTS characters (id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    "name TEXT, race TEXT, class TEXT);");
+            System.out.println("Connection with Database failed!");
+        }
+    }
+
+    public List<String> getAllRaces(){
+
+        List<String> result = new ArrayList<>();
+
+        String query= "SELECT name FROM races ORDER BY name";
+
+        try(Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(query)){
+
+            while(resultSet.next()){
+
+                result.add(resultSet.getString("name"));
+
+            }
 
 
-        } catch (Exception _) {
+        } catch (SQLException e) {
+
+            System.err.println(e.getMessage());
 
         }
 
+        return result;
     }
+
 
 
 
