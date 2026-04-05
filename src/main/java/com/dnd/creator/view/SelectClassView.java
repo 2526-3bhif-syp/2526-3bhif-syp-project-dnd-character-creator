@@ -17,9 +17,9 @@ public class SelectClassView {
             root = loader.load();
             if (btnBack != null) {
                 btnBack.setOnAction(e -> {
-                    CreateCharacterView createView = new CreateCharacterView();
+                    CreateCharacterView prevView = new CreateCharacterView();
                     Stage stage = (Stage) root.getScene().getWindow();
-                    stage.setScene(new Scene(createView.getRoot(), stage.getScene().getWidth(), stage.getScene().getHeight()));
+                    stage.setScene(new Scene(prevView.getRoot(), stage.getScene().getWidth(), stage.getScene().getHeight()));
                 });
             }
             if (btnNext != null) {
