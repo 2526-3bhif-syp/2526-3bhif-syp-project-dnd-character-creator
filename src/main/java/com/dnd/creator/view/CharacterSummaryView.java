@@ -1,5 +1,7 @@
 package com.dnd.creator.view;
 
+import com.dnd.creator.model.CharacterSession;
+import com.dnd.creator.model.Race;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -63,21 +65,112 @@ public class CharacterSummaryView {
     }
 
     private void loadCharacterData() {
-        // TODO: Load data from model/session
-        lblCharacterName.setText("Beispiel Held");
-        lblClass.setText("Warrior");
-        lblRace.setText("Human");
-        lblBackground.setText("Soldier");
-        lblSkills.setText("Athletics, Perception");
-        lblEquipment.setText("Longsword, Shield, Leather Armor");
-        lblSpells.setText("Keine");
-        
-        // Add ability scores
-        String[] abilities = {"STR: 15", "DEX: 14", "CON: 13", "INT: 12", "WIS: 10", "CHA: 8"};
-        for (String ability : abilities) {
-            Label label = new Label(ability);
-            label.setStyle("-fx-font-size: 14px; -fx-text-fill: #1A1A1A;");
-            abilityScoresContainer.getChildren().add(label);
+        var character = CharacterSession.getInstance().getCurrentCharacter();
+
+        // Character name
+        if (character.getName() != null && !character.getName().isEmpty()) {
+            lblCharacterName.setText(character.getName());
+        } else {
+            lblCharacterName.setText("Neuer Charakter");
+        }
+
+        // Race - mit allen Details
+        if (character.getRace() != null) {
+            Race race = character.getRace();
+            lblRace.setText(race.getName());
+
+            // Clear existing ability scores
+            abilityScoresContainer.getChildren().clear();
+
+            // Debug: Print bonuses to console
+            System.out.println("=== Race: " + race.getName() + " ===");
+            System.out.println("Ability Bonuses: " + race.getAbilityBonuses());
+
+            // Add ability scores from character WITH bonuses added
+            // Note: Database keys are "STR", "DEX", "CON", "INT", "WIS", "CHA"
+            int strBonus = race.getAbilityBonuses().getOrDefault("STR", 0);
+            int dexBonus = race.getAbilityBonuses().getOrDefault("DEX", 0);
+            int conBonus = race.getAbilityBonuses().getOrDefault("CON", 0);
+            int intBonus = race.getAbilityBonuses().getOrDefault("INT", 0);
+            int wisBonus = race.getAbilityBonuses().getOrDefault("WIS", 0);
+            int chaBonus = race.getAbilityBonuses().getOrDefault("CHA", 0);
+
+            int strWithBonus = character.getStrength() + strBonus;
+            int dexWithBonus = character.getDexterity() + dexBonus;
+            int conWithBonus = character.getConstitution() + conBonus;
+            int intWithBonus = character.getIntelligence() + intBonus;
+            int wisWithBonus = character.getWisdom() + wisBonus;
+            int chaWithBonus = character.getCharisma() + chaBonus;
+
+            // Display only final values (no calculations shown)
+            String[] abilities = {
+                "STR: " + strWithBonus,
+                "DEX: " + dexWithBonus,
+                "CON: " + conWithBonus,
+                "INT: " + intWithBonus,
+                "WIS: " + wisWithBonus,
+                "CHA: " + chaWithBonus
+            };
+
+            for (String ability : abilities) {
+                Label label = new Label(ability);
+                label.setStyle("-fx-font-size: 14px; -fx-text-fill: #1A1A1A;");
+                abilityScoresContainer.getChildren().add(label);
+            }
+
+            // Add race information
+            addRaceInformation(race);
+        } else {
+            lblRace.setText("Keine Rasse gewählt");
+        }
+
+        // Class
+        lblClass.setText(character.getCharacterClass() != null ? character.getCharacterClass() : "Keine Klasse gewählt");
+
+        // Default values for now (can be extended later)
+        lblBackground.setText("Keine Hintergrund gewählt");
+        lblSkills.setText("Keine Fähigkeiten gewählt");
+        lblEquipment.setText("Keine Ausrüstung gewählt");
+        lblSpells.setText("Keine Zauber");
+    }
+
+    private void addRaceInformation(Race race) {
+        // Add traits section
+        if (race.getTraits() != null && !race.getTraits().isEmpty()) {
+            Label traitsTitle = new Label("✓ Fähigkeiten:");
+            traitsTitle.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #1565C0; -fx-padding: 10 0 5 0;");
+            abilityScoresContainer.getChildren().add(traitsTitle);
+
+            for (Race.Trait trait : race.getTraits()) {
+                VBox traitBox = new VBox(3);
+                traitBox.setStyle("-fx-border-color: #E0E0E0; -fx-border-width: 0 0 1 0; -fx-padding: 8;");
+
+                Label traitName = new Label("• " + trait.getName());
+                traitName.setStyle("-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #1A1A1A;");
+                traitBox.getChildren().add(traitName);
+
+                if (trait.getDescription() != null && !trait.getDescription().isEmpty()) {
+                    Label traitDesc = new Label(trait.getDescription());
+                    traitDesc.setStyle("-fx-font-size: 10px; -fx-text-fill: #555555; -fx-wrap-text: true;");
+                    traitDesc.setWrapText(true);
+                    traitBox.getChildren().add(traitDesc);
+                }
+
+                abilityScoresContainer.getChildren().add(traitBox);
+            }
+        }
+
+        // Add languages section
+        if (race.getLanguages() != null && !race.getLanguages().isEmpty()) {
+            Label langTitle = new Label("✓ Sprachen:");
+            langTitle.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #6A4C93; -fx-padding: 10 0 5 0;");
+            abilityScoresContainer.getChildren().add(langTitle);
+
+            for (String language : race.getLanguages()) {
+                Label langLabel = new Label("  • " + language);
+                langLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #6A4C93;");
+                abilityScoresContainer.getChildren().add(langLabel);
+            }
         }
     }
 
