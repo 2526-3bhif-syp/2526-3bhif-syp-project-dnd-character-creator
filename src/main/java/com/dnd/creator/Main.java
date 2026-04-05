@@ -12,12 +12,13 @@ import java.util.List;
 public class Main extends Application {
     @Override
     public void start(Stage stage) {
-        CharacterModel model = new CharacterModel();
         MainView view = new MainView();
-        MainPresenter presenter = new MainPresenter(model, view);
-        Scene scene = new Scene(view.getRoot(), 400, 300);
+        new MainPresenter(view, stage);
+        
+        Scene scene = new Scene(view.getRoot(), 800, 600);
         stage.setTitle("D&D Character Creator");
         stage.setScene(scene);
+        stage.setMaximized(true);
         stage.show();
     }
         public static void main(String[] args) {
