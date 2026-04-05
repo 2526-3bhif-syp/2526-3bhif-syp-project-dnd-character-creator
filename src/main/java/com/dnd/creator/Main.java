@@ -14,7 +14,7 @@ public class Main extends Application {
     public void start(Stage stage) {
         MainView view = new MainView();
         new MainPresenter(view, stage);
-        
+
         Scene scene = new Scene(view.getRoot(), 800, 600);
         stage.setTitle("D&D Character Creator");
         stage.setScene(scene);
@@ -22,16 +22,9 @@ public class Main extends Application {
         stage.show();
     }
         public static void main(String[] args) {
-            DbManager dbManager = new DbManager();
-            dbManager.connect();  // Verbindung aufbauen
 
-            List<String> races = dbManager.getAllRaces();  // Methode testen
+        Application.launch(args);
 
-            System.out.println("Gefundene Rassen:");
-            for (String race : races) {
-                System.out.println("- " + race);
-            }
+
         }
-
-
 }
