@@ -18,8 +18,10 @@
         </ImageView>
     </top>
     <center>
-        <VBox alignment="CENTER">
+        <VBox alignment="CENTER" spacing="30">
             <Button text="Create" style="-fx-background-color: #F5F5DC; -fx-border-color: #C6A664; -fx-border-radius: 15; -fx-background-radius: 15; -fx-text-fill: #8B0000; -fx-border-width: 3; -fx-font-size: 24px;" prefWidth="300" prefHeight="70"/>
+            <Button text="Overview" style="-fx-background-color: #F5F5DC; -fx-border-color: #C6A664; -fx-border-radius: 15; -fx-background-radius: 15; -fx-text-fill: #8B0000; -fx-border-width: 3; -fx-font-size: 24px;" prefWidth="300" prefHeight="70"/>
+            <Button text="Rules" style="-fx-background-color: #F5F5DC; -fx-border-color: #C6A664; -fx-border-radius: 15; -fx-background-radius: 15; -fx-text-fill: #8B0000; -fx-border-width: 3; -fx-font-size: 24px;" prefWidth="300" prefHeight="70"/>
         </VBox>
     </center>
 </BorderPane>
