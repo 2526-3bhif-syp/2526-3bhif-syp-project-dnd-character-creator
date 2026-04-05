@@ -79,6 +79,10 @@ public class AbilityScoresView {
         for (Integer value : availableValues) {
             Button valueBtn = new Button(value.toString());
             valueBtn.getStyleClass().add("value-button");
+            valueBtn.setStyle("-fx-background-color: #8B0000; -fx-text-fill: #F5F5DC; " +
+                            "-fx-font-size: 18px; -fx-font-weight: bold; " +
+                            "-fx-min-width: 60px; -fx-min-height: 60px; " +
+                            "-fx-background-radius: 10; -fx-cursor: hand;");
             valueBtn.setOnAction(e -> handleValueSelection(value));
             valuePool.getChildren().add(valueBtn);
         }
