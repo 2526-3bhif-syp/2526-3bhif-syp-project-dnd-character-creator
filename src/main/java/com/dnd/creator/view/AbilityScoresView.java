@@ -51,6 +51,7 @@ public class AbilityScoresView {
     private Integer selectedINT = null;
     private Integer selectedWIS = null;
     private Integer selectedCHA = null;
+    private Label currentlySelectedLabel = null;
 
     public AbilityScoresView() {
         try {
@@ -83,7 +84,23 @@ public class AbilityScoresView {
     }
 
     private void handleValueSelection(Integer value) {
-        // Placeholder for next step
+        if (currentlySelectedLabel != null) {
+            assignValueToAttribute(currentlySelectedLabel, value);
+            availableValues.remove(value);
+            initializeValuePool();
+            currentlySelectedLabel = null;
+        }
+    }
+
+    private void assignValueToAttribute(Label label, Integer value) {
+        label.setText(value.toString());
+        
+        if (label == strValue) selectedSTR = value;
+        else if (label == dexValue) selectedDEX = value;
+        else if (label == conValue) selectedCON = value;
+        else if (label == intValue) selectedINT = value;
+        else if (label == wisValue) selectedWIS = value;
+        else if (label == chaValue) selectedCHA = value;
     }
 
     private void setupButtonHandlers() {
