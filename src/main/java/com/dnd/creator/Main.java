@@ -14,7 +14,7 @@ public class Main extends Application {
         Scene scene = new Scene(view.getRoot(), 800, 600);
         stage.setTitle("D&D Character Creator");
         stage.setScene(scene);
-        stage.setMaximized(true);
+        stage.setMaximized(true); // <--- Macht die App im Vollbild auf
         stage.show();
     }
     public static void main(String[] args) {
