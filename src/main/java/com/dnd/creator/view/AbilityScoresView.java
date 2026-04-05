@@ -71,4 +71,32 @@ public class AbilityScoresView {
         return root;
     }
 
+    private void initializeValuePool() {
+        valuePool.getChildren().clear();
+        
+        for (Integer value : availableValues) {
+            Button valueBtn = new Button(value.toString());
+            valueBtn.getStyleClass().add("value-button");
+            valueBtn.setOnAction(e -> handleValueSelection(value));
+            valuePool.getChildren().add(valueBtn);
+        }
+    }
 
+    private void handleValueSelection(Integer value) {
+        // Placeholder for next step
+    }
+
+    private void setupButtonHandlers() {
+        btnBack.setOnAction(e -> navigateBack());
+        btnNext.setOnAction(e -> navigateNext());
+    }
+
+    private void navigateBack() {
+        try {
+            Stage stage = (Stage) btnBack.getScene().getWindow();
+            // TODO: Load previous view (RaceSelectionView)
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
