@@ -121,6 +121,27 @@
                         <Label text="Hit Die: d6" style="-fx-font-size: 12px; -fx-text-fill: #8B0000;" wrapText="true" textAlignment="CENTER"/>
                     </VBox>
                 </HBox>
+
+                <!-- ROW 3 (Warlock & Wizard centered) -->
+                <HBox alignment="CENTER" spacing="20">
+                    <!-- Warlock -->
+                    <VBox alignment="CENTER" prefWidth="160" prefHeight="160" style="-fx-border-color: #C6A664; -fx-border-width: 3; -fx-border-radius: 10; -fx-background-radius: 10; -fx-background-color: transparent; -fx-cursor: hand;">
+                        <Label text="Warlock" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #8B0000;"/>
+                        <Label text="Main: CHA" style="-fx-font-size: 14px; -fx-text-fill: #1A1A1A;" wrapText="true" textAlignment="CENTER">
+                            <VBox.margin><Insets top="10"/></VBox.margin>
+                        </Label>
+                        <Label text="Hit Die: d8" style="-fx-font-size: 12px; -fx-text-fill: #8B0000;" wrapText="true" textAlignment="CENTER"/>
+                    </VBox>
+
+                    <!-- Wizard -->
+                    <VBox alignment="CENTER" prefWidth="160" prefHeight="160" style="-fx-border-color: #C6A664; -fx-border-width: 3; -fx-border-radius: 10; -fx-background-radius: 10; -fx-background-color: transparent; -fx-cursor: hand;">
+                        <Label text="Wizard" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #8B0000;"/>
+                        <Label text="Main: INT" style="-fx-font-size: 14px; -fx-text-fill: #1A1A1A;" wrapText="true" textAlignment="CENTER">
+                            <VBox.margin><Insets top="10"/></VBox.margin>
+                        </Label>
+                        <Label text="Hit Die: d6" style="-fx-font-size: 12px; -fx-text-fill: #8B0000;" wrapText="true" textAlignment="CENTER"/>
+                    </VBox>
+                </HBox>
             </VBox>
         </javafx.scene.control.ScrollPane>
     </center>
