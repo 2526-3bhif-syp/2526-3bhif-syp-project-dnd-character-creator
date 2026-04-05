@@ -22,3 +22,29 @@ public class AbilityScoresView {
 
     @FXML
     private Label strValue;
+
+    @FXML
+    private Label dexValue;
+
+    @FXML
+    private Label conValue;
+
+    @FXML
+    private Label intValue;
+
+    @FXML
+    private Label wisValue;
+
+    @FXML
+    private Label chaValue;
+
+    @FXML
+    private Button btnBack;
+
+    @FXML
+    private Button btnNext;
+
+    private List<Integer> availableValues;
+    private Integer selectedSTR = null;
+    private Integer selectedDEX = null;
+
