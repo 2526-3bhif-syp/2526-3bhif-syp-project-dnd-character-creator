@@ -116,9 +116,11 @@ public class AbilityScoresView {
     private void selectLabel(Label label) {
         if (currentlySelectedLabel != null) {
             currentlySelectedLabel.getStyleClass().remove("selected");
+            currentlySelectedLabel.setStyle(currentlySelectedLabel.getStyle().replace("-fx-border-color: #C6A664;", "-fx-border-color: transparent;"));
         }
         currentlySelectedLabel = label;
         label.getStyleClass().add("selected");
+        label.setStyle(label.getStyle() + "-fx-border-color: #C6A664; -fx-background-color: #FFF8DC;");
     }
 
     private void setupButtonHandlers() {
