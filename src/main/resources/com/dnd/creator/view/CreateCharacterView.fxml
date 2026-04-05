@@ -37,6 +37,22 @@
                             <VBox.margin><Insets top="10"/></VBox.margin>
                         </Label>
                     </VBox>
+
+                    <!-- Elf -->
+                    <VBox alignment="CENTER" prefWidth="160" prefHeight="160" style="-fx-border-color: #C6A664; -fx-border-width: 3; -fx-border-radius: 10; -fx-background-radius: 10; -fx-background-color: transparent; -fx-cursor: hand;">
+                        <Label text="Elf" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #8B0000;"/>
+                        <Label text="+2 DEX" style="-fx-font-size: 14px; -fx-text-fill: #1A1A1A;" wrapText="true" textAlignment="CENTER">
+                            <VBox.margin><Insets top="10"/></VBox.margin>
+                        </Label>
+                    </VBox>
+
+                    <!-- Halfling -->
+                    <VBox alignment="CENTER" prefWidth="160" prefHeight="160" style="-fx-border-color: #C6A664; -fx-border-width: 3; -fx-border-radius: 10; -fx-background-radius: 10; -fx-background-color: transparent; -fx-cursor: hand;">
+                        <Label text="Halfling" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #8B0000;"/>
+                        <Label text="+2 DEX" style="-fx-font-size: 14px; -fx-text-fill: #1A1A1A;" wrapText="true" textAlignment="CENTER">
+                            <VBox.margin><Insets top="10"/></VBox.margin>
+                        </Label>
+                    </VBox>
                 </HBox>
             </VBox>
         </javafx.scene.control.ScrollPane>
