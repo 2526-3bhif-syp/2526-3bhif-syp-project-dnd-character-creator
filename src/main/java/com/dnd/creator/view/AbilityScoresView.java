@@ -1,5 +1,6 @@
 package com.dnd.creator.view;
 
+import com.dnd.creator.model.CharacterSession;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -147,7 +148,15 @@ public class AbilityScoresView {
             showError("Please assign all ability scores before continuing.");
             return;
         }
-        
+
+        // Save ability scores to session
+        CharacterSession.getInstance().getCurrentCharacter().setStrength(selectedSTR);
+        CharacterSession.getInstance().getCurrentCharacter().setDexterity(selectedDEX);
+        CharacterSession.getInstance().getCurrentCharacter().setConstitution(selectedCON);
+        CharacterSession.getInstance().getCurrentCharacter().setIntelligence(selectedINT);
+        CharacterSession.getInstance().getCurrentCharacter().setWisdom(selectedWIS);
+        CharacterSession.getInstance().getCurrentCharacter().setCharisma(selectedCHA);
+
         try {
             Stage stage = (Stage) btnNext.getScene().getWindow();
             SkillsView nextView = new SkillsView();
