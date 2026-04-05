@@ -47,4 +47,28 @@ public class AbilityScoresView {
     private List<Integer> availableValues;
     private Integer selectedSTR = null;
     private Integer selectedDEX = null;
+    private Integer selectedCON = null;
+    private Integer selectedINT = null;
+    private Integer selectedWIS = null;
+    private Integer selectedCHA = null;
+
+    public AbilityScoresView() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/dnd/creator/view/AbilityScoresView.fxml"));
+            loader.setController(this);
+            root = loader.load();
+
+            availableValues = new ArrayList<>(Arrays.asList(15, 14, 13, 12, 10, 8));
+            initializeValuePool();
+            setupButtonHandlers();
+
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load AbilityScoresView.fxml", e);
+        }
+    }
+
+    public Parent getRoot() {
+        return root;
+    }
+
 
