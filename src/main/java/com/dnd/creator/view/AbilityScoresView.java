@@ -134,4 +134,32 @@ public class AbilityScoresView {
             e.printStackTrace();
         }
     }
+
+    private void navigateNext() {
+        if (!allValuesAssigned()) {
+            showError("Please assign all ability scores before continuing.");
+            return;
+        }
+        
+        try {
+            Stage stage = (Stage) btnNext.getScene().getWindow();
+            // TODO: Load next view (Skills/Background)
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private boolean allValuesAssigned() {
+        return selectedSTR != null && selectedDEX != null && 
+               selectedCON != null && selectedINT != null && 
+               selectedWIS != null && selectedCHA != null;
+    }
+
+    private void showError(String message) {
+        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.WARNING);
+        alert.setTitle("Incomplete Selection");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
 }
