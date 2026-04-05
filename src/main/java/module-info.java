@@ -1,6 +1,7 @@
 module com.dnd.creator {
     requires javafx.controls;
     requires javafx.fxml;
+    requires java.sql;
     requires com.google.gson;
 
     opens com.dnd.creator.view to javafx.fxml;
