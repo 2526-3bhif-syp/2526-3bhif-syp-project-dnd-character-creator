@@ -100,3 +100,44 @@ public class SkillsView {
             selectedSkills.remove(skill);
         }
     }
+
+    private void setupButtonHandlers() {
+        btnBack.setOnAction(e -> navigateBack());
+        btnNext.setOnAction(e -> navigateNext());
+    }
+
+    private void navigateBack() {
+        try {
+            Stage stage = (Stage) btnBack.getScene().getWindow();
+            // TODO: Load previous view (AbilityScoresView)
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void navigateNext() {
+        if (selectedBackground == null) {
+            showError("Bitte wähle einen Hintergrund aus.");
+            return;
+        }
+        if (selectedSkills.size() != MAX_SKILLS) {
+            showError("Bitte wähle genau " + MAX_SKILLS + " Fertigkeiten aus.");
+            return;
+        }
+        
+        try {
+            Stage stage = (Stage) btnNext.getScene().getWindow();
+            // TODO: Load next view (EquipmentView)
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void showError(String message) {
+        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.WARNING);
+        alert.setTitle("Ungültige Auswahl");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+}
