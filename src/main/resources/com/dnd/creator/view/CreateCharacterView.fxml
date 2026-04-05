@@ -120,7 +120,7 @@
 
             <!-- Legend/Explanation Section -->
             <VBox alignment="CENTER_LEFT" spacing="5" style="-fx-background-color: transparent; -fx-padding: 10;">
-                <Label text="** Die 6 Attribute:" style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #8B0000;"/>
+                <Label text="Begriffserklärungen" style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #8B0000;"/>
                 <HBox spacing="40">
                     <VBox spacing="5">
                         <Label text="STR = Stärke (Muskelkraft, Nahkampf)" style="-fx-font-size: 12px; -fx-text-fill: #1A1A1A;"/>
