@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.FlowPane?>
+<?import javafx.geometry.Pos?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
 
 <VBox alignment="TOP_CENTER" spacing="20.0" 
       style="-fx-padding: 20; -fx-background-color: #F5F5DC;" 
@@ -16,4 +19,11 @@
         </ScrollPane>
         <Label fx:id="emptyLabel" style="-fx-font-size: 20; -fx-text-fill: #1A1A1A; -fx-font-style: italic;" text="Keine Charaktere" />
     </StackPane>
+    <HBox alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308">
+        <Button text="Zurück"
+                onAction="#handleBackToMain"
+                style="-fx-background-color: #FDF5E6; -fx-border-color: #D4AF37; -fx-border-radius: 10; -fx-background-radius: 10; -fx-text-fill: #8B0000; -fx-border-width: 2; -fx-font-size: 16px;"
+                prefWidth="140"
+                prefHeight="42" />
+    </HBox>
 </VBox>

@@ -24,8 +24,15 @@ public class MainPresenter {
 
     private void showOverview() {
         CharactersOverviewView overviewView = new CharactersOverviewView();
+        overviewView.setOnBackRequested(this::showMain);
         new CharactersOverviewPresenter(overviewView);
 
         stage.getScene().setRoot(overviewView.getRoot());
+    }
+
+    private void showMain() {
+        MainView newMainView = new MainView();
+        new MainPresenter(newMainView, stage);
+        stage.getScene().setRoot(newMainView.getRoot());
     }
 }

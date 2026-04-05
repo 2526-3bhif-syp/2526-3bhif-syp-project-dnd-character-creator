@@ -15,6 +15,7 @@ public class CharactersOverviewView {
     private Label emptyLabel;
 
     private Parent root;
+    private Runnable onBackRequested;
 
     public CharactersOverviewView() {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/dnd/creator/view/CharactersOverview.fxml"));
@@ -28,6 +29,17 @@ public class CharactersOverviewView {
 
     public Parent getRoot() {
         return root;
+    }
+
+    @FXML
+    private void handleBackToMain() {
+        if (onBackRequested != null) {
+            onBackRequested.run();
+        }
+    }
+
+    public void setOnBackRequested(Runnable onBackRequested) {
+        this.onBackRequested = onBackRequested;
     }
 
     public FlowPane getCardsPane() {
