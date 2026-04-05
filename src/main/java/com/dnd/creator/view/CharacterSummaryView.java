@@ -60,3 +60,50 @@ public class CharacterSummaryView {
     public Parent getRoot() {
         return root;
     }
+
+    private void loadCharacterData() {
+        // TODO: Load data from model/session
+        lblCharacterName.setText("Beispiel Held");
+        lblClass.setText("Warrior");
+        lblRace.setText("Human");
+        lblBackground.setText("Soldier");
+        lblSkills.setText("Athletics, Perception");
+        lblEquipment.setText("Longsword, Shield, Leather Armor");
+        lblSpells.setText("Keine");
+        
+        // Add ability scores
+        String[] abilities = {"STR: 15", "DEX: 14", "CON: 13", "INT: 12", "WIS: 10", "CHA: 8"};
+        for (String ability : abilities) {
+            Label label = new Label(ability);
+            label.setStyle("-fx-font-size: 14px; -fx-text-fill: #1A1A1A;");
+            abilityScoresContainer.getChildren().add(label);
+        }
+    }
+
+    private void setupButtonHandlers() {
+        btnBack.setOnAction(e -> navigateBack());
+        btnSave.setOnAction(e -> saveCharacter());
+    }
+
+    private void navigateBack() {
+        try {
+            Stage stage = (Stage) btnBack.getScene().getWindow();
+            // TODO: Load previous view (EquipmentView)
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void saveCharacter() {
+        // TODO: Save character to database
+        showSuccess("Charakter erfolgreich gespeichert!");
+    }
+
+    private void showSuccess(String message) {
+        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
+        alert.setTitle("Erfolg");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+}
