@@ -1,8 +1,8 @@
 package com.dnd.creator.presenter;
 
 import com.dnd.creator.view.CharactersOverviewView;
+import com.dnd.creator.view.CreateCharacterView;
 import com.dnd.creator.view.MainView;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class MainPresenter {
@@ -12,14 +12,20 @@ public class MainPresenter {
     public MainPresenter(MainView mainView, Stage stage) {
         this.mainView = mainView;
         this.stage = stage;
-        
+
+        this.mainView.setOnCreateRequested(this::showCreateStep);
         this.mainView.setOnShowOverviewRequested(this::showOverview);
+    }
+
+    private void showCreateStep() {
+        CreateCharacterView createCharacterView = new CreateCharacterView();
+        stage.getScene().setRoot(createCharacterView.getRoot());
     }
 
     private void showOverview() {
         CharactersOverviewView overviewView = new CharactersOverviewView();
         new CharactersOverviewPresenter(overviewView);
-        
+
         stage.getScene().setRoot(overviewView.getRoot());
     }
 }

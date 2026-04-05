@@ -8,6 +8,7 @@ import java.io.IOException;
 public class MainView {
     private Parent root;
     private Runnable onShowOverviewRequested;
+    private Runnable onCreateRequested;
 
     public MainView() {
         try {
@@ -26,8 +27,19 @@ public class MainView {
         }
     }
 
+    @FXML
+    private void handleCreate() {
+        if (onCreateRequested != null) {
+            onCreateRequested.run();
+        }
+    }
+
     public void setOnShowOverviewRequested(Runnable callback) {
         this.onShowOverviewRequested = callback;
+    }
+
+    public void setOnCreateRequested(Runnable callback) {
+        this.onCreateRequested = callback;
     }
 
     public Parent getRoot() {

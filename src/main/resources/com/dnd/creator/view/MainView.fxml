@@ -20,7 +20,7 @@
     </top>
     <center>
         <VBox alignment="CENTER" spacing="30">
-            <Button fx:id="btnCreate" text="Create" style="-fx-background-color: #FDF5E6; -fx-border-color: #D4AF37; -fx-border-radius: 15; -fx-background-radius: 15; -fx-text-fill: #8B0000; -fx-border-width: 3; -fx-font-size: 24px;" prefWidth="300" prefHeight="70"/>
+            <Button fx:id="btnCreate" onAction="#handleCreate" text="Create" style="-fx-background-color: #FDF5E6; -fx-border-color: #D4AF37; -fx-border-radius: 15; -fx-background-radius: 15; -fx-text-fill: #8B0000; -fx-border-width: 3; -fx-font-size: 24px;" prefWidth="300" prefHeight="70"/>
             <Button onAction="#handleShowOverview" text="Overview" style="-fx-background-color: #FDF5E6; -fx-border-color: #D4AF37; -fx-border-radius: 15; -fx-background-radius: 15; -fx-text-fill: #8B0000; -fx-border-width: 3; -fx-font-size: 24px;" prefWidth="300" prefHeight="70"/>
             <Button text="Rules" style="-fx-background-color: #FDF5E6; -fx-border-color: #D4AF37; -fx-border-radius: 15; -fx-background-radius: 15; -fx-text-fill: #8B0000; -fx-border-width: 3; -fx-font-size: 24px;" prefWidth="300" prefHeight="70"/>
         </VBox>

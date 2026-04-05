@@ -1,5 +1,6 @@
 package com.dnd.creator.view;
 
+import com.dnd.creator.presenter.MainPresenter;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -28,6 +29,7 @@ public class CreateCharacterView {
                 btnBack.setOnAction(e -> {
                     MainView mainView = new MainView();
                     Stage stage = (Stage) root.getScene().getWindow();
+                    new MainPresenter(mainView, stage);
                     stage.setScene(new Scene(mainView.getRoot(), stage.getScene().getWidth(), stage.getScene().getHeight()));
                 });
             }
@@ -48,4 +50,3 @@ public class CreateCharacterView {
         return root;
     }
 }
-
