@@ -63,3 +63,7 @@ out/
 # Project specific
 dist/
 docs/slides/revealjs
+
+#ai helper files
+/gemini-files
+GEMINI.md
