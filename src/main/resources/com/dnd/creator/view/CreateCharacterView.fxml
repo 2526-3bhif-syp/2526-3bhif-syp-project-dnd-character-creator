@@ -33,7 +33,7 @@
                     <!-- Dwarf -->
                     <VBox alignment="CENTER" prefWidth="160" prefHeight="160" style="-fx-border-color: #C6A664; -fx-border-width: 3; -fx-border-radius: 10; -fx-background-radius: 10; -fx-background-color: transparent; -fx-cursor: hand;">
                         <Label text="Dwarf" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #8B0000;"/>
-                        <Label text="+2 CON" style="-fx-font-size: 14px; -fx-text-fill: #1A1A1A;" wrapText="true" textAlignment="CENTER">
+                        <Label text="+2 CON**" style="-fx-font-size: 14px; -fx-text-fill: #1A1A1A;" wrapText="true" textAlignment="CENTER">
                             <VBox.margin><Insets top="10"/></VBox.margin>
                         </Label>
                     </VBox>
@@ -41,7 +41,7 @@
                     <!-- Elf -->
                     <VBox alignment="CENTER" prefWidth="160" prefHeight="160" style="-fx-border-color: #C6A664; -fx-border-width: 3; -fx-border-radius: 10; -fx-background-radius: 10; -fx-background-color: transparent; -fx-cursor: hand;">
                         <Label text="Elf" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #8B0000;"/>
-                        <Label text="+2 DEX" style="-fx-font-size: 14px; -fx-text-fill: #1A1A1A;" wrapText="true" textAlignment="CENTER">
+                        <Label text="+2 DEX**" style="-fx-font-size: 14px; -fx-text-fill: #1A1A1A;" wrapText="true" textAlignment="CENTER">
                             <VBox.margin><Insets top="10"/></VBox.margin>
                         </Label>
                     </VBox>
@@ -65,7 +65,7 @@
                     <!-- Dragonborn -->
                     <VBox alignment="CENTER" prefWidth="160" prefHeight="160" style="-fx-border-color: #C6A664; -fx-border-width: 3; -fx-border-radius: 10; -fx-background-radius: 10; -fx-background-color: transparent; -fx-cursor: hand;">
                         <Label text="Dragonborn" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #8B0000;"/>
-                        <Label text="+2 STR, +1 CHA" style="-fx-font-size: 14px; -fx-text-fill: #1A1A1A;" wrapText="true" textAlignment="CENTER">
+                        <Label text="+2 STR**, +1 CHA**" style="-fx-font-size: 14px; -fx-text-fill: #1A1A1A;" wrapText="true" textAlignment="CENTER">
                             <VBox.margin><Insets top="10"/></VBox.margin>
                         </Label>
                     </VBox>
@@ -76,7 +76,7 @@
                     <!-- Gnome -->
                     <VBox alignment="CENTER" prefWidth="160" prefHeight="160" style="-fx-border-color: #C6A664; -fx-border-width: 3; -fx-border-radius: 10; -fx-background-radius: 10; -fx-background-color: transparent; -fx-cursor: hand;">
                         <Label text="Gnome" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #8B0000;"/>
-                        <Label text="+2 INT" style="-fx-font-size: 14px; -fx-text-fill: #1A1A1A;" wrapText="true" textAlignment="CENTER">
+                        <Label text="+2 INT**" style="-fx-font-size: 14px; -fx-text-fill: #1A1A1A;" wrapText="true" textAlignment="CENTER">
                             <VBox.margin><Insets top="10"/></VBox.margin>
                         </Label>
                     </VBox>
@@ -84,7 +84,7 @@
                     <!-- Half-Elf -->
                     <VBox alignment="CENTER" prefWidth="160" prefHeight="160" style="-fx-border-color: #C6A664; -fx-border-width: 3; -fx-border-radius: 10; -fx-background-radius: 10; -fx-background-color: transparent; -fx-cursor: hand;">
                         <Label text="Half-Elf" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #8B0000;"/>
-                        <Label text="+2 CHA, +1 to two others" style="-fx-font-size: 14px; -fx-text-fill: #1A1A1A;" wrapText="true" textAlignment="CENTER">
+                        <Label text="+2 CHA**, +1 to two others" style="-fx-font-size: 14px; -fx-text-fill: #1A1A1A;" wrapText="true" textAlignment="CENTER">
                             <VBox.margin><Insets top="10"/></VBox.margin>
                         </Label>
                     </VBox>
@@ -113,12 +113,33 @@
 
     <!-- Bottom: Navigation Buttons (Zurück / Weiter) -->
     <bottom>
-        <HBox alignment="CENTER" spacing="50">
+        <VBox spacing="20">
             <BorderPane.margin>
-                <Insets top="20" bottom="30"/>
+                <Insets left="40" right="40" top="10" bottom="20"/>
             </BorderPane.margin>
-            <Button fx:id="btnBack" text="Zurück" style="-fx-background-color: #F5F5DC; -fx-border-color: #C6A664; -fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10; -fx-text-fill: #1A1A1A; -fx-font-size: 18px;" prefWidth="150" prefHeight="50"/>
-            <Button text="Weiter" style="-fx-background-color: #8B0000; -fx-text-fill: #F5F5DC; -fx-border-width: 0; -fx-background-radius: 10; -fx-font-size: 18px; -fx-font-weight: bold;" prefWidth="150" prefHeight="50"/>
-        </HBox>
+
+            <!-- Legend/Explanation Section -->
+            <VBox alignment="CENTER_LEFT" spacing="5" style="-fx-background-color: transparent; -fx-padding: 10;">
+                <Label text="** Die 6 Attribute:" style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #8B0000;"/>
+                <HBox spacing="40">
+                    <VBox spacing="5">
+                        <Label text="STR = Stärke (Muskelkraft, Nahkampf)" style="-fx-font-size: 12px; -fx-text-fill: #1A1A1A;"/>
+                        <Label text="DEX = Geschicklichkeit (Schnelligkeit, Zielen)" style="-fx-font-size: 12px; -fx-text-fill: #1A1A1A;"/>
+                        <Label text="CON = Konstitution (Leben, Ausdauer)" style="-fx-font-size: 12px; -fx-text-fill: #1A1A1A;"/>
+                    </VBox>
+                    <VBox spacing="5">
+                        <Label text="INT = Intelligenz (Buchwissen, Magie studieren)" style="-fx-font-size: 12px; -fx-text-fill: #1A1A1A;"/>
+                        <Label text="WIS = Weisheit (Sinne, Instinkt, Natur)" style="-fx-font-size: 12px; -fx-text-fill: #1A1A1A;"/>
+                        <Label text="CHA = Charisma (Reden, Ausstrahlung)" style="-fx-font-size: 12px; -fx-text-fill: #1A1A1A;"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+
+            <!-- Navigation Buttons -->
+            <HBox alignment="CENTER" spacing="50">
+                <Button fx:id="btnBack" text="Zurück" style="-fx-background-color: #F5F5DC; -fx-border-color: #C6A664; -fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10; -fx-text-fill: #1A1A1A; -fx-font-size: 18px;" prefWidth="150" prefHeight="50"/>
+                <Button text="Weiter" style="-fx-background-color: #8B0000; -fx-text-fill: #F5F5DC; -fx-border-width: 0; -fx-background-radius: 10; -fx-font-size: 18px; -fx-font-weight: bold;" prefWidth="150" prefHeight="50"/>
+            </HBox>
+        </VBox>
     </bottom>
 </BorderPane>
