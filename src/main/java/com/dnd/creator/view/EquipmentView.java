@@ -64,3 +64,49 @@ public class EquipmentView {
     public Parent getRoot() {
         return root;
     }
+
+    private void initializeEquipment() {
+        int row = 0;
+        int col = 0;
+        
+        for (String item : equipment) {
+            CheckBox checkBox = new CheckBox(item);
+            checkBox.setStyle("-fx-font-size: 14px; -fx-text-fill: #1A1A1A;");
+            checkBox.setOnAction(e -> {
+                if (checkBox.isSelected()) {
+                    selectedEquipment.add(item);
+                } else {
+                    selectedEquipment.remove(item);
+                }
+            });
+            equipmentGrid.add(checkBox, col, row);
+            
+            col++;
+            if (col > 1) {
+                col = 0;
+                row++;
+            }
+        }
+    }
+
+    private void initializeSpells() {
+        for (String spell : spells) {
+            CheckBox checkBox = new CheckBox(spell);
+            checkBox.setStyle("-fx-font-size: 14px; -fx-text-fill: #1A1A1A;");
+            checkBox.setOnAction(e -> handleSpellSelection(checkBox, spell));
+            spellsContainer.getChildren().add(checkBox);
+        }
+    }
+
+    private void handleSpellSelection(CheckBox checkBox, String spell) {
+        if (checkBox.isSelected()) {
+            if (selectedSpells.size() >= MAX_SPELLS) {
+                checkBox.setSelected(false);
+                showError("Du kannst maximal " + MAX_SPELLS + " Zauber auswählen.");
+            } else {
+                selectedSpells.add(spell);
+            }
+        } else {
+            selectedSpells.remove(spell);
+        }
+    }
