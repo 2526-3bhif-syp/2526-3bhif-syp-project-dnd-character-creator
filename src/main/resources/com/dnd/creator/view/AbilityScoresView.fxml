@@ -38,37 +38,37 @@
                 <!-- STR Row -->
                 <HBox alignment="CENTER_LEFT" spacing="20">
                     <Label text="STR (Stärke):" style="-fx-font-size: 16px; -fx-text-fill: #1A1A1A; -fx-min-width: 200px;"/>
-                    <Label fx:id="strValue" text="--" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #8B0000; -fx-min-width: 50px;"/>
+                    <Label fx:id="strValue" text="--" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #8B0000; -fx-min-width: 50px; -fx-cursor: hand; -fx-padding: 5px; -fx-border-color: transparent; -fx-border-width: 2; -fx-border-radius: 5; -fx-background-radius: 5;"/>
                 </HBox>
 
                 <!-- DEX Row -->
                 <HBox alignment="CENTER_LEFT" spacing="20">
                     <Label text="DEX (Geschicklichkeit):" style="-fx-font-size: 16px; -fx-text-fill: #1A1A1A; -fx-min-width: 200px;"/>
-                    <Label fx:id="dexValue" text="--" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #8B0000; -fx-min-width: 50px;"/>
+                    <Label fx:id="dexValue" text="--" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #8B0000; -fx-min-width: 50px; -fx-cursor: hand; -fx-padding: 5px; -fx-border-color: transparent; -fx-border-width: 2; -fx-border-radius: 5; -fx-background-radius: 5;"/>
                 </HBox>
 
                 <!-- CON Row -->
                 <HBox alignment="CENTER_LEFT" spacing="20">
                     <Label text="CON (Konstitution):" style="-fx-font-size: 16px; -fx-text-fill: #1A1A1A; -fx-min-width: 200px;"/>
-                    <Label fx:id="conValue" text="--" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #8B0000; -fx-min-width: 50px;"/>
+                    <Label fx:id="conValue" text="--" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #8B0000; -fx-min-width: 50px; -fx-cursor: hand; -fx-padding: 5px; -fx-border-color: transparent; -fx-border-width: 2; -fx-border-radius: 5; -fx-background-radius: 5;"/>
                 </HBox>
 
                 <!-- INT Row -->
                 <HBox alignment="CENTER_LEFT" spacing="20">
                     <Label text="INT (Intelligenz):" style="-fx-font-size: 16px; -fx-text-fill: #1A1A1A; -fx-min-width: 200px;"/>
-                    <Label fx:id="intValue" text="--" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #8B0000; -fx-min-width: 50px;"/>
+                    <Label fx:id="intValue" text="--" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #8B0000; -fx-min-width: 50px; -fx-cursor: hand; -fx-padding: 5px; -fx-border-color: transparent; -fx-border-width: 2; -fx-border-radius: 5; -fx-background-radius: 5;"/>
                 </HBox>
 
                 <!-- WIS Row -->
                 <HBox alignment="CENTER_LEFT" spacing="20">
                     <Label text="WIS (Weisheit):" style="-fx-font-size: 16px; -fx-text-fill: #1A1A1A; -fx-min-width: 200px;"/>
-                    <Label fx:id="wisValue" text="--" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #8B0000; -fx-min-width: 50px;"/>
+                    <Label fx:id="wisValue" text="--" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #8B0000; -fx-min-width: 50px; -fx-cursor: hand; -fx-padding: 5px; -fx-border-color: transparent; -fx-border-width: 2; -fx-border-radius: 5; -fx-background-radius: 5;"/>
                 </HBox>
 
                 <!-- CHA Row -->
                 <HBox alignment="CENTER_LEFT" spacing="20">
                     <Label text="CHA (Charisma):" style="-fx-font-size: 16px; -fx-text-fill: #1A1A1A; -fx-min-width: 200px;"/>
-                    <Label fx:id="chaValue" text="--" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #8B0000; -fx-min-width: 50px;"/>
+                    <Label fx:id="chaValue" text="--" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #8B0000; -fx-min-width: 50px; -fx-cursor: hand; -fx-padding: 5px; -fx-border-color: transparent; -fx-border-width: 2; -fx-border-radius: 5; -fx-background-radius: 5;"/>
                 </HBox>
             </VBox>
         </VBox>
