@@ -61,6 +61,7 @@ public class AbilityScoresView {
 
             availableValues = new ArrayList<>(Arrays.asList(15, 14, 13, 12, 10, 8));
             initializeValuePool();
+            setupLabelHandlers();
             setupButtonHandlers();
 
         } catch (IOException e) {
@@ -101,6 +102,23 @@ public class AbilityScoresView {
         else if (label == intValue) selectedINT = value;
         else if (label == wisValue) selectedWIS = value;
         else if (label == chaValue) selectedCHA = value;
+    }
+
+    private void setupLabelHandlers() {
+        strValue.setOnMouseClicked(e -> selectLabel(strValue));
+        dexValue.setOnMouseClicked(e -> selectLabel(dexValue));
+        conValue.setOnMouseClicked(e -> selectLabel(conValue));
+        intValue.setOnMouseClicked(e -> selectLabel(intValue));
+        wisValue.setOnMouseClicked(e -> selectLabel(wisValue));
+        chaValue.setOnMouseClicked(e -> selectLabel(chaValue));
+    }
+
+    private void selectLabel(Label label) {
+        if (currentlySelectedLabel != null) {
+            currentlySelectedLabel.getStyleClass().remove("selected");
+        }
+        currentlySelectedLabel = label;
+        label.getStyleClass().add("selected");
     }
 
     private void setupButtonHandlers() {
