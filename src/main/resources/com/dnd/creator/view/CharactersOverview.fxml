@@ -5,10 +5,13 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="TOP_CENTER" spacing="20.0" style="-fx-padding: 20; -fx-background-color: #F5F5DC;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+<VBox alignment="TOP_CENTER" spacing="20.0" 
+      style="-fx-padding: 20; -fx-background-color: #F5F5DC;" 
+      prefHeight="1080.0" prefWidth="1920.0"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
     <Label style="-fx-font-size: 32; -fx-font-weight: bold; -fx-text-fill: #8B0000; -fx-font-family: 'Serif';" text="Charakter Übersicht" />
     <StackPane VBox.vgrow="ALWAYS">
-        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;">
+        <ScrollPane fitToWidth="true" fitToHeight="true" style="-fx-background-color: transparent; -fx-background: transparent;">
             <FlowPane fx:id="cardsPane" alignment="CENTER" hgap="30" style="-fx-padding: 10;" vgap="30" />
         </ScrollPane>
         <Label fx:id="emptyLabel" style="-fx-font-size: 20; -fx-text-fill: #1A1A1A; -fx-font-style: italic;" text="Keine Charaktere" />

@@ -7,6 +7,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.geometry.Insets?>
+
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" style="-fx-background-color: #F5F5DC;">
     <top>
         <StackPane>
@@ -15,22 +16,13 @@
                     <Insets top="20"/>
                 </StackPane.margin>
             </Label>
-            <ImageView fitHeight="40" fitWidth="40" pickOnBounds="true" preserveRatio="true" StackPane.alignment="TOP_LEFT">
-                <image>
-                    <Image url="@../pics/zahnrad.png"/>
-                </image>
-                <StackPane.margin>
-                    <Insets top="10" left="10" right="10" bottom="10"/>
-                </StackPane.margin>
-            </ImageView>
         </StackPane>
     </top>
     <center>
         <VBox alignment="CENTER" spacing="30">
-            <Button fx:id="btnCreate" text="Create" style="-fx-background-color: #F5F5DC; -fx-border-color: #C6A664; -fx-border-radius: 15; -fx-background-radius: 15; -fx-text-fill: #8B0000; -fx-border-width: 3; -fx-font-size: 24px;" prefWidth="300" prefHeight="70"/>
-            <Button text="Overview" style="-fx-background-color: #F5F5DC; -fx-border-color: #C6A664; -fx-border-radius: 15; -fx-background-radius: 15; -fx-text-fill: #8B0000; -fx-border-width: 3; -fx-font-size: 24px;" prefWidth="300" prefHeight="70"/>
-            <Button text="Rules" style="-fx-background-color: #F5F5DC; -fx-border-color: #C6A664; -fx-border-radius: 15; -fx-background-radius: 15; -fx-text-fill: #8B0000; -fx-border-width: 3; -fx-font-size: 24px;" prefWidth="300" prefHeight="70"/>
+            <Button fx:id="btnCreate" text="Create" style="-fx-background-color: #FDF5E6; -fx-border-color: #D4AF37; -fx-border-radius: 15; -fx-background-radius: 15; -fx-text-fill: #8B0000; -fx-border-width: 3; -fx-font-size: 24px;" prefWidth="300" prefHeight="70"/>
+            <Button onAction="#handleShowOverview" text="Overview" style="-fx-background-color: #FDF5E6; -fx-border-color: #D4AF37; -fx-border-radius: 15; -fx-background-radius: 15; -fx-text-fill: #8B0000; -fx-border-width: 3; -fx-font-size: 24px;" prefWidth="300" prefHeight="70"/>
+            <Button text="Rules" style="-fx-background-color: #FDF5E6; -fx-border-color: #D4AF37; -fx-border-radius: 15; -fx-background-radius: 15; -fx-text-fill: #8B0000; -fx-border-width: 3; -fx-font-size: 24px;" prefWidth="300" prefHeight="70"/>
         </VBox>
     </center>
 </BorderPane>
-

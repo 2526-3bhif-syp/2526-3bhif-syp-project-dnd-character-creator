@@ -20,7 +20,6 @@ public class MainPresenter {
         CharactersOverviewView overviewView = new CharactersOverviewView();
         new CharactersOverviewPresenter(overviewView);
         
-        Scene scene = new Scene(overviewView.getRoot(), 800, 600);
-        stage.setScene(scene);
+        stage.getScene().setRoot(overviewView.getRoot());
     }
 }
