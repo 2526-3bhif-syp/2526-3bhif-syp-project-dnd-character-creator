@@ -66,3 +66,37 @@ public class SkillsView {
     public Parent getRoot() {
         return root;
     }
+
+    private void initializeBackgrounds() {
+        backgroundGroup = new ToggleGroup();
+        
+        for (String background : backgrounds) {
+            RadioButton radioButton = new RadioButton(background);
+            radioButton.setToggleGroup(backgroundGroup);
+            radioButton.setStyle("-fx-font-size: 16px; -fx-text-fill: #1A1A1A;");
+            radioButton.setOnAction(e -> selectedBackground = background);
+            backgroundContainer.getChildren().add(radioButton);
+        }
+    }
+
+    private void initializeSkills() {
+        for (String skill : skills) {
+            CheckBox checkBox = new CheckBox(skill);
+            checkBox.setStyle("-fx-font-size: 14px; -fx-text-fill: #1A1A1A;");
+            checkBox.setOnAction(e -> handleSkillSelection(checkBox, skill));
+            skillsContainer.getChildren().add(checkBox);
+        }
+    }
+
+    private void handleSkillSelection(CheckBox checkBox, String skill) {
+        if (checkBox.isSelected()) {
+            if (selectedSkills.size() >= MAX_SKILLS) {
+                checkBox.setSelected(false);
+                showError("Du kannst maximal " + MAX_SKILLS + " Fertigkeiten auswählen.");
+            } else {
+                selectedSkills.add(skill);
+            }
+        } else {
+            selectedSkills.remove(skill);
+        }
+    }
