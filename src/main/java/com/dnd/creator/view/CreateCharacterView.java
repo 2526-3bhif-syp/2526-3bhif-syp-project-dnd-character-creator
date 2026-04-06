@@ -62,6 +62,7 @@ public class CreateCharacterView {
 
             setupRaceButtons();
             setupNavigationButtons();
+            loadSavedRace();
 
         } catch (IOException e) {
             throw new RuntimeException("Failed to load CreateCharacterView.fxml", e);
@@ -70,6 +71,34 @@ public class CreateCharacterView {
 
     public Parent getRoot() {
         return root;
+    }
+
+    private void loadSavedRace() {
+        var character = CharacterSession.getInstance().getCurrentCharacter();
+        var savedRace = character.getRace();
+
+        if (savedRace != null && savedRace.getName() != null) {
+            selectedRaceName = savedRace.getName();
+
+            // Hebe die bereits ausgewählte Rasse hervor
+            Button raceButton = null;
+            switch(selectedRaceName) {
+                case "Dwarf" -> raceButton = btnDwarf;
+                case "Elf" -> raceButton = btnElf;
+                case "Halfling" -> raceButton = btnHalfling;
+                case "Human" -> raceButton = btnHuman;
+                case "Dragonborn" -> raceButton = btnDragonborn;
+                case "Gnome" -> raceButton = btnGnome;
+                case "Half-Elf" -> raceButton = btnHalfElf;
+                case "Half-Orc" -> raceButton = btnHalfOrc;
+                case "Tiefling" -> raceButton = btnTiefling;
+            }
+
+            if (raceButton != null) {
+                resetRaceButtonStyles();
+                raceButton.setStyle(raceButton.getStyle() + "; -fx-background-color: #8B0000; -fx-text-fill: #F5F5DC;");
+            }
+        }
     }
 
     private void setupRaceButtons() {
