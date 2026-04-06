@@ -8,6 +8,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -49,6 +50,9 @@ public class CreateCharacterView {
     @FXML
     private Button btnTiefling;
 
+    @FXML
+    private TextField txtCharacterName;
+
     private String selectedRaceName = null;
 
     public CreateCharacterView() {
@@ -62,7 +66,7 @@ public class CreateCharacterView {
 
             setupRaceButtons();
             setupNavigationButtons();
-            loadSavedRace();
+            loadSavedStepData();
 
         } catch (IOException e) {
             throw new RuntimeException("Failed to load CreateCharacterView.fxml", e);
@@ -73,8 +77,14 @@ public class CreateCharacterView {
         return root;
     }
 
-    private void loadSavedRace() {
+    private void loadSavedStepData() {
         var character = CharacterSession.getInstance().getCurrentCharacter();
+
+        if (txtCharacterName != null && character.getName() != null && !character.getName().isBlank()
+            && !"New Character".equals(character.getName())) {
+            txtCharacterName.setText(character.getName());
+        }
+
         var savedRace = character.getRace();
 
         if (savedRace != null && savedRace.getName() != null) {
@@ -157,10 +167,18 @@ public class CreateCharacterView {
     }
 
     private void navigateNext() {
-        if (selectedRaceName == null) {
-            showError("Bitte wähle eine Rasse!");
+        String characterName = txtCharacterName != null ? txtCharacterName.getText().trim() : "";
+        if (characterName.isEmpty()) {
+            showError("Fehlender Name", "Bitte gib einen Charakternamen ein!");
             return;
         }
+
+        if (selectedRaceName == null) {
+            showError("Keine Rasse gewählt", "Bitte wähle eine Rasse!");
+            return;
+        }
+
+        CharacterSession.getInstance().getCurrentCharacter().setName(characterName);
 
         // Load race from database and save to session
         var race = dbManager.getRaceByName(selectedRaceName);
@@ -177,9 +195,9 @@ public class CreateCharacterView {
         }
     }
 
-    private void showError(String message) {
+    private void showError(String title, String message) {
         javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.WARNING);
-        alert.setTitle("Keine Rasse gewählt");
+        alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
