@@ -4,6 +4,7 @@ import com.dnd.creator.data.DbManager;
 import com.dnd.creator.model.CharacterModel;
 import com.dnd.creator.model.CharacterSession;
 import com.dnd.creator.model.Race;
+import com.dnd.creator.presenter.MainPresenter;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -280,7 +281,8 @@ public class CharacterSummaryView {
         showSuccess("Charakter erfolgreich gespeichert!");
         MainView mainView = new MainView();
         Stage stage = (Stage) btnSave.getScene().getWindow();
-        stage.setScene(new Scene(mainView.getRoot(), stage.getScene().getWidth(), stage.getScene().getHeight()));
+        new MainPresenter(mainView, stage);
+        stage.getScene().setRoot(mainView.getRoot());
     }
 
     private void showSuccess(String message) {
