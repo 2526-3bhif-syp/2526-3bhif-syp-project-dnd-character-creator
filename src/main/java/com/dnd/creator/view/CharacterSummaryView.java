@@ -1,5 +1,7 @@
 package com.dnd.creator.view;
 
+import com.dnd.creator.data.DbManager;
+import com.dnd.creator.model.CharacterModel;
 import com.dnd.creator.model.CharacterSession;
 import com.dnd.creator.model.Race;
 import javafx.fxml.FXML;
@@ -12,6 +14,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.Map;
 
 public class CharacterSummaryView {
     private Parent root;
@@ -46,12 +49,15 @@ public class CharacterSummaryView {
     @FXML
     private Button btnSave;
 
+    private DbManager dbManager = new DbManager();
+
     public CharacterSummaryView() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/dnd/creator/view/CharacterSummaryView.fxml"));
             loader.setController(this);
             root = loader.load();
 
+            dbManager.connect();
             loadCharacterData();
             setupButtonHandlers();
 
@@ -120,18 +126,98 @@ public class CharacterSummaryView {
 
             // Add race information
             addRaceInformation(race);
+
+            // Add combat stats
+            addCombatStats();
         } else {
             lblRace.setText("Keine Rasse gewählt");
         }
 
         // Class
-        lblClass.setText(character.getCharacterClass() != null ? character.getCharacterClass() : "Keine Klasse gewählt");
+        if (character.getCharacterClass() != null && !character.getCharacterClass().isEmpty()) {
+            lblClass.setText(character.getCharacterClass());
+            addClassInformation(character);
+        } else {
+            lblClass.setText("Keine Klasse gewählt");
+        }
 
         // Default values for now (can be extended later)
         lblBackground.setText("Keine Hintergrund gewählt");
         lblSkills.setText("Keine Fähigkeiten gewählt");
         lblEquipment.setText("Keine Ausrüstung gewählt");
         lblSpells.setText("Keine Zauber");
+    }
+
+    private void addClassInformation(com.dnd.creator.model.CharacterModel character) {
+        // Get class data from database
+        Map<String, Object> classData = dbManager.getClassByName(character.getCharacterClass());
+
+        if (classData != null) {
+            Label classTitle = new Label("✓ Klassenmerkmale:");
+            classTitle.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #1565C0; -fx-padding: 10 0 5 0;");
+            abilityScoresContainer.getChildren().add(classTitle);
+
+            VBox classInfoBox = new VBox(3);
+            classInfoBox.setStyle("-fx-border-color: #E0E0E0; -fx-border-width: 0 0 1 0; -fx-padding: 8;");
+
+            // Hit Die
+            Label hitDieLabel = new Label("• Hit Die: d" + classData.get("hit_die"));
+            hitDieLabel.setStyle("-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #1A1A1A;");
+            classInfoBox.getChildren().add(hitDieLabel);
+
+            // Spellcasting info
+            if ((Boolean) classData.get("has_spells")) {
+                String spellAbility = (String) classData.get("spellcasting_ability");
+                Label spellLabel = new Label("• Zauber: Hauptfähigkeit = " + (spellAbility != null ? spellAbility : "Unbekannt"));
+                spellLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #8B0000;");
+                classInfoBox.getChildren().add(spellLabel);
+            }
+
+            // Proficiencies
+            @SuppressWarnings("unchecked")
+            java.util.List<String> profs = (java.util.List<String>) classData.get("proficiencies");
+            if (profs != null && !profs.isEmpty()) {
+                Label profTitle = new Label("• Profizienzen:");
+                profTitle.setStyle("-fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: #555555;");
+                classInfoBox.getChildren().add(profTitle);
+
+                for (String prof : profs) {
+                    Label profLabel = new Label("  - " + prof);
+                    profLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: #555555;");
+                    classInfoBox.getChildren().add(profLabel);
+                }
+            }
+
+            abilityScoresContainer.getChildren().add(classInfoBox);
+
+            // Starting Equipment
+            java.util.List<String> equipment = dbManager.getClassStartingEquipment((String) classData.get("index"));
+            if (equipment != null && !equipment.isEmpty()) {
+                Label equipTitle = new Label("✓ Startausrüstung:");
+                equipTitle.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #6A4C93; -fx-padding: 10 0 5 0;");
+                abilityScoresContainer.getChildren().add(equipTitle);
+
+                for (String equip : equipment) {
+                    Label equipLabel = new Label("  • " + equip);
+                    equipLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #6A4C93;");
+                    abilityScoresContainer.getChildren().add(equipLabel);
+                }
+            }
+
+            // Selected Equipment Choices
+            java.util.List<String> selectedEquip = character.getSelectedEquipment();
+            if (selectedEquip != null && !selectedEquip.isEmpty()) {
+                Label selectedTitle = new Label("✓ Ausgewählte Ausrüstung:");
+                selectedTitle.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #1565C0; -fx-padding: 10 0 5 0;");
+                abilityScoresContainer.getChildren().add(selectedTitle);
+
+                for (String choice : selectedEquip) {
+                    Label choiceLabel = new Label("  • " + choice);
+                    choiceLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #1565C0;");
+                    abilityScoresContainer.getChildren().add(choiceLabel);
+                }
+            }
+        }
     }
 
     private void addRaceInformation(Race race) {
@@ -203,5 +289,100 @@ public class CharacterSummaryView {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    private void addCombatStats() {
+        var character = CharacterSession.getInstance().getCurrentCharacter();
+
+        Label statsTitle = new Label("✓ Kampfwerte:");
+        statsTitle.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #D32F2F; -fx-padding: 10 0 5 0;");
+        abilityScoresContainer.getChildren().add(statsTitle);
+
+        // Leben (HP)
+        int hp = calculateHP(character);
+        Label hpLabel = new Label("  • Leben: " + hp);
+        hpLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #D32F2F;");
+        abilityScoresContainer.getChildren().add(hpLabel);
+
+        // Speed
+        String raceName = character.getRace() != null ? character.getRace().getName() : "Human";
+        int speed = getRaceSpeed(raceName);
+        Label speedLabel = new Label("  • Geschwindigkeit: " + speed + " ft/round");
+        speedLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #D32F2F;");
+        abilityScoresContainer.getChildren().add(speedLabel);
+
+        // Initiative
+        int dexMod = (character.getDexterity() - 10) / 2;
+        Label initiativeLabel = new Label("  • Initiative: " + (dexMod >= 0 ? "+" : "") + dexMod);
+        initiativeLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #D32F2F;");
+        abilityScoresContainer.getChildren().add(initiativeLabel);
+
+        // Armor Class (vereinfacht: 10 + DEX)
+        int ac = 10 + dexMod;
+        Label acLabel = new Label("  • Rüstungsklasse: " + ac);
+        acLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #D32F2F;");
+        abilityScoresContainer.getChildren().add(acLabel);
+
+        // Skills
+        Label skillsTitle = new Label("✓ Fertigkeiten:");
+        skillsTitle.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #F57C00; -fx-padding: 10 0 5 0;");
+        abilityScoresContainer.getChildren().add(skillsTitle);
+
+        int strMod = (character.getStrength() - 10) / 2;
+        int conMod = (character.getConstitution() - 10) / 2;
+        int intMod = (character.getIntelligence() - 10) / 2;
+        int wisMod = (character.getWisdom() - 10) / 2;
+        int chaMod = (character.getCharisma() - 10) / 2;
+
+        String[][] skills = {
+            {"Akrobatik", String.valueOf(dexMod)},
+            {"Tierhandhabung", String.valueOf(wisMod)},
+            {"Arkanwissen", String.valueOf(intMod)},
+            {"Athletik", String.valueOf(strMod)},
+            {"Betrug", String.valueOf(chaMod)},
+            {"Geschichte", String.valueOf(intMod)},
+            {"Einsicht", String.valueOf(wisMod)},
+            {"Einschüchterung", String.valueOf(chaMod)},
+            {"Untersuchung", String.valueOf(intMod)},
+            {"Heilkunde", String.valueOf(wisMod)},
+            {"Naturkunde", String.valueOf(intMod)},
+            {"Wahrnehmung", String.valueOf(wisMod)},
+            {"Aufführung", String.valueOf(chaMod)},
+            {"Überzeugung", String.valueOf(chaMod)},
+            {"Religion", String.valueOf(intMod)},
+            {"Fingerfertigkeit", String.valueOf(dexMod)},
+            {"Heimlichkeit", String.valueOf(dexMod)},
+            {"Überleben", String.valueOf(wisMod)}
+        };
+
+        for (String[] skill : skills) {
+            int mod = Integer.parseInt(skill[1]);
+            Label skillLabel = new Label("  • " + skill[0] + ": " + (mod >= 0 ? "+" : "") + mod);
+            skillLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: #F57C00;");
+            abilityScoresContainer.getChildren().add(skillLabel);
+        }
+    }
+
+    private int calculateHP(CharacterModel character) {
+        int hitDie = character.getClassHitDie();
+        if (hitDie == 0) hitDie = 6;
+        int conMod = (character.getConstitution() - 10) / 2;
+        return hitDie + conMod;
+    }
+
+    private int getRaceSpeed(String raceName) {
+        if (raceName == null || raceName.isEmpty()) return 30;
+        switch (raceName) {
+            case "Dwarf": return 25;
+            case "Elf": return 30;
+            case "Halfling": return 25;
+            case "Human": return 30;
+            case "Dragonborn": return 30;
+            case "Gnome": return 25;
+            case "Half-Elf": return 30;
+            case "Half-Orc": return 30;
+            case "Tiefling": return 30;
+            default: return 30;
+        }
     }
 }

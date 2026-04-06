@@ -61,6 +61,10 @@ public class AbilityScoresView {
             root = loader.load();
 
             availableValues = new ArrayList<>(Arrays.asList(15, 14, 13, 12, 10, 8));
+
+            // Lade gespeicherte Werte aus der Session
+            loadSavedAbilityScores();
+
             initializeValuePool();
             setupLabelHandlers();
             setupButtonHandlers();
@@ -72,6 +76,44 @@ public class AbilityScoresView {
 
     public Parent getRoot() {
         return root;
+    }
+
+    private void loadSavedAbilityScores() {
+        var character = CharacterSession.getInstance().getCurrentCharacter();
+
+        // Lade alle gespeicherten Werte
+        int str = character.getStrength();
+        int dex = character.getDexterity();
+        int con = character.getConstitution();
+        int intel = character.getIntelligence();
+        int wis = character.getWisdom();
+        int cha = character.getCharisma();
+
+        // Wenn Werte vorhanden sind, stelle sie wieder her
+        if (str != 0) {
+            selectedSTR = str;
+            availableValues.remove(Integer.valueOf(str));
+        }
+        if (dex != 0) {
+            selectedDEX = dex;
+            availableValues.remove(Integer.valueOf(dex));
+        }
+        if (con != 0) {
+            selectedCON = con;
+            availableValues.remove(Integer.valueOf(con));
+        }
+        if (intel != 0) {
+            selectedINT = intel;
+            availableValues.remove(Integer.valueOf(intel));
+        }
+        if (wis != 0) {
+            selectedWIS = wis;
+            availableValues.remove(Integer.valueOf(wis));
+        }
+        if (cha != 0) {
+            selectedCHA = cha;
+            availableValues.remove(Integer.valueOf(cha));
+        }
     }
 
     private void initializeValuePool() {
@@ -87,6 +129,14 @@ public class AbilityScoresView {
             valueBtn.setOnAction(e -> handleValueSelection(value));
             valuePool.getChildren().add(valueBtn);
         }
+
+        // Aktualisiere alle Label mit gespeicherten Werten
+        if (selectedSTR != null) strValue.setText(selectedSTR.toString());
+        if (selectedDEX != null) dexValue.setText(selectedDEX.toString());
+        if (selectedCON != null) conValue.setText(selectedCON.toString());
+        if (selectedINT != null) intValue.setText(selectedINT.toString());
+        if (selectedWIS != null) wisValue.setText(selectedWIS.toString());
+        if (selectedCHA != null) chaValue.setText(selectedCHA.toString());
     }
 
     private void handleValueSelection(Integer value) {
