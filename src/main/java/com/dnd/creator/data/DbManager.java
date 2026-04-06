@@ -282,7 +282,7 @@ public class DbManager {
 
     public List<Map<String, Object>> getClassSkillProficiencies(String classIndex) {
         List<Map<String, Object>> result = new ArrayList<>();
-        String query = "SELECT describe, choose FROM classes_proficiency_choices " +
+        String query = "SELECT \"desc\", choose FROM classes_proficiency_choices " +
                       "WHERE classes_index = ? " +
                       "ORDER BY order_num";
 
@@ -292,7 +292,7 @@ public class DbManager {
 
             while (rs.next()) {
                 Map<String, Object> skillChoice = new HashMap<>();
-                skillChoice.put("description", rs.getString("describe"));
+                skillChoice.put("description", rs.getString("desc"));
                 skillChoice.put("choose", rs.getInt("choose"));
                 result.add(skillChoice);
             }
@@ -301,6 +301,74 @@ public class DbManager {
         }
 
         return result;
+    }
+
+    public List<String> getAllBackgrounds() {
+        List<String> result = new ArrayList<>();
+        String query = "SELECT name FROM backgrounds ORDER BY name";
+
+        try (Statement statement = connection.createStatement();
+             ResultSet rs = statement.executeQuery(query)) {
+            while (rs.next()) {
+                result.add(rs.getString("name"));
+            }
+        } catch (SQLException e) {
+            System.err.println("Error loading backgrounds: " + e.getMessage());
+        }
+
+        return result;
+    }
+
+    public List<String> getAllSkills() {
+        List<String> result = new ArrayList<>();
+        String query = "SELECT name FROM skills ORDER BY name";
+
+        try (Statement statement = connection.createStatement();
+             ResultSet rs = statement.executeQuery(query)) {
+            while (rs.next()) {
+                result.add(rs.getString("name"));
+            }
+        } catch (SQLException e) {
+            System.err.println("Error loading skills: " + e.getMessage());
+        }
+
+        return result;
+    }
+
+    public Map<String, Object> getClassSkillSelectionConfig(String classIndex) {
+        Map<String, Object> config = new HashMap<>();
+        List<String> options = new ArrayList<>();
+        int choose = 2;
+
+        String query = "SELECT cpc.choose, p.name " +
+            "FROM classes_proficiency_choices cpc " +
+            "JOIN classes_proficiency_choices_options cpco ON cpco.classes_proficiency_choices_index = cpc.id " +
+            "JOIN proficiencies p ON p.\"index\" = cpco.item_index " +
+            "WHERE cpc.classes_index = ? AND LOWER(p.type) = 'skills' " +
+            "ORDER BY cpc.order_num, cpco.order_num";
+
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, classIndex);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                choose = Math.max(choose, rs.getInt("choose"));
+                String skillName = rs.getString("name");
+                if (skillName != null && !skillName.isBlank() && !options.contains(skillName)) {
+                    options.add(skillName);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error loading class skill selection config: " + e.getMessage());
+        }
+
+        if (options.isEmpty()) {
+            options = getAllSkills();
+        }
+
+        config.put("choose", choose);
+        config.put("options", options);
+        return config;
     }
 
     // ===== SPELL METHODS =====
