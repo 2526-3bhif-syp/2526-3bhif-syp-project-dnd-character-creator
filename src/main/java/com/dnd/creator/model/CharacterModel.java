@@ -1,4 +1,6 @@
 package com.dnd.creator.model;
+import java.util.*;
+
 public class CharacterModel {
     private String name = "New Character";
     private String imagePath = "placeholder.png";
@@ -10,6 +12,13 @@ public class CharacterModel {
     private int charisma;
     private Race race;
     private String characterClass;
+    private String classIndex;
+    private int classHitDie;
+    private String spellcastingAbility;
+    private List<String> classProficiencies = new ArrayList<>();
+    private List<String> selectedSpells = new ArrayList<>();
+    private List<String> selectedEquipmentOptions = new ArrayList<>();
+    private List<String> selectedSkills = new ArrayList<>();
 
     public CharacterModel() {}
 
@@ -103,4 +112,77 @@ public class CharacterModel {
     public void setCharacterClass(String characterClass) {
         this.characterClass = characterClass;
     }
+
+    public String getClassIndex() {
+        return classIndex;
+    }
+
+    public void setClassIndex(String classIndex) {
+        this.classIndex = classIndex;
+    }
+
+    public int getClassHitDie() {
+        return classHitDie;
+    }
+
+    public void setClassHitDie(int classHitDie) {
+        this.classHitDie = classHitDie;
+    }
+
+    public String getSpellcastingAbility() {
+        return spellcastingAbility;
+    }
+
+    public void setSpellcastingAbility(String spellcastingAbility) {
+        this.spellcastingAbility = spellcastingAbility;
+    }
+
+    public List<String> getClassProficiencies() {
+        return classProficiencies;
+    }
+
+    public void setClassProficiencies(List<String> classProficiencies) {
+        this.classProficiencies = classProficiencies;
+    }
+
+    public void addClassProficiency(String proficiency) {
+        this.classProficiencies.add(proficiency);
+    }
+
+    public List<String> getSelectedSpells() {
+        return selectedSpells;
+    }
+
+    public void setSelectedSpells(List<String> selectedSpells) {
+        this.selectedSpells = selectedSpells;
+    }
+
+    public void addSelectedSpell(String spell) {
+        this.selectedSpells.add(spell);
+    }
+
+    public List<String> getSelectedEquipment() {
+        return selectedEquipmentOptions;
+    }
+
+    public void setSelectedEquipment(List<String> selectedEquipment) {
+        this.selectedEquipmentOptions = selectedEquipment;
+    }
+
+    public void addSelectedEquipment(String equipment) {
+        this.selectedEquipmentOptions.add(equipment);
+    }
+
+    public List<String> getSelectedSkills() {
+        return selectedSkills;
+    }
+
+    public void setSelectedSkills(List<String> selectedSkills) {
+        this.selectedSkills = selectedSkills;
+    }
+
+    public void addSelectedSkill(String skill) {
+        this.selectedSkills.add(skill);
+    }
 }
+
