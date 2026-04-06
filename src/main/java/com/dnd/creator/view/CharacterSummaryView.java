@@ -155,8 +155,29 @@ public class CharacterSummaryView {
             lblSkills.setText("Keine Fähigkeiten gewählt");
         }
 
-        // Default values for now (can be extended later)
-        lblEquipment.setText("Keine Ausrüstung gewählt");
+        // Equipment
+        java.util.List<String> allEquipment = new java.util.ArrayList<>();
+        if (character.getCharacterClass() != null && !character.getCharacterClass().isEmpty()) {
+            Map<String, Object> classData = dbManager.getClassByName(character.getCharacterClass());
+            if (classData != null && classData.get("index") != null) {
+                java.util.List<String> startingEquip = dbManager.getClassStartingEquipment((String) classData.get("index"));
+                if (startingEquip != null) {
+                    allEquipment.addAll(startingEquip);
+                }
+            }
+        }
+        java.util.List<String> selectedEquip = character.getSelectedEquipment();
+        if (selectedEquip != null) {
+            allEquipment.addAll(selectedEquip);
+        }
+
+        if (!allEquipment.isEmpty()) {
+            lblEquipment.setText("• " + String.join("\n• ", allEquipment));
+        } else {
+            lblEquipment.setText("Keine Ausrüstung gewählt");
+        }
+
+        // Spells
         lblSpells.setText("Keine Zauber");
     }
 
@@ -201,34 +222,6 @@ public class CharacterSummaryView {
             }
 
             abilityScoresContainer.getChildren().add(classInfoBox);
-
-            // Starting Equipment
-            java.util.List<String> equipment = dbManager.getClassStartingEquipment((String) classData.get("index"));
-            if (equipment != null && !equipment.isEmpty()) {
-                Label equipTitle = new Label("✓ Startausrüstung:");
-                equipTitle.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #6A4C93; -fx-padding: 10 0 5 0;");
-                abilityScoresContainer.getChildren().add(equipTitle);
-
-                for (String equip : equipment) {
-                    Label equipLabel = new Label("  • " + equip);
-                    equipLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #6A4C93;");
-                    abilityScoresContainer.getChildren().add(equipLabel);
-                }
-            }
-
-            // Selected Equipment Choices
-            java.util.List<String> selectedEquip = character.getSelectedEquipment();
-            if (selectedEquip != null && !selectedEquip.isEmpty()) {
-                Label selectedTitle = new Label("✓ Ausgewählte Ausrüstung:");
-                selectedTitle.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #1565C0; -fx-padding: 10 0 5 0;");
-                abilityScoresContainer.getChildren().add(selectedTitle);
-
-                for (String choice : selectedEquip) {
-                    Label choiceLabel = new Label("  • " + choice);
-                    choiceLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #1565C0;");
-                    abilityScoresContainer.getChildren().add(choiceLabel);
-                }
-            }
         }
     }
 
