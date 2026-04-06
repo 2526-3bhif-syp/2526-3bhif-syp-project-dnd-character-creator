@@ -19,6 +19,7 @@ public class CharacterModel {
     private List<String> selectedSpells = new ArrayList<>();
     private List<String> selectedEquipmentOptions = new ArrayList<>();
     private List<String> selectedSkills = new ArrayList<>();
+    private String selectedBackground;
 
     public CharacterModel() {}
 
@@ -183,6 +184,14 @@ public class CharacterModel {
 
     public void addSelectedSkill(String skill) {
         this.selectedSkills.add(skill);
+    }
+
+    public String getSelectedBackground() {
+        return selectedBackground;
+    }
+
+    public void setSelectedBackground(String selectedBackground) {
+        this.selectedBackground = selectedBackground;
     }
 }
 

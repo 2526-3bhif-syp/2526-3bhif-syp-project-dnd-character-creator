@@ -36,7 +36,7 @@
 
             <!-- Skills Selection -->
             <VBox alignment="CENTER_LEFT" spacing="15">
-                <Label text="Fertigkeiten (wähle bis zu 2):" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #8B0000;"/>
+                <Label fx:id="lblSkillsTitle" text="Fertigkeiten:" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #8B0000;"/>
                 <VBox fx:id="skillsContainer" spacing="8">
                     <!-- Skill checkboxes will be added dynamically -->
                 </VBox>

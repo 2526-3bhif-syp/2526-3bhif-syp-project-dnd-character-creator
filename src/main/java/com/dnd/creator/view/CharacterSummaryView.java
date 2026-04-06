@@ -142,9 +142,20 @@ public class CharacterSummaryView {
             lblClass.setText("Keine Klasse gewählt");
         }
 
+        // Step 4 selections
+        if (character.getSelectedBackground() != null && !character.getSelectedBackground().isBlank()) {
+            lblBackground.setText(character.getSelectedBackground());
+        } else {
+            lblBackground.setText("Kein Hintergrund gewählt");
+        }
+
+        if (character.getSelectedSkills() != null && !character.getSelectedSkills().isEmpty()) {
+            lblSkills.setText(String.join(", ", character.getSelectedSkills()));
+        } else {
+            lblSkills.setText("Keine Fähigkeiten gewählt");
+        }
+
         // Default values for now (can be extended later)
-        lblBackground.setText("Keine Hintergrund gewählt");
-        lblSkills.setText("Keine Fähigkeiten gewählt");
         lblEquipment.setText("Keine Ausrüstung gewählt");
         lblSpells.setText("Keine Zauber");
     }
