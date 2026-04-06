@@ -18,6 +18,7 @@ public class MainPresenter {
     }
 
     private void showCreateStep() {
+        com.dnd.creator.model.CharacterSession.getInstance().reset();
         CreateCharacterView createCharacterView = new CreateCharacterView();
         stage.getScene().setRoot(createCharacterView.getRoot());
     }

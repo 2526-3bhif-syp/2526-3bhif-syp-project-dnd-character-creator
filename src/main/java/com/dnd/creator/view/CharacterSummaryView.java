@@ -283,6 +283,10 @@ public class CharacterSummaryView {
     private void saveCharacter() {
         // TODO: Save character to database
         showSuccess("Charakter erfolgreich gespeichert!");
+
+        // Reset the session so the next character starts fresh
+        CharacterSession.getInstance().reset();
+
         MainView mainView = new MainView();
         Stage stage = (Stage) btnSave.getScene().getWindow();
         new MainPresenter(mainView, stage);
