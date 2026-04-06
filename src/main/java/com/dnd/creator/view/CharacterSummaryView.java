@@ -281,16 +281,25 @@ public class CharacterSummaryView {
     }
 
     private void saveCharacter() {
-        // TODO: Save character to database
-        showSuccess("Charakter erfolgreich gespeichert!");
+        var character = CharacterSession.getInstance().getCurrentCharacter();
+        
+        if (dbManager.saveCharacter(character)) {
+            showSuccess("Charakter erfolgreich gespeichert!");
+            
+            // Reset the session so the next character starts fresh
+            CharacterSession.getInstance().reset();
 
-        // Reset the session so the next character starts fresh
-        CharacterSession.getInstance().reset();
-
-        MainView mainView = new MainView();
-        Stage stage = (Stage) btnSave.getScene().getWindow();
-        new MainPresenter(mainView, stage);
-        stage.getScene().setRoot(mainView.getRoot());
+            MainView mainView = new MainView();
+            Stage stage = (Stage) btnSave.getScene().getWindow();
+            new MainPresenter(mainView, stage);
+            stage.getScene().setRoot(mainView.getRoot());
+        } else {
+            javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
+            alert.setTitle("Fehler");
+            alert.setHeaderText(null);
+            alert.setContentText("Fehler beim Speichern des Charakters!");
+            alert.showAndWait();
+        }
     }
 
     private void showSuccess(String message) {
