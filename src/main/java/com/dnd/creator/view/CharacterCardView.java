@@ -1,0 +1,64 @@
+package com.dnd.creator.view;
+
+import com.dnd.creator.model.CharacterModel;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
+
+import java.io.IOException;
+
+public class CharacterCardView {
+    @FXML
+    private ImageView imageView;
+    @FXML
+    private Label nameLabel;
+    @FXML
+    private Label strLabel;
+    @FXML
+    private Label dexLabel;
+    @FXML
+    private Label conLabel;
+    @FXML
+    private Label intLabel;
+    @FXML
+    private Label wisLabel;
+    @FXML
+    private Label chaLabel;
+
+    private Parent root;
+
+    public CharacterCardView(CharacterModel character) {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/dnd/creator/view/CharacterCard.fxml"));
+        loader.setController(this);
+        try {
+            root = loader.load();
+            updateUI(character);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load CharacterCard.fxml", e);
+        }
+    }
+
+    private void updateUI(CharacterModel character) {
+        if (character == null) return;
+        
+        nameLabel.setText(character.getName());
+        strLabel.setText(String.valueOf(character.getStrength()));
+        dexLabel.setText(String.valueOf(character.getDexterity()));
+        conLabel.setText(String.valueOf(character.getConstitution()));
+        intLabel.setText(String.valueOf(character.getIntelligence()));
+        wisLabel.setText(String.valueOf(character.getWisdom()));
+        chaLabel.setText(String.valueOf(character.getCharisma()));
+        
+        // Visual debug for ImageView: set a colored style to see it
+        imageView.setStyle("-fx-background-color: #cccccc;");
+        
+        // Debug output to see what's being loaded
+        System.out.println("Card loaded for: " + character.getName() + " STR: " + character.getStrength());
+    }
+
+    public Parent getRoot() {
+        return root;
+    }
+}
