@@ -1528,3 +1528,46 @@ CREATE TABLE weapon_properties_desc (
   FOREIGN KEY (weapon_properties_index) REFERENCES weapon_properties("index")
 );
 
+DROP TABLE IF EXISTS character_spells;
+DROP TABLE IF EXISTS character_equipment;
+DROP TABLE IF EXISTS character_skills;
+DROP TABLE IF EXISTS characters;
+
+CREATE TABLE characters (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  image_path TEXT,
+  strength INTEGER,
+  dexterity INTEGER,
+  constitution INTEGER,
+  intelligence INTEGER,
+  wisdom INTEGER,
+  charisma INTEGER,
+  race_index TEXT,
+  class_index TEXT,
+  background TEXT,
+  hit_die INTEGER,
+  spellcasting_ability TEXT
+);
+
+CREATE TABLE character_skills (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  character_id INTEGER NOT NULL,
+  skill_name TEXT NOT NULL,
+  FOREIGN KEY (character_id) REFERENCES characters(id)
+);
+
+CREATE TABLE character_equipment (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  character_id INTEGER NOT NULL,
+  equipment_name TEXT NOT NULL,
+  FOREIGN KEY (character_id) REFERENCES characters(id)
+);
+
+CREATE TABLE character_spells (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  character_id INTEGER NOT NULL,
+  spell_name TEXT NOT NULL,
+  FOREIGN KEY (character_id) REFERENCES characters(id)
+);
+

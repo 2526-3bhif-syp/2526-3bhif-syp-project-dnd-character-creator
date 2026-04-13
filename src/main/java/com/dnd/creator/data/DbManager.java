@@ -1,5 +1,9 @@
 package com.dnd.creator.data;
 import com.dnd.creator.model.Race;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,14 +16,83 @@ public class DbManager {
     private static final String DB_URL = "jdbc:sqlite:src/main/data/data.db";
 
     public void connect(){
-
         try {
+            boolean isNew = !new File("src/main/data/data.db").exists();
             connection = DriverManager.getConnection(DB_URL);
             System.out.println("Connection with Database successful!");
+            if (isNew) {
+                initializeDatabase();
+            }
         } catch (SQLException e) {
-
             System.out.println("Connection with Database failed!");
         }
+    }
+
+    private void initializeDatabase() {
+        System.out.println("Database not found — initializing from SQL scripts...");
+        runSqlScript("src/main/data/2014_ddl.sql");
+        runSqlScript("src/main/data/2014_dml.sql");
+        System.out.println("Database initialized successfully!");
+    }
+
+    private void runSqlScript(String scriptPath) {
+        try {
+            String content = new String(Files.readAllBytes(Paths.get(scriptPath)));
+            List<String> statements = splitSqlStatements(content);
+            try (Statement stmt = connection.createStatement()) {
+                for (String sql : statements) {
+                    stmt.executeUpdate(sql);
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading SQL script '" + scriptPath + "': " + e.getMessage());
+        } catch (SQLException e) {
+            System.err.println("Error executing SQL script '" + scriptPath + "': " + e.getMessage());
+        }
+    }
+
+    private List<String> splitSqlStatements(String content) {
+        List<String> statements = new ArrayList<>();
+        StringBuilder current = new StringBuilder();
+        boolean inString = false;
+
+        for (int i = 0; i < content.length(); i++) {
+            char c = content.charAt(i);
+
+            if (inString) {
+                current.append(c);
+                if (c == '\'') {
+                    // SQLite escapes a single quote as '' — skip the second one and stay in string
+                    if (i + 1 < content.length() && content.charAt(i + 1) == '\'') {
+                        current.append(content.charAt(i + 1));
+                        i++;
+                    } else {
+                        inString = false;
+                    }
+                }
+            } else {
+                if (c == '\'') {
+                    inString = true;
+                    current.append(c);
+                } else if (c == ';') {
+                    String trimmed = current.toString().trim();
+                    if (!trimmed.isEmpty()) {
+                        statements.add(trimmed);
+                    }
+                    current = new StringBuilder();
+                } else {
+                    current.append(c);
+                }
+            }
+        }
+
+        // Handle any trailing statement without a semicolon
+        String trimmed = current.toString().trim();
+        if (!trimmed.isEmpty()) {
+            statements.add(trimmed);
+        }
+
+        return statements;
     }
 
     public List<String> getAllRaces(){
