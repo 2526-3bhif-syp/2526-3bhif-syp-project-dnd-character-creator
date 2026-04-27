@@ -169,7 +169,37 @@ public class CharacterSummaryView {
         lblTempHp.setStyle("-fx-font-size: 12px; -fx-font-weight: bold;");
         tempHpBox.getChildren().addAll(lblTempHpValue, lblTempHp);
 
-        middleColumn.getChildren().addAll(hpBox, tempHpBox);
+        // Hit Dice & Death Saves
+        HBox diceSavesBox = new HBox(10);
+
+        VBox hitDiceBox = new VBox(5);
+        hitDiceBox.setStyle("-fx-border-color: #1A1A1A; -fx-padding: 10; -fx-background-color: white; -fx-background-radius: 5; -fx-border-radius: 5; -fx-pref-width: 140;");
+        Label lblHdTotal = new Label("Total: 1d" + (character.getClassHitDie() == 0 ? 6 : character.getClassHitDie()));
+        lblHdTotal.setStyle("-fx-font-size: 10px; -fx-text-fill: #555;");
+        Label lblHdValue = new Label("1d" + (character.getClassHitDie() == 0 ? 6 : character.getClassHitDie()));
+        lblHdValue.setStyle("-fx-font-size: 18px; -fx-alignment: center;");
+        Label lblHdText = new Label("HIT DICE");
+        lblHdText.setStyle("-fx-font-size: 10px; -fx-font-weight: bold;");
+        hitDiceBox.getChildren().addAll(lblHdTotal, lblHdValue, lblHdText);
+
+        VBox deathBox = new VBox(5);
+        deathBox.setStyle("-fx-border-color: #1A1A1A; -fx-padding: 10; -fx-background-color: white; -fx-background-radius: 5; -fx-border-radius: 5; -fx-pref-width: 140;");
+
+        HBox successes = new HBox(5);
+        successes.getChildren().addAll(new Label("SUCCESSES"), new CheckBox(), new CheckBox(), new CheckBox());
+        successes.setStyle("-fx-font-size: 9px;");
+
+        HBox failures = new HBox(5);
+        failures.getChildren().addAll(new Label("FAILURES  "), new CheckBox(), new CheckBox(), new CheckBox());
+        failures.setStyle("-fx-font-size: 9px;");
+
+        Label lblDeathText = new Label("DEATH SAVES");
+        lblDeathText.setStyle("-fx-font-size: 10px; -fx-font-weight: bold;");
+        deathBox.getChildren().addAll(successes, failures, lblDeathText);
+
+        diceSavesBox.getChildren().addAll(hitDiceBox, deathBox);
+
+        middleColumn.getChildren().addAll(hpBox, tempHpBox, diceSavesBox);
     }
 
     private VBox createStatBox(String title, String value) {
