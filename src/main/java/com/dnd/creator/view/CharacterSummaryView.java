@@ -12,6 +12,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
+import javafx.scene.control.CheckBox;
+import javafx.geometry.Pos;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -147,7 +150,64 @@ public class CharacterSummaryView {
         abilityBox.getChildren().add(createAbilityBlock("WISDOM", wis));
         abilityBox.getChildren().add(createAbilityBlock("CHARISMA", cha));
 
-        leftColumn.getChildren().add(abilityBox);
+        // Inspiration & Proficiency Bonus
+        VBox inspProfBox = new VBox(5);
+        inspProfBox.getChildren().add(createLabeledBox("INSPIRATION", ""));
+
+        int profBonus = 2; // Default for level 1
+        inspProfBox.getChildren().add(createLabeledBox("PROFICIENCY BONUS", "+" + profBonus));
+
+        // Saving Throws
+        VBox savesBox = new VBox(5);
+        savesBox.setStyle("-fx-border-color: #1A1A1A; -fx-padding: 10; -fx-background-color: white; -fx-background-radius: 5; -fx-border-radius: 5;");
+        Label lblSaves = new Label("SAVING THROWS");
+        lblSaves.setStyle("-fx-font-size: 10px; -fx-font-weight: bold;");
+        savesBox.getChildren().add(lblSaves);
+
+        savesBox.getChildren().add(createSaveRow("Strength", (str - 10) / 2));
+        savesBox.getChildren().add(createSaveRow("Dexterity", (dex - 10) / 2));
+        savesBox.getChildren().add(createSaveRow("Constitution", (con - 10) / 2));
+        savesBox.getChildren().add(createSaveRow("Intelligence", (intel - 10) / 2));
+        savesBox.getChildren().add(createSaveRow("Wisdom", (wis - 10) / 2));
+        savesBox.getChildren().add(createSaveRow("Charisma", (cha - 10) / 2));
+
+        leftColumn.getChildren().addAll(abilityBox, inspProfBox, savesBox);
+    }
+
+    private HBox createLabeledBox(String label, String value) {
+        HBox box = new HBox(10);
+        box.setAlignment(Pos.CENTER_LEFT);
+
+        Label valLbl = new Label(value);
+        valLbl.setPrefWidth(30);
+        valLbl.setStyle("-fx-border-color: black; -fx-padding: 5; -fx-alignment: center; -fx-background-color: white;");
+
+        Label nameLbl = new Label(label);
+        nameLbl.setStyle("-fx-font-size: 10px; -fx-font-weight: bold;");
+
+        box.getChildren().addAll(valLbl, nameLbl);
+        return box;
+    }
+
+    private HBox createSaveRow(String name, int score) {
+        if (score < 0) score++; // Adjust for negative truncation if needed, simplicity here
+        int mod = score;
+        String modStr = (mod >= 0 ? "+" : "") + mod;
+
+        HBox row = new HBox(5);
+        row.setAlignment(Pos.CENTER_LEFT);
+
+        CheckBox cb = new CheckBox();
+        cb.setDisable(true); // read-only preview
+
+        Label lblMod = new Label(modStr);
+        lblMod.setStyle("-fx-border-color: transparent transparent black transparent; -fx-pref-width: 25; -fx-alignment: bottom-center;");
+
+        Label lblName = new Label(name);
+        lblName.setStyle("-fx-font-size: 10px;");
+
+        row.getChildren().addAll(cb, lblMod, lblName);
+        return row;
     }
 
     private VBox createAbilityBlock(String name, int score) {
