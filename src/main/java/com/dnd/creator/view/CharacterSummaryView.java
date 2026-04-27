@@ -16,6 +16,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.control.CheckBox;
 import javafx.geometry.Pos;
 import javafx.stage.Stage;
+import javafx.scene.layout.GridPane;
+import javafx.geometry.Insets;
 
 import java.io.IOException;
 import java.util.Map;
@@ -123,6 +125,41 @@ public class CharacterSummaryView {
         rightColumn.getChildren().clear();
 
         populateLeftColumn(character);
+        populateMiddleColumn(character);
+    }
+
+    private void populateMiddleColumn(CharacterModel character) {
+        int dexMod = (character.getDexterity() - 10) / 2;
+        int ac = 10 + dexMod;
+        String raceName = character.getRace() != null ? character.getRace().getName() : "Human";
+        int speed = getRaceSpeed(raceName);
+
+        HBox topStatsBox = new HBox(10);
+        topStatsBox.setAlignment(Pos.CENTER);
+        topStatsBox.getChildren().addAll(
+            createShieldBox("ARMOR\nCLASS", String.valueOf(ac)),
+            createStatBox("INITIATIVE", (dexMod >= 0 ? "+" : "") + dexMod),
+            createStatBox("SPEED", String.valueOf(speed))
+        );
+        middleColumn.getChildren().add(topStatsBox);
+    }
+
+    private VBox createStatBox(String title, String value) {
+        VBox box = new VBox(2);
+        box.setStyle("-fx-border-color: #1A1A1A; -fx-border-radius: 5; -fx-background-color: white; -fx-background-radius: 5; -fx-alignment: center; -fx-pref-width: 80; -fx-pref-height: 80;");
+        Label valLbl = new Label(value); valLbl.setStyle("-fx-font-size: 24px;");
+        Label titleLbl = new Label(title); titleLbl.setStyle("-fx-font-size: 9px; -fx-font-weight: bold;");
+        box.getChildren().addAll(valLbl, titleLbl);
+        return box;
+    }
+
+    private VBox createShieldBox(String title, String value) {
+        VBox box = new VBox(2);
+        box.setStyle("-fx-border-color: #1A1A1A; -fx-border-radius: 10 10 30 30; -fx-background-color: white; -fx-background-radius: 10 10 30 30; -fx-alignment: center; -fx-pref-width: 80; -fx-pref-height: 80;");
+        Label valLbl = new Label(value); valLbl.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+        Label titleLbl = new Label(title); titleLbl.setStyle("-fx-font-size: 9px; -fx-font-weight: bold; -fx-text-alignment: center;");
+        box.getChildren().addAll(valLbl, titleLbl);
+        return box;
     }
 
     private void populateLeftColumn(CharacterModel character) {
