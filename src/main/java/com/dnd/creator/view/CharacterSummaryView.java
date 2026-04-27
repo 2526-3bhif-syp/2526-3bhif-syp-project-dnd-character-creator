@@ -18,6 +18,7 @@ import javafx.geometry.Pos;
 import javafx.stage.Stage;
 import javafx.scene.layout.GridPane;
 import javafx.scene.control.TextArea;
+import javafx.scene.layout.Priority;
 import javafx.geometry.Insets;
 
 import java.io.IOException;
@@ -139,20 +140,27 @@ public class CharacterSummaryView {
     }
 
     private void populateRightColumn(CharacterModel character) {
-        rightColumn.getChildren().add(createTextBox("PERSONALITY TRAITS"));
-        rightColumn.getChildren().add(createTextBox("IDEALS"));
-        rightColumn.getChildren().add(createTextBox("BONDS"));
-        rightColumn.getChildren().add(createTextBox("FLAWS"));
+        rightColumn.getChildren().add(createTextBox("PERSONALITY TRAITS", true));
+        rightColumn.getChildren().add(createTextBox("IDEALS", true));
+        rightColumn.getChildren().add(createTextBox("BONDS", true));
+        rightColumn.getChildren().add(createTextBox("FLAWS", true));
     }
 
-    private VBox createTextBox(String title) {
-        VBox box = new VBox(5);
-        box.setStyle("-fx-border-color: #1A1A1A; -fx-padding: 10; -fx-background-color: white; -fx-background-radius: 5; -fx-border-radius: 5; -fx-pref-height: 120;");
+    private VBox createTextBox(String title, boolean grow) {
+        VBox box = new VBox(2);
+        box.setStyle("-fx-border-color: #1A1A1A; -fx-padding: 5; -fx-background-color: white; -fx-background-radius: 5; -fx-border-radius: 5;");
+        if(grow) {
+            VBox.setVgrow(box, Priority.ALWAYS);
+        }
 
         TextArea textArea = new TextArea();
         textArea.setWrapText(true);
         textArea.setStyle("-fx-background-color: transparent; -fx-border-color: transparent; -fx-control-inner-background: white; -fx-font-size: 11px;");
-        textArea.setPrefRowCount(4);
+        if(grow) {
+            VBox.setVgrow(textArea, Priority.ALWAYS);
+        } else {
+            textArea.setPrefRowCount(2);
+        }
 
         Label lblTitle = new Label(title);
         lblTitle.setStyle("-fx-font-size: 10px; -fx-font-weight: bold; -fx-alignment: center; -fx-pref-width: 200;");
@@ -300,13 +308,15 @@ public class CharacterSummaryView {
         int wis = character.getWisdom() + wisBonus;
         int cha = character.getCharisma() + chaBonus;
 
-        VBox abilityBox = new VBox(10);
-        abilityBox.getChildren().add(createAbilityBlock("STRENGTH", str));
-        abilityBox.getChildren().add(createAbilityBlock("DEXTERITY", dex));
-        abilityBox.getChildren().add(createAbilityBlock("CONSTITUTION", con));
-        abilityBox.getChildren().add(createAbilityBlock("INTELLIGENCE", intel));
-        abilityBox.getChildren().add(createAbilityBlock("WISDOM", wis));
-        abilityBox.getChildren().add(createAbilityBlock("CHARISMA", cha));
+        GridPane abilityBox = new GridPane();
+        abilityBox.setHgap(5);
+        abilityBox.setVgap(5);
+        abilityBox.add(createAbilityBlock("STRENGTH", str), 0, 0);
+        abilityBox.add(createAbilityBlock("DEXTERITY", dex), 1, 0);
+        abilityBox.add(createAbilityBlock("CONSTITUTION", con), 2, 0);
+        abilityBox.add(createAbilityBlock("INTELLIGENCE", intel), 0, 1);
+        abilityBox.add(createAbilityBlock("WISDOM", wis), 1, 1);
+        abilityBox.add(createAbilityBlock("CHARISMA", cha), 2, 1);
 
         // Inspiration & Proficiency Bonus
         VBox inspProfBox = new VBox(5);
@@ -343,24 +353,31 @@ public class CharacterSummaryView {
         int wisMod = (wis - 10) / 2;
         int chaMod = (cha - 10) / 2;
 
-        skillsBox.getChildren().add(createSkillRow("Acrobatics", "Dex", dexMod, character));
-        skillsBox.getChildren().add(createSkillRow("Animal Handling", "Wis", wisMod, character));
-        skillsBox.getChildren().add(createSkillRow("Arcana", "Int", intMod, character));
-        skillsBox.getChildren().add(createSkillRow("Athletics", "Str", strMod, character));
-        skillsBox.getChildren().add(createSkillRow("Deception", "Cha", chaMod, character));
-        skillsBox.getChildren().add(createSkillRow("History", "Int", intMod, character));
-        skillsBox.getChildren().add(createSkillRow("Insight", "Wis", wisMod, character));
-        skillsBox.getChildren().add(createSkillRow("Intimidation", "Cha", chaMod, character));
-        skillsBox.getChildren().add(createSkillRow("Investigation", "Int", intMod, character));
-        skillsBox.getChildren().add(createSkillRow("Medicine", "Wis", wisMod, character));
-        skillsBox.getChildren().add(createSkillRow("Nature", "Int", intMod, character));
-        skillsBox.getChildren().add(createSkillRow("Perception", "Wis", wisMod, character));
-        skillsBox.getChildren().add(createSkillRow("Performance", "Cha", chaMod, character));
-        skillsBox.getChildren().add(createSkillRow("Persuasion", "Cha", chaMod, character));
-        skillsBox.getChildren().add(createSkillRow("Religion", "Int", intMod, character));
-        skillsBox.getChildren().add(createSkillRow("Sleight of Hand", "Dex", dexMod, character));
-        skillsBox.getChildren().add(createSkillRow("Stealth", "Dex", dexMod, character));
-        skillsBox.getChildren().add(createSkillRow("Survival", "Wis", wisMod, character));
+        GridPane skillsGrid = new GridPane();
+        skillsGrid.setHgap(5);
+        skillsGrid.setVgap(2);
+
+        skillsGrid.add(createSkillRow("Acrobatics", "Dex", dexMod, character), 0, 0);
+        skillsGrid.add(createSkillRow("Animal Hand.", "Wis", wisMod, character), 0, 1);
+        skillsGrid.add(createSkillRow("Arcana", "Int", intMod, character), 0, 2);
+        skillsGrid.add(createSkillRow("Athletics", "Str", strMod, character), 0, 3);
+        skillsGrid.add(createSkillRow("Deception", "Cha", chaMod, character), 0, 4);
+        skillsGrid.add(createSkillRow("History", "Int", intMod, character), 0, 5);
+        skillsGrid.add(createSkillRow("Insight", "Wis", wisMod, character), 0, 6);
+        skillsGrid.add(createSkillRow("Intimidation", "Cha", chaMod, character), 0, 7);
+        skillsGrid.add(createSkillRow("Investigation", "Int", intMod, character), 0, 8);
+
+        skillsGrid.add(createSkillRow("Medicine", "Wis", wisMod, character), 1, 0);
+        skillsGrid.add(createSkillRow("Nature", "Int", intMod, character), 1, 1);
+        skillsGrid.add(createSkillRow("Perception", "Wis", wisMod, character), 1, 2);
+        skillsGrid.add(createSkillRow("Performance", "Cha", chaMod, character), 1, 3);
+        skillsGrid.add(createSkillRow("Persuasion", "Cha", chaMod, character), 1, 4);
+        skillsGrid.add(createSkillRow("Religion", "Int", intMod, character), 1, 5);
+        skillsGrid.add(createSkillRow("Sleight Of Hand.", "Dex", dexMod, character), 1, 6);
+        skillsGrid.add(createSkillRow("Stealth", "Dex", dexMod, character), 1, 7);
+        skillsGrid.add(createSkillRow("Survival", "Wis", wisMod, character), 1, 8);
+
+        skillsBox.getChildren().add(skillsGrid);
 
         leftColumn.getChildren().addAll(abilityBox, inspProfBox, savesBox, skillsBox);
     }
@@ -426,21 +443,21 @@ public class CharacterSummaryView {
     }
 
     private VBox createAbilityBlock(String name, int score) {
-        VBox box = new VBox(2);
-        box.setStyle("-fx-border-color: #C6A664; -fx-border-width: 2; -fx-alignment: center; -fx-padding: 5; -fx-background-color: white; -fx-background-radius: 10; -fx-border-radius: 10;");
+        VBox box = new VBox(0); // reduce spacing
+        box.setStyle("-fx-border-color: #C6A664; -fx-border-width: 2; -fx-alignment: center; -fx-padding: 2; -fx-background-color: white; -fx-background-radius: 10; -fx-border-radius: 10;");
 
         Label lblName = new Label(name);
-        lblName.setStyle("-fx-font-size: 10px; -fx-font-weight: bold;");
+        lblName.setStyle("-fx-font-size: 8px; -fx-font-weight: bold;"); // smaller font
 
         int mod = (score - 10) / 2;
-        if (score < 10 && score % 2 != 0) mod--; // Java integer division truncates towards zero
+        if (score < 10 && score % 2 != 0) mod--;
         String modStr = (mod >= 0 ? "+" : "") + mod;
 
         Label lblScore = new Label(String.valueOf(score));
-        lblScore.setStyle("-fx-font-size: 24px;");
+        lblScore.setStyle("-fx-font-size: 18px;"); // smaller font
 
         Label lblMod = new Label(modStr);
-        lblMod.setStyle("-fx-font-size: 14px; -fx-border-color: black; -fx-border-radius: 15; -fx-padding: 2 5; -fx-background-color: #eee; -fx-background-radius: 15;");
+        lblMod.setStyle("-fx-font-size: 12px; -fx-border-color: black; -fx-border-radius: 15; -fx-padding: 2 4; -fx-background-color: #eee; -fx-background-radius: 15;");
 
         box.getChildren().addAll(lblName, lblScore, lblMod);
         return box;

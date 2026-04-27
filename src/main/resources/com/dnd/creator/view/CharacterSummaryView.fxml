@@ -51,30 +51,25 @@
         </HBox>
     </top>
 
-    <!-- Center: 3 Columns Layout -->
+    <!-- Center: 3 Columns Layout (No ScrollPane) -->
     <center>
-        <ScrollPane fitToWidth="true" style="-fx-background: #F5F5DC; -fx-background-color: #F5F5DC;">
-            <HBox spacing="20" alignment="TOP_CENTER">
-                <padding>
-                    <Insets top="20" bottom="20" left="20" right="20"/>
-                </padding>
+        <HBox spacing="15" alignment="TOP_CENTER">
+            <padding>
+                <Insets top="10" bottom="10" left="10" right="10"/>
+            </padding>
 
-                <!-- Left Column -->
-                <VBox fx:id="leftColumn" spacing="15" prefWidth="250" style="-fx-border-color: #C6A664; -fx-border-width: 1; -fx-padding: 10;">
-                    <Label text="LEFT COLUMN TODO" />
-                </VBox>
+            <!-- Left Column -->
+            <VBox fx:id="leftColumn" spacing="8" HBox.hgrow="SOMETIMES" style="-fx-border-color: #C6A664; -fx-border-width: 1; -fx-padding: 8;">
+            </VBox>
 
-                <!-- Middle Column -->
-                <VBox fx:id="middleColumn" spacing="15" prefWidth="300" style="-fx-border-color: #C6A664; -fx-border-width: 1; -fx-padding: 10;">
-                    <Label text="MIDDLE COLUMN TODO" />
-                </VBox>
+            <!-- Middle Column -->
+            <VBox fx:id="middleColumn" spacing="8" HBox.hgrow="SOMETIMES" style="-fx-border-color: #C6A664; -fx-border-width: 1; -fx-padding: 8;">
+            </VBox>
 
-                <!-- Right Column -->
-                <VBox fx:id="rightColumn" spacing="15" prefWidth="250" style="-fx-border-color: #C6A664; -fx-border-width: 1; -fx-padding: 10;">
-                    <Label text="RIGHT COLUMN TODO" />
-                </VBox>
-            </HBox>
-        </ScrollPane>
+            <!-- Right Column -->
+            <VBox fx:id="rightColumn" spacing="8" HBox.hgrow="SOMETIMES" style="-fx-border-color: #C6A664; -fx-border-width: 1; -fx-padding: 8;">
+            </VBox>
+        </HBox>
     </center>
 
     <!-- Bottom: Action Buttons -->
