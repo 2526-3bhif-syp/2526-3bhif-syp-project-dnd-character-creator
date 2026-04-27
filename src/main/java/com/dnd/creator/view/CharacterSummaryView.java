@@ -142,6 +142,34 @@ public class CharacterSummaryView {
             createStatBox("SPEED", String.valueOf(speed))
         );
         middleColumn.getChildren().add(topStatsBox);
+
+        // HP Section
+        int maxHp = calculateHP(character);
+        VBox hpBox = new VBox(5);
+        hpBox.setStyle("-fx-border-color: #1A1A1A; -fx-padding: 10; -fx-background-color: white; -fx-background-radius: 5; -fx-border-radius: 5;");
+
+        HBox hpLabels = new HBox(10);
+        Label lblHpMax = new Label("Hit Point Maximum: " + maxHp);
+        lblHpMax.setStyle("-fx-font-size: 10px; -fx-text-fill: #555;");
+        hpLabels.getChildren().add(lblHpMax);
+
+        Label lblHpValue = new Label(String.valueOf(maxHp));
+        lblHpValue.setStyle("-fx-font-size: 24px; -fx-padding: 10; -fx-alignment: center; -fx-pref-width: 200;");
+
+        Label lblHpCurrent = new Label("CURRENT HIT POINTS");
+        lblHpCurrent.setStyle("-fx-font-size: 12px; -fx-font-weight: bold;");
+
+        hpBox.getChildren().addAll(hpLabels, lblHpValue, lblHpCurrent);
+
+        VBox tempHpBox = new VBox(5);
+        tempHpBox.setStyle("-fx-border-color: #1A1A1A; -fx-padding: 10; -fx-background-color: white; -fx-background-radius: 5; -fx-border-radius: 5;");
+        Label lblTempHpValue = new Label("");
+        lblTempHpValue.setStyle("-fx-font-size: 24px; -fx-padding: 10; -fx-alignment: center; -fx-pref-width: 200;");
+        Label lblTempHp = new Label("TEMPORARY HIT POINTS");
+        lblTempHp.setStyle("-fx-font-size: 12px; -fx-font-weight: bold;");
+        tempHpBox.getChildren().addAll(lblTempHpValue, lblTempHp);
+
+        middleColumn.getChildren().addAll(hpBox, tempHpBox);
     }
 
     private VBox createStatBox(String title, String value) {
