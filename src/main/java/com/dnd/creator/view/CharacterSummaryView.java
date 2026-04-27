@@ -120,6 +120,14 @@ public class CharacterSummaryView {
         lblAlignment.setText("Neutral");
         lblExp.setText("0");
 
+        // Passive Wisdom
+        int wisBonus = character.getRace() != null ? character.getRace().getAbilityBonuses().getOrDefault("WIS", 0) : 0;
+        int wis = character.getWisdom() + wisBonus;
+        int wisMod = (wis - 10) / 2;
+        boolean proficientInPerception = character.getSelectedSkills() != null && character.getSelectedSkills().contains("Perception");
+        int passiveWisdom = 10 + wisMod + (proficientInPerception ? 2 : 0);
+        lblPassiveWisdom.setText(String.valueOf(passiveWisdom));
+
         // We will build columns step by step, for now just clear them
         leftColumn.getChildren().clear();
         middleColumn.getChildren().clear();
@@ -483,77 +491,6 @@ public class CharacterSummaryView {
         alert.showAndWait();
     }
 
-    private void addCombatStats() {
-        var character = CharacterSession.getInstance().getCurrentCharacter();
-
-        Label statsTitle = new Label("✓ Kampfwerte:");
-        statsTitle.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #D32F2F; -fx-padding: 10 0 5 0;");
-        leftColumn.getChildren().add(statsTitle);
-
-        // Leben (HP)
-        int hp = calculateHP(character);
-        Label hpLabel = new Label("  • Leben: " + hp);
-        hpLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #D32F2F;");
-        leftColumn.getChildren().add(hpLabel);
-
-        // Speed
-        String raceName = character.getRace() != null ? character.getRace().getName() : "Human";
-        int speed = getRaceSpeed(raceName);
-        Label speedLabel = new Label("  • Geschwindigkeit: " + speed + " ft/round");
-        speedLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #D32F2F;");
-        leftColumn.getChildren().add(speedLabel);
-
-        // Initiative
-        int dexMod = (character.getDexterity() - 10) / 2;
-        Label initiativeLabel = new Label("  • Initiative: " + (dexMod >= 0 ? "+" : "") + dexMod);
-        initiativeLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #D32F2F;");
-        leftColumn.getChildren().add(initiativeLabel);
-
-        // Armor Class (vereinfacht: 10 + DEX)
-        int ac = 10 + dexMod;
-        Label acLabel = new Label("  • Rüstungsklasse: " + ac);
-        acLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #D32F2F;");
-        leftColumn.getChildren().add(acLabel);
-
-        // Skills
-        Label skillsTitle = new Label("✓ Fertigkeiten:");
-        skillsTitle.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #F57C00; -fx-padding: 10 0 5 0;");
-        middleColumn.getChildren().add(skillsTitle);
-
-        int strMod = (character.getStrength() - 10) / 2;
-        int conMod = (character.getConstitution() - 10) / 2;
-        int intMod = (character.getIntelligence() - 10) / 2;
-        int wisMod = (character.getWisdom() - 10) / 2;
-        int chaMod = (character.getCharisma() - 10) / 2;
-
-        String[][] skills = {
-            {"Akrobatik", String.valueOf(dexMod)},
-            {"Tierhandhabung", String.valueOf(wisMod)},
-            {"Arkanwissen", String.valueOf(intMod)},
-            {"Athletik", String.valueOf(strMod)},
-            {"Betrug", String.valueOf(chaMod)},
-            {"Geschichte", String.valueOf(intMod)},
-            {"Einsicht", String.valueOf(wisMod)},
-            {"Einschüchterung", String.valueOf(chaMod)},
-            {"Untersuchung", String.valueOf(intMod)},
-            {"Heilkunde", String.valueOf(wisMod)},
-            {"Naturkunde", String.valueOf(intMod)},
-            {"Wahrnehmung", String.valueOf(wisMod)},
-            {"Aufführung", String.valueOf(chaMod)},
-            {"Überzeugung", String.valueOf(chaMod)},
-            {"Religion", String.valueOf(intMod)},
-            {"Fingerfertigkeit", String.valueOf(dexMod)},
-            {"Heimlichkeit", String.valueOf(dexMod)},
-            {"Überleben", String.valueOf(wisMod)}
-        };
-
-        for (String[] skill : skills) {
-            int mod = Integer.parseInt(skill[1]);
-            Label skillLabel = new Label("  • " + skill[0] + ": " + (mod >= 0 ? "+" : "") + mod);
-            skillLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: #F57C00;");
-            middleColumn.getChildren().add(skillLabel);
-        }
-    }
 
     private int calculateHP(CharacterModel character) {
         int hitDie = character.getClassHitDie();
