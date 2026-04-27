@@ -140,6 +140,7 @@ public class CharacterSummaryView {
     }
 
     private void populateRightColumn(CharacterModel character) {
+        rightColumn.setSpacing(5);
         rightColumn.getChildren().add(createTextBox("PERSONALITY TRAITS", true));
         rightColumn.getChildren().add(createTextBox("IDEALS", true));
         rightColumn.getChildren().add(createTextBox("BONDS", true));
@@ -148,14 +149,14 @@ public class CharacterSummaryView {
 
     private VBox createTextBox(String title, boolean grow) {
         VBox box = new VBox(2);
-        box.setStyle("-fx-border-color: #1A1A1A; -fx-padding: 5; -fx-background-color: white; -fx-background-radius: 5; -fx-border-radius: 5;");
+        box.setStyle("-fx-border-color: #1A1A1A; -fx-padding: 2; -fx-background-color: white; -fx-background-radius: 5; -fx-border-radius: 5;");
         if(grow) {
             VBox.setVgrow(box, Priority.ALWAYS);
         }
 
         TextArea textArea = new TextArea();
         textArea.setWrapText(true);
-        textArea.setStyle("-fx-background-color: transparent; -fx-border-color: transparent; -fx-control-inner-background: white; -fx-font-size: 11px;");
+        textArea.setStyle("-fx-background-color: transparent; -fx-border-color: transparent; -fx-control-inner-background: white; -fx-font-size: 10px;");
         if(grow) {
             VBox.setVgrow(textArea, Priority.ALWAYS);
         } else {
@@ -163,7 +164,7 @@ public class CharacterSummaryView {
         }
 
         Label lblTitle = new Label(title);
-        lblTitle.setStyle("-fx-font-size: 10px; -fx-font-weight: bold; -fx-alignment: center; -fx-pref-width: 200;");
+        lblTitle.setStyle("-fx-font-size: 9px; -fx-font-weight: bold; -fx-alignment: center; -fx-pref-width: 200;");
 
         box.getChildren().addAll(textArea, lblTitle);
         return box;
