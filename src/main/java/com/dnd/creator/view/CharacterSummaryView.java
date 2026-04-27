@@ -326,22 +326,26 @@ public class CharacterSummaryView {
         inspProfBox.getChildren().add(createLabeledBox("PROFICIENCY BONUS", "+" + profBonus));
 
         // Saving Throws
-        VBox savesBox = new VBox(5);
-        savesBox.setStyle("-fx-border-color: #1A1A1A; -fx-padding: 10; -fx-background-color: white; -fx-background-radius: 5; -fx-border-radius: 5;");
+        VBox savesBox = new VBox(2);
+        savesBox.setStyle("-fx-border-color: #1A1A1A; -fx-padding: 5; -fx-background-color: white; -fx-background-radius: 5; -fx-border-radius: 5;");
         Label lblSaves = new Label("SAVING THROWS");
         lblSaves.setStyle("-fx-font-size: 10px; -fx-font-weight: bold;");
         savesBox.getChildren().add(lblSaves);
 
-        savesBox.getChildren().add(createSaveRow("Strength", (str - 10) / 2));
-        savesBox.getChildren().add(createSaveRow("Dexterity", (dex - 10) / 2));
-        savesBox.getChildren().add(createSaveRow("Constitution", (con - 10) / 2));
-        savesBox.getChildren().add(createSaveRow("Intelligence", (intel - 10) / 2));
-        savesBox.getChildren().add(createSaveRow("Wisdom", (wis - 10) / 2));
-        savesBox.getChildren().add(createSaveRow("Charisma", (cha - 10) / 2));
+        GridPane savesGrid = new GridPane();
+        savesGrid.setHgap(5);
+        savesGrid.setVgap(2);
+        savesGrid.add(createSaveRow("Strength", (str - 10) / 2), 0, 0);
+        savesGrid.add(createSaveRow("Dexterity", (dex - 10) / 2), 1, 0);
+        savesGrid.add(createSaveRow("Constitution", (con - 10) / 2), 0, 1);
+        savesGrid.add(createSaveRow("Intelligence", (intel - 10) / 2), 1, 1);
+        savesGrid.add(createSaveRow("Wisdom", (wis - 10) / 2), 0, 2);
+        savesGrid.add(createSaveRow("Charisma", (cha - 10) / 2), 1, 2);
+        savesBox.getChildren().add(savesGrid);
 
         // Skills List
-        VBox skillsBox = new VBox(5);
-        skillsBox.setStyle("-fx-border-color: #1A1A1A; -fx-padding: 10; -fx-background-color: white; -fx-background-radius: 5; -fx-border-radius: 5;");
+        VBox skillsBox = new VBox(2);
+        skillsBox.setStyle("-fx-border-color: #1A1A1A; -fx-padding: 5; -fx-background-color: white; -fx-background-radius: 5; -fx-border-radius: 5;");
         Label lblSkillsTitle = new Label("SKILLS");
         lblSkillsTitle.setStyle("-fx-font-size: 10px; -fx-font-weight: bold;");
         skillsBox.getChildren().add(lblSkillsTitle);
@@ -355,7 +359,7 @@ public class CharacterSummaryView {
 
         GridPane skillsGrid = new GridPane();
         skillsGrid.setHgap(5);
-        skillsGrid.setVgap(2);
+        skillsGrid.setVgap(1);
 
         skillsGrid.add(createSkillRow("Acrobatics", "Dex", dexMod, character), 0, 0);
         skillsGrid.add(createSkillRow("Animal Hand.", "Wis", wisMod, character), 0, 1);
@@ -363,19 +367,20 @@ public class CharacterSummaryView {
         skillsGrid.add(createSkillRow("Athletics", "Str", strMod, character), 0, 3);
         skillsGrid.add(createSkillRow("Deception", "Cha", chaMod, character), 0, 4);
         skillsGrid.add(createSkillRow("History", "Int", intMod, character), 0, 5);
-        skillsGrid.add(createSkillRow("Insight", "Wis", wisMod, character), 0, 6);
-        skillsGrid.add(createSkillRow("Intimidation", "Cha", chaMod, character), 0, 7);
-        skillsGrid.add(createSkillRow("Investigation", "Int", intMod, character), 0, 8);
 
-        skillsGrid.add(createSkillRow("Medicine", "Wis", wisMod, character), 1, 0);
-        skillsGrid.add(createSkillRow("Nature", "Int", intMod, character), 1, 1);
-        skillsGrid.add(createSkillRow("Perception", "Wis", wisMod, character), 1, 2);
-        skillsGrid.add(createSkillRow("Performance", "Cha", chaMod, character), 1, 3);
-        skillsGrid.add(createSkillRow("Persuasion", "Cha", chaMod, character), 1, 4);
-        skillsGrid.add(createSkillRow("Religion", "Int", intMod, character), 1, 5);
-        skillsGrid.add(createSkillRow("Sleight Of Hand.", "Dex", dexMod, character), 1, 6);
-        skillsGrid.add(createSkillRow("Stealth", "Dex", dexMod, character), 1, 7);
-        skillsGrid.add(createSkillRow("Survival", "Wis", wisMod, character), 1, 8);
+        skillsGrid.add(createSkillRow("Insight", "Wis", wisMod, character), 1, 0);
+        skillsGrid.add(createSkillRow("Intimidation", "Cha", chaMod, character), 1, 1);
+        skillsGrid.add(createSkillRow("Investigation", "Int", intMod, character), 1, 2);
+        skillsGrid.add(createSkillRow("Medicine", "Wis", wisMod, character), 1, 3);
+        skillsGrid.add(createSkillRow("Nature", "Int", intMod, character), 1, 4);
+        skillsGrid.add(createSkillRow("Perception", "Wis", wisMod, character), 1, 5);
+
+        skillsGrid.add(createSkillRow("Performance", "Cha", chaMod, character), 2, 0);
+        skillsGrid.add(createSkillRow("Persuasion", "Cha", chaMod, character), 2, 1);
+        skillsGrid.add(createSkillRow("Religion", "Int", intMod, character), 2, 2);
+        skillsGrid.add(createSkillRow("Sleight Of Hand.", "Dex", dexMod, character), 2, 3);
+        skillsGrid.add(createSkillRow("Stealth", "Dex", dexMod, character), 2, 4);
+        skillsGrid.add(createSkillRow("Survival", "Wis", wisMod, character), 2, 5);
 
         skillsBox.getChildren().add(skillsGrid);
 
