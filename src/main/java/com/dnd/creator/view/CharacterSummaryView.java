@@ -17,6 +17,7 @@ import javafx.scene.control.CheckBox;
 import javafx.geometry.Pos;
 import javafx.stage.Stage;
 import javafx.scene.layout.GridPane;
+import javafx.scene.control.TextArea;
 import javafx.geometry.Insets;
 
 import java.io.IOException;
@@ -126,6 +127,30 @@ public class CharacterSummaryView {
 
         populateLeftColumn(character);
         populateMiddleColumn(character);
+        populateRightColumn(character);
+    }
+
+    private void populateRightColumn(CharacterModel character) {
+        rightColumn.getChildren().add(createTextBox("PERSONALITY TRAITS"));
+        rightColumn.getChildren().add(createTextBox("IDEALS"));
+        rightColumn.getChildren().add(createTextBox("BONDS"));
+        rightColumn.getChildren().add(createTextBox("FLAWS"));
+    }
+
+    private VBox createTextBox(String title) {
+        VBox box = new VBox(5);
+        box.setStyle("-fx-border-color: #1A1A1A; -fx-padding: 10; -fx-background-color: white; -fx-background-radius: 5; -fx-border-radius: 5; -fx-pref-height: 120;");
+
+        TextArea textArea = new TextArea();
+        textArea.setWrapText(true);
+        textArea.setStyle("-fx-background-color: transparent; -fx-border-color: transparent; -fx-control-inner-background: white; -fx-font-size: 11px;");
+        textArea.setPrefRowCount(4);
+
+        Label lblTitle = new Label(title);
+        lblTitle.setStyle("-fx-font-size: 10px; -fx-font-weight: bold; -fx-alignment: center; -fx-pref-width: 200;");
+
+        box.getChildren().addAll(textArea, lblTitle);
+        return box;
     }
 
     private void populateMiddleColumn(CharacterModel character) {
