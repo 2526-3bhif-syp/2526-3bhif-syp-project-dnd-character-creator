@@ -184,10 +184,14 @@ public class CharacterSummaryView {
         );
         middleColumn.getChildren().add(topStatsBox);
 
+        // HPC Row
+        HBox hpHBox = new HBox(10);
+
         // HP Section
         int maxHp = calculateHP(character);
         VBox hpBox = new VBox(5);
-        hpBox.setStyle("-fx-border-color: #1A1A1A; -fx-padding: 10; -fx-background-color: white; -fx-background-radius: 5; -fx-border-radius: 5;");
+        hpBox.setStyle("-fx-border-color: #1A1A1A; -fx-padding: 5; -fx-background-color: white; -fx-background-radius: 5; -fx-border-radius: 5;");
+        HBox.setHgrow(hpBox, Priority.ALWAYS);
 
         HBox hpLabels = new HBox(10);
         Label lblHpMax = new Label("Hit Point Maximum: " + maxHp);
@@ -195,36 +199,41 @@ public class CharacterSummaryView {
         hpLabels.getChildren().add(lblHpMax);
 
         Label lblHpValue = new Label(String.valueOf(maxHp));
-        lblHpValue.setStyle("-fx-font-size: 24px; -fx-padding: 10; -fx-alignment: center; -fx-pref-width: 200;");
+        lblHpValue.setStyle("-fx-font-size: 18px; -fx-padding: 5; -fx-alignment: center;");
 
         Label lblHpCurrent = new Label("CURRENT HIT POINTS");
-        lblHpCurrent.setStyle("-fx-font-size: 12px; -fx-font-weight: bold;");
+        lblHpCurrent.setStyle("-fx-font-size: 10px; -fx-font-weight: bold;");
 
         hpBox.getChildren().addAll(hpLabels, lblHpValue, lblHpCurrent);
 
         VBox tempHpBox = new VBox(5);
-        tempHpBox.setStyle("-fx-border-color: #1A1A1A; -fx-padding: 10; -fx-background-color: white; -fx-background-radius: 5; -fx-border-radius: 5;");
+        tempHpBox.setStyle("-fx-border-color: #1A1A1A; -fx-padding: 5; -fx-background-color: white; -fx-background-radius: 5; -fx-border-radius: 5;");
+        HBox.setHgrow(tempHpBox, Priority.ALWAYS);
         Label lblTempHpValue = new Label("");
-        lblTempHpValue.setStyle("-fx-font-size: 24px; -fx-padding: 10; -fx-alignment: center; -fx-pref-width: 200;");
-        Label lblTempHp = new Label("TEMPORARY HIT POINTS");
-        lblTempHp.setStyle("-fx-font-size: 12px; -fx-font-weight: bold;");
+        lblTempHpValue.setStyle("-fx-font-size: 18px; -fx-padding: 5; -fx-alignment: center;");
+        Label lblTempHp = new Label("TEMP HIT POINTS");
+        lblTempHp.setStyle("-fx-font-size: 10px; -fx-font-weight: bold;");
         tempHpBox.getChildren().addAll(lblTempHpValue, lblTempHp);
+
+        hpHBox.getChildren().addAll(hpBox, tempHpBox);
 
         // Hit Dice & Death Saves
         HBox diceSavesBox = new HBox(10);
 
         VBox hitDiceBox = new VBox(5);
-        hitDiceBox.setStyle("-fx-border-color: #1A1A1A; -fx-padding: 10; -fx-background-color: white; -fx-background-radius: 5; -fx-border-radius: 5; -fx-pref-width: 140;");
+        hitDiceBox.setStyle("-fx-border-color: #1A1A1A; -fx-padding: 5; -fx-background-color: white; -fx-background-radius: 5; -fx-border-radius: 5;");
+        HBox.setHgrow(hitDiceBox, Priority.ALWAYS);
         Label lblHdTotal = new Label("Total: 1d" + (character.getClassHitDie() == 0 ? 6 : character.getClassHitDie()));
         lblHdTotal.setStyle("-fx-font-size: 10px; -fx-text-fill: #555;");
         Label lblHdValue = new Label("1d" + (character.getClassHitDie() == 0 ? 6 : character.getClassHitDie()));
-        lblHdValue.setStyle("-fx-font-size: 18px; -fx-alignment: center;");
+        lblHdValue.setStyle("-fx-font-size: 14px; -fx-alignment: center;");
         Label lblHdText = new Label("HIT DICE");
         lblHdText.setStyle("-fx-font-size: 10px; -fx-font-weight: bold;");
         hitDiceBox.getChildren().addAll(lblHdTotal, lblHdValue, lblHdText);
 
         VBox deathBox = new VBox(5);
-        deathBox.setStyle("-fx-border-color: #1A1A1A; -fx-padding: 10; -fx-background-color: white; -fx-background-radius: 5; -fx-border-radius: 5; -fx-pref-width: 140;");
+        deathBox.setStyle("-fx-border-color: #1A1A1A; -fx-padding: 5; -fx-background-color: white; -fx-background-radius: 5; -fx-border-radius: 5;");
+        HBox.setHgrow(deathBox, Priority.ALWAYS);
 
         HBox successes = new HBox(5);
         successes.getChildren().addAll(new Label("SUCCESSES"), new CheckBox(), new CheckBox(), new CheckBox());
@@ -242,7 +251,7 @@ public class CharacterSummaryView {
 
         // Attacks & Spellcasting
         VBox attacksBox = new VBox(5);
-        attacksBox.setStyle("-fx-border-color: #1A1A1A; -fx-padding: 10; -fx-background-color: white; -fx-background-radius: 5; -fx-border-radius: 5; -fx-min-height: 150;");
+        attacksBox.setStyle("-fx-border-color: #1A1A1A; -fx-padding: 5; -fx-background-color: white; -fx-background-radius: 5; -fx-border-radius: 5; -fx-min-height: 150;");
 
         GridPane atkGrid = new GridPane();
         atkGrid.setHgap(10);
@@ -266,11 +275,11 @@ public class CharacterSummaryView {
         atkGrid.add(dmgPlaceholder, 2, 1);
 
         Label lblAttacksText = new Label("ATTACKS & SPELLCASTING");
-        lblAttacksText.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-padding: 10 0 0 0;");
+        lblAttacksText.setStyle("-fx-font-size: 10px; -fx-font-weight: bold; -fx-padding: 5 0 0 0;");
 
         attacksBox.getChildren().addAll(atkGrid, lblAttacksText);
 
-        middleColumn.getChildren().addAll(hpBox, tempHpBox, diceSavesBox, attacksBox);
+        middleColumn.getChildren().addAll(hpHBox, diceSavesBox, attacksBox);
     }
 
     private VBox createStatBox(String title, String value) {
