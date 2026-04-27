@@ -118,6 +118,57 @@ public class CharacterSummaryView {
         leftColumn.getChildren().clear();
         middleColumn.getChildren().clear();
         rightColumn.getChildren().clear();
+
+        populateLeftColumn(character);
+    }
+
+    private void populateLeftColumn(CharacterModel character) {
+        // 1. Ability Scores
+        Race race = character.getRace();
+        int strBonus = race != null ? race.getAbilityBonuses().getOrDefault("STR", 0) : 0;
+        int dexBonus = race != null ? race.getAbilityBonuses().getOrDefault("DEX", 0) : 0;
+        int conBonus = race != null ? race.getAbilityBonuses().getOrDefault("CON", 0) : 0;
+        int intBonus = race != null ? race.getAbilityBonuses().getOrDefault("INT", 0) : 0;
+        int wisBonus = race != null ? race.getAbilityBonuses().getOrDefault("WIS", 0) : 0;
+        int chaBonus = race != null ? race.getAbilityBonuses().getOrDefault("CHA", 0) : 0;
+
+        int str = character.getStrength() + strBonus;
+        int dex = character.getDexterity() + dexBonus;
+        int con = character.getConstitution() + conBonus;
+        int intel = character.getIntelligence() + intBonus;
+        int wis = character.getWisdom() + wisBonus;
+        int cha = character.getCharisma() + chaBonus;
+
+        VBox abilityBox = new VBox(10);
+        abilityBox.getChildren().add(createAbilityBlock("STRENGTH", str));
+        abilityBox.getChildren().add(createAbilityBlock("DEXTERITY", dex));
+        abilityBox.getChildren().add(createAbilityBlock("CONSTITUTION", con));
+        abilityBox.getChildren().add(createAbilityBlock("INTELLIGENCE", intel));
+        abilityBox.getChildren().add(createAbilityBlock("WISDOM", wis));
+        abilityBox.getChildren().add(createAbilityBlock("CHARISMA", cha));
+
+        leftColumn.getChildren().add(abilityBox);
+    }
+
+    private VBox createAbilityBlock(String name, int score) {
+        VBox box = new VBox(2);
+        box.setStyle("-fx-border-color: #C6A664; -fx-border-width: 2; -fx-alignment: center; -fx-padding: 5; -fx-background-color: white; -fx-background-radius: 10; -fx-border-radius: 10;");
+
+        Label lblName = new Label(name);
+        lblName.setStyle("-fx-font-size: 10px; -fx-font-weight: bold;");
+
+        int mod = (score - 10) / 2;
+        if (score < 10 && score % 2 != 0) mod--; // Java integer division truncates towards zero
+        String modStr = (mod >= 0 ? "+" : "") + mod;
+
+        Label lblScore = new Label(String.valueOf(score));
+        lblScore.setStyle("-fx-font-size: 24px;");
+
+        Label lblMod = new Label(modStr);
+        lblMod.setStyle("-fx-font-size: 14px; -fx-border-color: black; -fx-border-radius: 15; -fx-padding: 2 5; -fx-background-color: #eee; -fx-background-radius: 15;");
+
+        box.getChildren().addAll(lblName, lblScore, lblMod);
+        return box;
     }
 
     private void setupButtonHandlers() {
