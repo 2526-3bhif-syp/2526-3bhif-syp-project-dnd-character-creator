@@ -171,7 +171,64 @@ public class CharacterSummaryView {
         savesBox.getChildren().add(createSaveRow("Wisdom", (wis - 10) / 2));
         savesBox.getChildren().add(createSaveRow("Charisma", (cha - 10) / 2));
 
-        leftColumn.getChildren().addAll(abilityBox, inspProfBox, savesBox);
+        // Skills List
+        VBox skillsBox = new VBox(5);
+        skillsBox.setStyle("-fx-border-color: #1A1A1A; -fx-padding: 10; -fx-background-color: white; -fx-background-radius: 5; -fx-border-radius: 5;");
+        Label lblSkillsTitle = new Label("SKILLS");
+        lblSkillsTitle.setStyle("-fx-font-size: 10px; -fx-font-weight: bold;");
+        skillsBox.getChildren().add(lblSkillsTitle);
+
+        int strMod = (str - 10) / 2;
+        int dexMod = (dex - 10) / 2;
+        int conMod = (con - 10) / 2;
+        int intMod = (intel - 10) / 2;
+        int wisMod = (wis - 10) / 2;
+        int chaMod = (cha - 10) / 2;
+
+        skillsBox.getChildren().add(createSkillRow("Acrobatics", "Dex", dexMod, character));
+        skillsBox.getChildren().add(createSkillRow("Animal Handling", "Wis", wisMod, character));
+        skillsBox.getChildren().add(createSkillRow("Arcana", "Int", intMod, character));
+        skillsBox.getChildren().add(createSkillRow("Athletics", "Str", strMod, character));
+        skillsBox.getChildren().add(createSkillRow("Deception", "Cha", chaMod, character));
+        skillsBox.getChildren().add(createSkillRow("History", "Int", intMod, character));
+        skillsBox.getChildren().add(createSkillRow("Insight", "Wis", wisMod, character));
+        skillsBox.getChildren().add(createSkillRow("Intimidation", "Cha", chaMod, character));
+        skillsBox.getChildren().add(createSkillRow("Investigation", "Int", intMod, character));
+        skillsBox.getChildren().add(createSkillRow("Medicine", "Wis", wisMod, character));
+        skillsBox.getChildren().add(createSkillRow("Nature", "Int", intMod, character));
+        skillsBox.getChildren().add(createSkillRow("Perception", "Wis", wisMod, character));
+        skillsBox.getChildren().add(createSkillRow("Performance", "Cha", chaMod, character));
+        skillsBox.getChildren().add(createSkillRow("Persuasion", "Cha", chaMod, character));
+        skillsBox.getChildren().add(createSkillRow("Religion", "Int", intMod, character));
+        skillsBox.getChildren().add(createSkillRow("Sleight of Hand", "Dex", dexMod, character));
+        skillsBox.getChildren().add(createSkillRow("Stealth", "Dex", dexMod, character));
+        skillsBox.getChildren().add(createSkillRow("Survival", "Wis", wisMod, character));
+
+        leftColumn.getChildren().addAll(abilityBox, inspProfBox, savesBox, skillsBox);
+    }
+
+    private HBox createSkillRow(String name, String ability, int score, CharacterModel character) {
+        int mod = score;
+        boolean isProficient = character.getSelectedSkills() != null && character.getSelectedSkills().contains(name);
+        if (isProficient) mod += 2; // Add proficiency bonus
+
+        String modStr = (mod >= 0 ? "+" : "") + mod;
+
+        HBox row = new HBox(5);
+        row.setAlignment(Pos.CENTER_LEFT);
+
+        CheckBox cb = new CheckBox();
+        cb.setSelected(isProficient);
+        cb.setDisable(true);
+
+        Label lblMod = new Label(modStr);
+        lblMod.setStyle("-fx-border-color: transparent transparent black transparent; -fx-pref-width: 25; -fx-alignment: bottom-center;");
+
+        Label lblName = new Label(name + " (" + ability + ")");
+        lblName.setStyle("-fx-font-size: 10px;");
+
+        row.getChildren().addAll(cb, lblMod, lblName);
+        return row;
     }
 
     private HBox createLabeledBox(String label, String value) {
