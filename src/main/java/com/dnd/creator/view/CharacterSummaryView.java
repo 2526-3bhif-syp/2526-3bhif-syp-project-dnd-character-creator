@@ -199,7 +199,37 @@ public class CharacterSummaryView {
 
         diceSavesBox.getChildren().addAll(hitDiceBox, deathBox);
 
-        middleColumn.getChildren().addAll(hpBox, tempHpBox, diceSavesBox);
+        // Attacks & Spellcasting
+        VBox attacksBox = new VBox(5);
+        attacksBox.setStyle("-fx-border-color: #1A1A1A; -fx-padding: 10; -fx-background-color: white; -fx-background-radius: 5; -fx-border-radius: 5; -fx-min-height: 150;");
+
+        GridPane atkGrid = new GridPane();
+        atkGrid.setHgap(10);
+        atkGrid.setVgap(5);
+
+        Label lN = new Label("NAME"); lN.setStyle("-fx-font-size: 9px; -fx-font-weight: bold; -fx-text-fill: #555;");
+        Label lA = new Label("ATK BONUS"); lA.setStyle("-fx-font-size: 9px; -fx-font-weight: bold; -fx-text-fill: #555;");
+        Label lD = new Label("DAMAGE/TYPE"); lD.setStyle("-fx-font-size: 9px; -fx-font-weight: bold; -fx-text-fill: #555;");
+
+        atkGrid.add(lN, 0, 0);
+        atkGrid.add(lA, 1, 0);
+        atkGrid.add(lD, 2, 0);
+
+        Label atkPlaceholder = new Label("Unarmed Strike"); atkPlaceholder.setStyle("-fx-font-size: 11px;");
+        int strModForAttack = (character.getStrength() - 10) / 2;
+        Label AtkBonusPlaceholder = new Label((strModForAttack >= 0 ? "+" : "") + strModForAttack); AtkBonusPlaceholder.setStyle("-fx-font-size: 11px;");
+        Label dmgPlaceholder = new Label("1 Bludgeoning"); dmgPlaceholder.setStyle("-fx-font-size: 11px;");
+
+        atkGrid.add(atkPlaceholder, 0, 1);
+        atkGrid.add(AtkBonusPlaceholder, 1, 1);
+        atkGrid.add(dmgPlaceholder, 2, 1);
+
+        Label lblAttacksText = new Label("ATTACKS & SPELLCASTING");
+        lblAttacksText.setStyle("-fx-font-size: 12px; -fx-font-weight: bold; -fx-padding: 10 0 0 0;");
+
+        attacksBox.getChildren().addAll(atkGrid, lblAttacksText);
+
+        middleColumn.getChildren().addAll(hpBox, tempHpBox, diceSavesBox, attacksBox);
     }
 
     private VBox createStatBox(String title, String value) {
