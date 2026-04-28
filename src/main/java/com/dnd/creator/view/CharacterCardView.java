@@ -5,8 +5,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.function.Consumer;
 
@@ -68,11 +70,13 @@ public class CharacterCardView {
         wisLabel.setText(String.valueOf(character.getWisdom()));
         chaLabel.setText(String.valueOf(character.getCharisma()));
         
-        // Visual debug for ImageView: set a colored style to see it
-        imageView.setStyle("-fx-background-color: #cccccc;");
-        
-        // Debug output to see what's being loaded
-        System.out.println("Card loaded for: " + character.getName() + " STR: " + character.getStrength());
+        String path = character.getImagePath();
+        if (path != null && !path.isBlank()) {
+            File file = new File(path);
+            if (file.exists()) {
+                imageView.setImage(new Image(file.toURI().toString()));
+            }
+        }
     }
 
     public Parent getRoot() {
