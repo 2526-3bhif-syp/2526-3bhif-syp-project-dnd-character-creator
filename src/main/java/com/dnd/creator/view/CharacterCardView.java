@@ -29,12 +29,24 @@ public class CharacterCardView {
 
     private Parent root;
 
+    private static final String STYLE_DEFAULT =
+            "-fx-border-color: #D4AF37; -fx-border-width: 3; -fx-padding: 15; " +
+            "-fx-background-color: #FDF5E6; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 10, 0, 4, 4); " +
+            "-fx-min-width: 220; -fx-max-width: 220; -fx-min-height: 320; -fx-background-radius: 5; -fx-border-radius: 5;";
+
+    private static final String STYLE_HOVER =
+            "-fx-border-color: #D4AF37; -fx-border-width: 3; -fx-padding: 15; " +
+            "-fx-background-color: #FDF5E6; -fx-effect: dropshadow(three-pass-box, rgba(139,0,0,0.85), 22, 0.6, 0, 0); " +
+            "-fx-min-width: 220; -fx-max-width: 220; -fx-min-height: 320; -fx-background-radius: 5; -fx-border-radius: 5;";
+
     public CharacterCardView(CharacterModel character) {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/dnd/creator/view/CharacterCard.fxml"));
         loader.setController(this);
         try {
             root = loader.load();
             updateUI(character);
+            root.setOnMouseEntered(e -> root.setStyle(STYLE_HOVER));
+            root.setOnMouseExited(e -> root.setStyle(STYLE_DEFAULT));
         } catch (IOException e) {
             throw new RuntimeException("Failed to load CharacterCard.fxml", e);
         }
