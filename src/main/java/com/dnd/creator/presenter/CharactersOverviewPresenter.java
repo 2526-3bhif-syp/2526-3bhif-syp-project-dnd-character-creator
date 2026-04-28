@@ -3,6 +3,7 @@ package com.dnd.creator.presenter;
 import com.dnd.creator.data.DbManager;
 import com.dnd.creator.model.CharacterModel;
 import com.dnd.creator.view.CharacterCardView;
+import com.dnd.creator.view.CharacterSheetPopupView;
 import com.dnd.creator.view.CharactersOverviewView;
 
 import java.util.List;
@@ -28,6 +29,10 @@ public class CharactersOverviewPresenter {
             view.getCardsPane().getChildren().clear();
             for (CharacterModel character : characters) {
                 CharacterCardView cardView = new CharacterCardView(character);
+                cardView.setOnCardClicked(c -> {
+                    CharacterSheetPopupView popup = new CharacterSheetPopupView(c);
+                    popup.showAsPopup(view.getCardsPane().getScene().getWindow());
+                });
                 view.getCardsPane().getChildren().add(cardView.getRoot());
             }
         }

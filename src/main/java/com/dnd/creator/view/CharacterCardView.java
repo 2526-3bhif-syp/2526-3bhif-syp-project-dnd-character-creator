@@ -8,6 +8,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 
 import java.io.IOException;
+import java.util.function.Consumer;
 
 public class CharacterCardView {
     @FXML
@@ -28,6 +29,7 @@ public class CharacterCardView {
     private Label chaLabel;
 
     private Parent root;
+    private Consumer<CharacterModel> onCardClicked;
 
     private static final String STYLE_DEFAULT =
             "-fx-border-color: #D4AF37; -fx-border-width: 3; -fx-padding: 15; " +
@@ -47,6 +49,9 @@ public class CharacterCardView {
             updateUI(character);
             root.setOnMouseEntered(e -> root.setStyle(STYLE_HOVER));
             root.setOnMouseExited(e -> root.setStyle(STYLE_DEFAULT));
+            root.setOnMouseClicked(e -> {
+                if (onCardClicked != null) onCardClicked.accept(character);
+            });
         } catch (IOException e) {
             throw new RuntimeException("Failed to load CharacterCard.fxml", e);
         }
@@ -72,5 +77,9 @@ public class CharacterCardView {
 
     public Parent getRoot() {
         return root;
+    }
+
+    public void setOnCardClicked(Consumer<CharacterModel> callback) {
+        this.onCardClicked = callback;
     }
 }
