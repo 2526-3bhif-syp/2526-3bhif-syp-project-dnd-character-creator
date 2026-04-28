@@ -610,10 +610,12 @@ public class DbManager {
                     }
                 }
 
+                character.setDbId(id);
                 character.setSelectedBackground(rs.getString("background_name"));
                 character.setSelectedSkills(getCharacterSkills(id));
                 character.setSelectedEquipment(getCharacterEquipment(id));
                 character.setSelectedSpells(getCharacterSpells(id));
+                character.setWeaponAttacks(getCharacterWeaponAttacks(id, character));
                 characters.add(character);
             }
         } catch (SQLException e) {
@@ -657,6 +659,37 @@ public class DbManager {
             while (rs.next()) result.add(rs.getString("name"));
         } catch (SQLException e) {
             System.err.println("Error loading character spells: " + e.getMessage());
+        }
+        return result;
+    }
+
+    private List<String[]> getCharacterWeaponAttacks(long characterId, com.dnd.creator.model.CharacterModel character) {
+        List<String[]> result = new ArrayList<>();
+        String query = "SELECT w.name, w.damage_dice, w.damage_type, w.range_normal " +
+                       "FROM character_equipment ce " +
+                       "JOIN weapon w ON w.name = ce.item_name " +
+                       "WHERE ce.character_id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setLong(1, characterId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                String name = rs.getString("name");
+                String damageDice = rs.getString("damage_dice");
+                String damageType = rs.getString("damage_type");
+                boolean isRanged = rs.getObject("range_normal") != null;
+
+                com.dnd.creator.model.Race race = character.getRace();
+                int strBase = character.getStrength() + (race != null ? race.getAbilityBonuses().getOrDefault("STR", 0) : 0);
+                int dexBase = character.getDexterity() + (race != null ? race.getAbilityBonuses().getOrDefault("DEX", 0) : 0);
+                int statMod = isRanged ? (dexBase - 10) / 2 : (strBase - 10) / 2;
+                int atkBonus = statMod + 2; // +2 proficiency at level 1
+
+                String atkStr = (atkBonus >= 0 ? "+" : "") + atkBonus;
+                String dmgStr = damageDice + " " + damageType;
+                result.add(new String[]{name, atkStr, dmgStr});
+            }
+        } catch (SQLException e) {
+            System.err.println("Error loading character weapon attacks: " + e.getMessage());
         }
         return result;
     }

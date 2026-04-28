@@ -59,7 +59,9 @@ public class CharacterSheetPopupView {
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.initOwner(owner);
         stage.setTitle(character.getName() + " — Character Sheet");
-        stage.setScene(new Scene(root, 900, 720));
+        Scene scene = new Scene(root, 900, 720);
+        scene.getStylesheets().add(getClass().getResource("/com/dnd/creator/view/character-sheet.css").toExternalForm());
+        stage.setScene(scene);
         stage.setMinWidth(800);
         stage.setMinHeight(600);
         stage.show();
@@ -196,12 +198,12 @@ public class CharacterSheetPopupView {
         succRow.setAlignment(Pos.CENTER_LEFT);
         Label succLbl = new Label("SUCCESSES");
         succLbl.setStyle("-fx-font-size: 9px;");
-        succRow.getChildren().addAll(succLbl, new CheckBox(), new CheckBox(), new CheckBox());
+        succRow.getChildren().addAll(succLbl, disabledCheckBox(), disabledCheckBox(), disabledCheckBox());
         HBox failRow = new HBox(4);
         failRow.setAlignment(Pos.CENTER_LEFT);
         Label failLbl = new Label("FAILURES   ");
         failLbl.setStyle("-fx-font-size: 9px;");
-        failRow.getChildren().addAll(failLbl, new CheckBox(), new CheckBox(), new CheckBox());
+        failRow.getChildren().addAll(failLbl, disabledCheckBox(), disabledCheckBox(), disabledCheckBox());
         Label dsLabel = new Label("DEATH SAVES");
         dsLabel.setStyle("-fx-font-size: 10px; -fx-font-weight: bold;");
         deathBox.getChildren().addAll(succRow, failRow, dsLabel);
@@ -220,10 +222,20 @@ public class CharacterSheetPopupView {
         atkGrid.add(headerLabel("ATK BONUS"), 1, 0);
         atkGrid.add(headerLabel("DAMAGE / TYPE"), 2, 0);
 
-        int strMod = mod(str);
-        atkGrid.add(new Label("Unarmed Strike"), 0, 1);
-        atkGrid.add(new Label(modStr(strMod)), 1, 1);
-        atkGrid.add(new Label("1 Bludgeoning"), 2, 1);
+        int row = 1;
+        for (String[] weapon : character.getWeaponAttacks()) {
+            atkGrid.add(new Label(weapon[0]), 0, row);
+            atkGrid.add(new Label(weapon[1]), 1, row);
+            atkGrid.add(new Label(weapon[2]), 2, row);
+            row++;
+        }
+        if (row == 1) {
+            // No weapons — show unarmed as fallback
+            int strMod = mod(str);
+            atkGrid.add(new Label("Unarmed Strike"), 0, 1);
+            atkGrid.add(new Label(modStr(strMod)), 1, 1);
+            atkGrid.add(new Label("1 Bludgeoning"), 2, 1);
+        }
 
         Label atkLabel = new Label("ATTACKS & SPELLCASTING");
         atkLabel.setStyle("-fx-font-size: 10px; -fx-font-weight: bold;");
@@ -384,5 +396,11 @@ public class CharacterSheetPopupView {
         Label l = new Label(text);
         l.setStyle("-fx-font-size: 9px; -fx-font-weight: bold; -fx-text-fill: #555;");
         return l;
+    }
+
+    private CheckBox disabledCheckBox() {
+        CheckBox cb = new CheckBox();
+        cb.setDisable(true);
+        return cb;
     }
 }

@@ -1,0 +1,7 @@
+.label {
+    -fx-text-fill: #1A1A1A;
+}
+
+.check-box .label {
+    -fx-text-fill: #1A1A1A;
+}

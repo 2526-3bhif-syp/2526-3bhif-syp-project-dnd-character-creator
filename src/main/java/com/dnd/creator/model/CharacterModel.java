@@ -2,6 +2,7 @@ package com.dnd.creator.model;
 import java.util.*;
 
 public class CharacterModel {
+    private long dbId;
     private String name = "New Character";
     private String imagePath = "placeholder.png";
     private int strength;
@@ -20,6 +21,7 @@ public class CharacterModel {
     private List<String> selectedEquipmentOptions = new ArrayList<>();
     private List<String> selectedSkills = new ArrayList<>();
     private String selectedBackground;
+    private List<String[]> weaponAttacks = new ArrayList<>();
 
     public CharacterModel() {}
 
@@ -33,6 +35,9 @@ public class CharacterModel {
         this.wisdom = wisdom;
         this.charisma = charisma;
     }
+
+    public long getDbId() { return dbId; }
+    public void setDbId(long dbId) { this.dbId = dbId; }
 
     public String getName() {
         return name;
@@ -193,5 +198,9 @@ public class CharacterModel {
     public void setSelectedBackground(String selectedBackground) {
         this.selectedBackground = selectedBackground;
     }
+
+    /** Each entry is {name, atkBonus, damageAndType} — e.g. {"Longsword", "+4", "1d8 Slashing"} */
+    public List<String[]> getWeaponAttacks() { return weaponAttacks; }
+    public void setWeaponAttacks(List<String[]> weaponAttacks) { this.weaponAttacks = weaponAttacks; }
 }
 
