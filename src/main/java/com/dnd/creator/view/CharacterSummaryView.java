@@ -110,7 +110,8 @@ public class CharacterSummaryView {
             lblRace.setText("Keine Rasse");
         }
 
-        lblAlignment.setText("Neutral");
+        String alignment = character.getAlignment();
+        lblAlignment.setText(alignment != null && !alignment.isBlank() ? alignment : "Neutral");
         lblExp.setText("1");
 
         // Passive Wisdom
@@ -526,7 +527,7 @@ public class CharacterSummaryView {
     private void navigateBack() {
         try {
             Stage stage = (Stage) btnBack.getScene().getWindow();
-            EquipmentView previousView = new EquipmentView();
+            AlignmentView previousView = new AlignmentView();
             stage.setScene(new Scene(previousView.getRoot(), stage.getScene().getWidth(), stage.getScene().getHeight()));
         } catch (Exception e) {
             e.printStackTrace();

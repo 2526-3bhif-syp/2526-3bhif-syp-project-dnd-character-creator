@@ -80,32 +80,36 @@ public class EquipmentView {
                 return;
             }
 
-            var figure= CharacterSession.getInstance().getCurrentCharacter();
-            String classIdx = figure.getClassIndex();
+            try {
+                var figure = CharacterSession.getInstance().getCurrentCharacter();
+                String classIdx = figure.getClassIndex();
 
-            // Komplett neu aufbauen um Duplikate zu vermeiden
-            List<String> allEquipment = new ArrayList<>();
+                List<String> allEquipment = new ArrayList<>();
+                List<String> mandatory = dbManager.getStartingEquipment(classIdx);
+                new java.util.LinkedHashSet<>(mandatory).forEach(allEquipment::add);
 
-            // 1. Pflichtausrüstung
-            List<String> mandatory = dbManager.getStartingEquipment(classIdx);
-            new java.util.LinkedHashSet<>(mandatory).forEach(allEquipment::add);
-
-            // 2. Holy Symbol für divine Klassen
-            if (classIdx != null) {
-                String lower = classIdx.toLowerCase();
-                if (lower.equals("cleric") || lower.equals("paladin")) {
-                    allEquipment.add("Holy Symbol");
+                if (classIdx != null) {
+                    String lower = classIdx.toLowerCase();
+                    if (lower.equals("cleric") || lower.equals("paladin")) {
+                        allEquipment.add("Holy Symbol");
+                    }
                 }
+
+                allEquipment.addAll(selectedChoices.values());
+                figure.setSelectedEquipment(allEquipment);
+
+                AlignmentView nextView = new AlignmentView();
+                Stage stage = (Stage) root.getScene().getWindow();
+                stage.setScene(new Scene(nextView.getRoot(), stage.getScene().getWidth(), stage.getScene().getHeight()));
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Fehler");
+                alert.setHeaderText(null);
+                alert.setContentText("Fehler: " + ex.getMessage());
+                alert.showAndWait();
             }
-
-            // 3. Gewählte Optionen
-            allEquipment.addAll(selectedChoices.values());
-
-            character.setSelectedEquipment(allEquipment);
-
-            CharacterSummaryView nextView = new CharacterSummaryView();
-            Stage stage = (Stage) root.getScene().getWindow();
-            stage.setScene(new Scene(nextView.getRoot(), stage.getScene().getWidth(), stage.getScene().getHeight()));
         });
         buttonBox.getChildren().addAll(btnBack, btnNext);
         ScrollPane scrollPane = new ScrollPane(equipmentContent);
