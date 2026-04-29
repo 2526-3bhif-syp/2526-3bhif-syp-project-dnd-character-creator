@@ -110,18 +110,21 @@ public class AlignmentView {
         btnNext.setOnAction(e -> {
             if (selectedAlignment == null) {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
-                alert.setTitle("Keine Gesinnung");
                 alert.setHeaderText(null);
                 alert.setContentText("Bitte wähle eine Gesinnung aus!");
                 alert.showAndWait();
                 return;
             }
-            CharacterSession.getInstance().getCurrentCharacter()
-                    .setAlignment(selectedAlignment);
+            CharacterSession.getInstance().getCurrentCharacter().setAlignment(selectedAlignment);
             Stage stage = (Stage) root.getScene().getWindow();
-            CharacterSummaryView next = new CharacterSummaryView();
-            stage.setScene(new Scene(next.getRoot(),
-                    stage.getScene().getWidth(), stage.getScene().getHeight()));
+            String classIdx = CharacterSession.getInstance().getCurrentCharacter().getClassIndex();
+            if (SpellSelectionView.isSpellcaster(classIdx)) {
+                stage.setScene(new Scene(new SpellSelectionView().getRoot(),
+                        stage.getScene().getWidth(), stage.getScene().getHeight()));
+            } else {
+                stage.setScene(new Scene(new CharacterSummaryView().getRoot(),
+                        stage.getScene().getWidth(), stage.getScene().getHeight()));
+            }
         });
     }
 
