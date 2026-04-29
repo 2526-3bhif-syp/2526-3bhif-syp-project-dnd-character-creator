@@ -322,6 +322,59 @@ public class CharacterSummaryView {
         attacksBox.getChildren().addAll(atkGrid, lblAttacksText);
 
         middleColumn.getChildren().addAll(hpHBox, diceSavesBox, attacksBox);
+
+        // Spell Slots anzeigen (nur für Zauberer)
+        String classIdx = character.getClassIndex();
+        if (SpellSelectionView.isSpellcaster(classIdx)) {
+            Map<String, Integer> slots = dbManager.getSpellSlotsAtLevel(classIdx, 1);
+            int slotsL1 = slots.getOrDefault("slots_level_1", 0);
+
+            VBox spellBox = new VBox(4);
+            spellBox.setStyle("-fx-border-color: #1A1A1A; -fx-padding: 8; -fx-background-color: white;");
+            Label spellTitle = new Label("ZAUBER & SLOTS");
+            spellTitle.setStyle("-fx-font-size: 10px; -fx-font-weight: bold;");
+
+            // Slots
+            HBox slotsRow = new HBox(5);
+            Label slotsLabel = new Label("Level-1-Slots:");
+            slotsLabel.setStyle("-fx-font-size: 11px; -fx-font-weight: bold;");
+            slotsRow.getChildren().add(slotsLabel);
+            for (int i = 0; i < slotsL1; i++) {
+                Label slot = new Label("○");
+                slot.setStyle("-fx-font-size: 14px; -fx-text-fill: #8B0000;");
+                slotsRow.getChildren().add(slot);
+            }
+
+            // Cantrips
+            VBox cantripSection = new VBox(2);
+            if (character.getSelectedCantrips() != null && !character.getSelectedCantrips().isEmpty()) {
+                Label cantripLbl = new Label("Cantrips:");
+                cantripLbl.setStyle("-fx-font-size: 11px; -fx-font-weight: bold;");
+                cantripSection.getChildren().add(cantripLbl);
+                for (String c : character.getSelectedCantrips()) {
+                    Label lbl = new Label("• " + c);
+                    lbl.setStyle("-fx-font-size: 11px;");
+                    cantripSection.getChildren().add(lbl);
+                }
+            }
+
+            // Prepared Spells
+            VBox preparedSection = new VBox(2);
+            if (character.getSelectedSpells() != null && !character.getSelectedSpells().isEmpty()) {
+                Label prepLbl = new Label("Zauber:");
+                prepLbl.setStyle("-fx-font-size: 11px; -fx-font-weight: bold;");
+                preparedSection.getChildren().add(prepLbl);
+                for (String s : character.getSelectedSpells()) {
+                    Label lbl = new Label("• " + s);
+                    lbl.setStyle("-fx-font-size: 11px;");
+                    preparedSection.getChildren().add(lbl);
+                }
+            }
+
+            spellBox.getChildren().addAll(spellTitle, slotsRow, cantripSection, preparedSection);
+            middleColumn.getChildren().add(spellBox);
+        }
+
     }
 
     private VBox createStatBox(String title, String value) {
@@ -527,8 +580,11 @@ public class CharacterSummaryView {
     private void navigateBack() {
         try {
             Stage stage = (Stage) btnBack.getScene().getWindow();
-            AlignmentView previousView = new AlignmentView();
-            stage.setScene(new Scene(previousView.getRoot(), stage.getScene().getWidth(), stage.getScene().getHeight()));
+            String classIdx = CharacterSession.getInstance().getCurrentCharacter().getClassIndex();
+            Parent prev = SpellSelectionView.isSpellcaster(classIdx)
+                    ? new SpellSelectionView().getRoot()
+                    : new AlignmentView().getRoot();
+            stage.setScene(new Scene(prev, stage.getScene().getWidth(), stage.getScene().getHeight()));
         } catch (Exception e) {
             e.printStackTrace();
         }

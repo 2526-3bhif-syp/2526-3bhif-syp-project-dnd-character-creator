@@ -18,10 +18,13 @@ public class CharacterModel {
     private String spellcastingAbility;
     private List<String> classProficiencies = new ArrayList<>();
     private List<String> selectedSpells = new ArrayList<>();
+    private List<String> selectedCantrips = new ArrayList<>();
     private List<String> selectedEquipmentOptions = new ArrayList<>();
     private List<String> selectedSkills = new ArrayList<>();
     private String selectedBackground;
     private List<String[]> weaponAttacks = new ArrayList<>();
+
+
 
     public CharacterModel() {}
 
@@ -153,6 +156,22 @@ public class CharacterModel {
 
     public void addClassProficiency(String proficiency) {
         this.classProficiencies.add(proficiency);
+    }
+
+    public void setSelectedCantrips(List<String> selectedCantrips) {
+        this.selectedCantrips = selectedCantrips;
+    }
+
+    public void setSelectedEquipmentOptions(List<String> selectedEquipmentOptions) {
+        this.selectedEquipmentOptions = selectedEquipmentOptions;
+    }
+
+    public List<String> getSelectedCantrips() {
+        return selectedCantrips;
+    }
+
+    public List<String> getSelectedEquipmentOptions() {
+        return selectedEquipmentOptions;
     }
 
     public List<String> getSelectedSpells() {
