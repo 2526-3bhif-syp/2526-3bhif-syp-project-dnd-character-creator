@@ -1,184 +1,310 @@
 package com.dnd.creator.view;
+
 import com.dnd.creator.data.DbManager;
 import com.dnd.creator.model.CharacterSession;
-import javafx.geometry.Insets;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Duration;
+
+import java.io.InputStream;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 public class SelectClassView {
+
+    private enum Role {
+        TANK("Tank", "role-tank"),
+        DPS("Schaden", "role-dps"),
+        CASTER("Magie", "role-caster"),
+        STEALTH("Heimlich", "role-stealth"),
+        SUPPORT("Unterstützung", "role-support");
+
+        final String label;
+        final String cssClass;
+
+        Role(String label, String cssClass) {
+            this.label = label;
+            this.cssClass = cssClass;
+        }
+    }
+
+    private static final class ClassDef {
+        final String name;
+        final String icon;
+        final Role role;
+        final int difficulty; // 1-3
+        final String tagline;
+        final Set<String> tags;
+
+        ClassDef(String name, String icon, Role role, int difficulty, String tagline, Set<String> tags) {
+            this.name = name;
+            this.icon = icon;
+            this.role = role;
+            this.difficulty = difficulty;
+            this.tagline = tagline;
+            this.tags = tags;
+        }
+    }
+
+    private static final String TAG_BEGINNER = "Anfängerfreundlich";
+    private static final String TAG_MAGIC = "Magie";
+    private static final String TAG_MELEE = "Nahkampf";
+    private static final String TAG_RANGED = "Fernkampf";
+
+    private static final List<ClassDef> CLASSES = List.of(
+        new ClassDef("Barbarian", "🪓", Role.DPS,    1, "Wilder Krieger. Schlägt hart, hält viel aus.",        Set.of(TAG_MELEE, TAG_BEGINNER)),
+        new ClassDef("Bard",      "🎵", Role.SUPPORT,2, "Inspiriert Verbündete mit Musik. Vielseitig.",        Set.of(TAG_MAGIC, TAG_RANGED)),
+        new ClassDef("Cleric",    "✝",  Role.SUPPORT,2, "Heiliger Heiler. Schild und göttliche Magie.",        Set.of(TAG_MAGIC, TAG_BEGINNER)),
+        new ClassDef("Druid",     "🌿", Role.CASTER, 3, "Naturmagier. Verwandelt sich in Tiere.",              Set.of(TAG_MAGIC)),
+        new ClassDef("Fighter",   "⚔",  Role.DPS,    1, "Verlässlicher Kämpfer. Einfach zu spielen.",          Set.of(TAG_MELEE, TAG_RANGED, TAG_BEGINNER)),
+        new ClassDef("Monk",      "👊", Role.DPS,    3, "Mönch der Faust. Schnell und beweglich.",             Set.of(TAG_MELEE)),
+        new ClassDef("Paladin",   "🛡", Role.TANK,   2, "Heiliger Ritter. Schwert, Schild und Glaube.",        Set.of(TAG_MELEE, TAG_MAGIC)),
+        new ClassDef("Ranger",    "🏹", Role.DPS,    2, "Spurenleser und Bogenschütze.",                       Set.of(TAG_RANGED, TAG_MAGIC)),
+        new ClassDef("Rogue",     "🗡", Role.STEALTH,2, "Hinterhältig und schnell. Trifft, wo es weh tut.",    Set.of(TAG_MELEE, TAG_RANGED)),
+        new ClassDef("Sorcerer",  "✨", Role.CASTER, 2, "Geborener Magier. Kraft aus den Adern.",              Set.of(TAG_MAGIC)),
+        new ClassDef("Warlock",   "👁", Role.CASTER, 2, "Pakt mit dunklen Mächten.",                           Set.of(TAG_MAGIC)),
+        new ClassDef("Wizard",    "🔮", Role.CASTER, 3, "Studierter Zauberer. Wissen ist Macht.",              Set.of(TAG_MAGIC))
+    );
+
+    @FXML private HBox stepperContainer;
+    @FXML private VBox previewContainer;
+    @FXML private HBox filterBar;
+    @FXML private TilePane classGrid;
+    @FXML private Button btnBack;
+    @FXML private Button btnNext;
+
     private Parent root;
     private final DbManager dbManager = new DbManager();
+    private final Map<String, VBox> classCards = new HashMap<>();
+    private final CharacterPreviewPanel preview = new CharacterPreviewPanel();
     private String selectedClass = null;
-    private VBox selectedCard = null;
-    private final java.util.Map<String, VBox> classCardMap = new java.util.HashMap<>();
+    private String activeFilter = "Alle";
+    private final List<Button> filterButtons = new ArrayList<>();
 
-    private static final String[][] CLASSES = {
-        {"Barbarian", "d12", "STR"},
-        {"Bard", "d8", "CHA"},
-        {"Cleric", "d8", "WIS"},
-        {"Druid", "d8", "WIS"},
-        {"Fighter", "d10", "STR/DEX"},
-        {"Monk", "d8", "DEX/WIS"},
-        {"Paladin", "d10", "STR/CHA"},
-        {"Ranger", "d10", "DEX/WIS"},
-        {"Rogue", "d8", "DEX"},
-        {"Sorcerer", "d6", "CHA"},
-        {"Warlock", "d8", "CHA"},
-        {"Wizard", "d6", "INT"}
-    };
     public SelectClassView() {
-        dbManager.connect();
-        VBox mainBox = new VBox(20);
-        mainBox.setPadding(new Insets(20));
-        mainBox.setStyle("-fx-background-color: #F5F5DC;");
-        javafx.scene.control.Label title = new javafx.scene.control.Label("Schritt 2: Klasse");
-        title.setStyle("-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #8B0000;");
-        javafx.scene.control.Label subtitle = new javafx.scene.control.Label("Wähle deine Klasse.");
-        subtitle.setStyle("-fx-font-size: 16px; -fx-text-fill: #1A1A1A;");
-        VBox headerBox = new VBox(10);
-        headerBox.getChildren().addAll(title, subtitle);
-        headerBox.setAlignment(javafx.geometry.Pos.CENTER);
-        VBox classGrid = createClassGrid();
-        HBox buttonBox = new HBox(50);
-        buttonBox.setPadding(new Insets(20));
-        buttonBox.setAlignment(javafx.geometry.Pos.CENTER);
-        Button btnBack = new Button("Zurück");
-        btnBack.setPrefWidth(150);
-        btnBack.setPrefHeight(50);
-        btnBack.setStyle("-fx-background-color: #F5F5DC; -fx-border-color: #C6A664; -fx-border-width: 2; -fx-font-size: 16px;");
-        btnBack.setOnAction(e -> {
-            CreateCharacterView prevView = new CreateCharacterView();
-            Stage stage = (Stage) root.getScene().getWindow();
-            stage.setScene(new Scene(prevView.getRoot(), stage.getScene().getWidth(), stage.getScene().getHeight()));
-        });
-        Button btnNext = new Button("Weiter");
-        btnNext.setPrefWidth(150);
-        btnNext.setPrefHeight(50);
-        btnNext.setStyle("-fx-background-color: #8B0000; -fx-text-fill: #F5F5DC; -fx-font-size: 16px; -fx-font-weight: bold;");
-        btnNext.setOnAction(e -> {
-            if (selectedClass != null) {
-                AbilityScoresView nextView = new AbilityScoresView();
-                Stage stage = (Stage) root.getScene().getWindow();
-                stage.setScene(new Scene(nextView.getRoot(), stage.getScene().getWidth(), stage.getScene().getHeight()));
-            } else {
-                javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.WARNING);
-                alert.setTitle("Warnung");
-                alert.setHeaderText(null);
-                alert.setContentText("Bitte wähle eine Klasse!");
-                alert.showAndWait();
-            }
-        });
-        buttonBox.getChildren().addAll(btnBack, btnNext);
-        ScrollPane scrollPane = new ScrollPane(classGrid);
-        scrollPane.setFitToWidth(true);
-        scrollPane.setStyle("-fx-background-color: #F5F5DC;");
-        mainBox.getChildren().addAll(headerBox, scrollPane, buttonBox);
-        VBox.setVgrow(scrollPane, javafx.scene.layout.Priority.ALWAYS);
-        root = mainBox;
-    }
-    private VBox createClassGrid() {
-        VBox grid = new VBox(20);
-        grid.setPadding(new Insets(20, 40, 20, 40));
-        grid.setAlignment(javafx.geometry.Pos.TOP_CENTER);
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/dnd/creator/view/SelectClassView.fxml"));
+            loader.setController(this);
+            root = loader.load();
+            CreationStyles.attach(root);
 
-        HBox row1 = new HBox(20);
-        row1.setAlignment(javafx.geometry.Pos.CENTER);
-        for (int i = 0; i < 5; i++) {
-            VBox card = createClassButton(CLASSES[i]);
-            classCardMap.put(CLASSES[i][0], card);
-            row1.getChildren().add(card);
-        }
+            dbManager.connect();
 
-        HBox row2 = new HBox(20);
-        row2.setAlignment(javafx.geometry.Pos.CENTER);
-        for (int i = 5; i < 10; i++) {
-            VBox card = createClassButton(CLASSES[i]);
-            classCardMap.put(CLASSES[i][0], card);
-            row2.getChildren().add(card);
-        }
+            stepperContainer.getChildren().setAll(new StepperBar(2).getRoot());
+            previewContainer.getChildren().setAll(preview.getRoot());
 
-        HBox row3 = new HBox(20);
-        row3.setAlignment(javafx.geometry.Pos.CENTER);
-        for (int i = 10; i < 12; i++) {
-            VBox card = createClassButton(CLASSES[i]);
-            classCardMap.put(CLASSES[i][0], card);
-            row3.getChildren().add(card);
-        }
+            buildFilterBar();
+            buildClassCards();
+            restoreSession();
+            wireNavigation();
+            updateNextButton();
 
-        grid.getChildren().addAll(row1, row2, row3);
-        
-        // Wenn bereits eine Klasse gespeichert ist, markiere sie
-        var character = CharacterSession.getInstance().getCurrentCharacter();
-        String savedClass = character.getCharacterClass();
-        if (savedClass != null && !savedClass.isEmpty() && classCardMap.containsKey(savedClass)) {
-            VBox savedCard = classCardMap.get(savedClass);
-            selectedClass = savedClass;
-            selectedCard = savedCard;
-            savedCard.setStyle(savedCard.getStyle().replace("transparent", "#4CAF50"));
-        }
-        
-        return grid;
-    }
-    private VBox createClassButton(String[] classInfo) {
-        String className = classInfo[0];
-        String hitDie = classInfo[1];
-        String mainAbility = classInfo[2];
-        VBox card = new VBox(5);
-        card.setPrefWidth(200);
-        card.setPrefHeight(180);
-        card.setAlignment(javafx.geometry.Pos.CENTER);
-        card.setStyle("-fx-border-color: #C6A664; -fx-border-width: 3; -fx-border-radius: 10; " +
-                      "-fx-background-color: transparent; -fx-background-radius: 10; -fx-cursor: hand; -fx-padding: 10;");
-        javafx.scene.control.Label nameLabel = new javafx.scene.control.Label(className);
-        nameLabel.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #8B0000;");
-        nameLabel.setWrapText(true);
-        nameLabel.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
-        javafx.scene.control.Label mainLabel = new javafx.scene.control.Label("Main: " + mainAbility);
-        mainLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #1A1A1A;");
-        mainLabel.setWrapText(true);
-        mainLabel.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
-        javafx.scene.control.Label dieLabel = new javafx.scene.control.Label("Hit Die: " + hitDie);
-        dieLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #8B0000;");
-        dieLabel.setWrapText(true);
-        dieLabel.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
-        card.getChildren().addAll(nameLabel, mainLabel, dieLabel);
-        card.setOnMouseClicked(e -> selectClass(className, card));
-        return card;
-    }
-    private void selectClass(String className, VBox card) {
-        System.out.println("Klasse: " + className);
-        if (selectedCard != null) {
-            String style = selectedCard.getStyle();
-            if (style.contains("#4CAF50")) {
-                style = style.replace("-fx-background-color: #4CAF50;", "-fx-background-color: transparent;");
-                selectedCard.setStyle(style);
-            }
-        }
-        selectedClass = className;
-        selectedCard = card;
-        card.setStyle(card.getStyle().replace("transparent", "#4CAF50"));
-
-        // Alte Ausrüstungs-Auswahlen löschen bei neuer Klassenwahl
-        CharacterSession.getInstance().getCurrentCharacter().setSelectedEquipment(new java.util.ArrayList<>());
-
-        Map<String, Object> classData = dbManager.getClassByName(className);
-        if (classData != null) {
-            CharacterSession.getInstance().getCurrentCharacter().setCharacterClass(className);
-            CharacterSession.getInstance().getCurrentCharacter().setClassIndex((String) classData.get("index"));
-            CharacterSession.getInstance().getCurrentCharacter().setClassHitDie((Integer) classData.get("hit_die"));
-            CharacterSession.getInstance().getCurrentCharacter().setSpellcastingAbility((String) classData.get("spellcasting_ability"));
-            @SuppressWarnings("unchecked")
-            java.util.List<String> profs = (java.util.List<String>) classData.get("proficiencies");
-            CharacterSession.getInstance().getCurrentCharacter().setClassProficiencies(profs);
-            System.out.println("OK");
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load SelectClassView.fxml", e);
         }
     }
+
     public Parent getRoot() {
         return root;
+    }
+
+    private void buildFilterBar() {
+        String[] filters = {"Alle", TAG_BEGINNER, TAG_MAGIC, TAG_MELEE, TAG_RANGED};
+        for (String f : filters) {
+            Button b = new Button(f);
+            b.getStyleClass().add("filter-chip");
+            if (f.equals(activeFilter)) b.getStyleClass().add("filter-chip-active");
+            b.setOnAction(e -> {
+                activeFilter = f;
+                refreshFilterButtonStyles();
+                applyFilter();
+            });
+            filterButtons.add(b);
+            filterBar.getChildren().add(b);
+        }
+    }
+
+    private void refreshFilterButtonStyles() {
+        for (Button b : filterButtons) {
+            b.getStyleClass().remove("filter-chip-active");
+            if (b.getText().equals(activeFilter)) {
+                b.getStyleClass().add("filter-chip-active");
+            }
+        }
+    }
+
+    private void buildClassCards() {
+        for (ClassDef def : CLASSES) {
+            VBox card = buildClassCard(def);
+            classCards.put(def.name, card);
+            classGrid.getChildren().add(card);
+        }
+    }
+
+    private void applyFilter() {
+        classGrid.getChildren().clear();
+        for (ClassDef def : CLASSES) {
+            boolean matches = "Alle".equals(activeFilter) || def.tags.contains(activeFilter);
+            if (matches) {
+                classGrid.getChildren().add(classCards.get(def.name));
+            }
+        }
+    }
+
+    private VBox buildClassCard(ClassDef def) {
+        VBox card = new VBox(4);
+        card.getStyleClass().add("selection-card");
+        card.setAlignment(Pos.TOP_CENTER);
+
+        HBox topRow = new HBox();
+        topRow.setAlignment(Pos.CENTER_LEFT);
+        Node icon = classIcon(def.name, def.icon);
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        Label stars = new Label(stars(def.difficulty));
+        stars.getStyleClass().add("difficulty-stars");
+        Tooltip.install(stars, new Tooltip(difficultyTip(def.difficulty)));
+        topRow.getChildren().addAll(icon, spacer, stars);
+
+        Label name = new Label(def.name);
+        name.getStyleClass().add("card-title");
+
+        Label roleTag = new Label(def.role.label);
+        roleTag.getStyleClass().addAll("role-tag", def.role.cssClass);
+
+        Label tagline = new Label(def.tagline);
+        tagline.getStyleClass().add("card-tagline");
+        tagline.setWrapText(true);
+        tagline.setMaxWidth(200);
+
+        // Tooltip with class details from DB
+        Map<String, Object> classData = dbManager.getClassByName(def.name);
+        if (classData != null) {
+            StringBuilder tip = new StringBuilder();
+            tip.append("Hit Die: d").append(classData.get("hit_die")).append(" (Lebenswürfel)\n");
+            Object primary = classData.get("primary_ability");
+            if (primary != null) tip.append("Hauptwert: ").append(primary).append("\n");
+            Object spellAbility = classData.get("spellcasting_ability");
+            if (spellAbility != null) tip.append("Magiewert: ").append(spellAbility).append("\n");
+            Tooltip tooltip = new Tooltip(tip.toString().trim());
+            tooltip.setShowDelay(Duration.millis(300));
+            Tooltip.install(card, tooltip);
+        }
+
+        card.getChildren().addAll(topRow, name, roleTag, tagline);
+        card.setOnMouseClicked(e -> selectClass(def));
+        return card;
+    }
+
+    private String stars(int difficulty) {
+        return "★".repeat(difficulty) + "☆".repeat(3 - difficulty);
+    }
+
+    private String difficultyTip(int difficulty) {
+        return switch (difficulty) {
+            case 1 -> "Einfach — gut für Einsteiger";
+            case 2 -> "Mittel — etwas Erfahrung hilft";
+            default -> "Komplex — viele Regeln zu lernen";
+        };
+    }
+
+    private void selectClass(ClassDef def) {
+        selectedClass = def.name;
+        for (Map.Entry<String, VBox> entry : classCards.entrySet()) {
+            VBox c = entry.getValue();
+            c.getStyleClass().remove("selection-card-selected");
+            if (entry.getKey().equals(def.name)) {
+                c.getStyleClass().add("selection-card-selected");
+            }
+        }
+
+        Map<String, Object> classData = dbManager.getClassByName(def.name);
+        var character = CharacterSession.getInstance().getCurrentCharacter();
+        character.setCharacterClass(def.name);
+        if (classData != null) {
+            character.setClassIndex((String) classData.get("index"));
+            Object hitDie = classData.get("hit_die");
+            if (hitDie instanceof Integer i) character.setClassHitDie(i);
+            character.setSpellcastingAbility((String) classData.get("spellcasting_ability"));
+            @SuppressWarnings("unchecked")
+            List<String> profs = (List<String>) classData.get("proficiencies");
+            if (profs != null) character.setClassProficiencies(profs);
+        }
+        // Reset equipment selection — different class, different gear
+        character.setSelectedEquipment(new ArrayList<>());
+
+        preview.refresh();
+        updateNextButton();
+    }
+
+    private void restoreSession() {
+        String saved = CharacterSession.getInstance().getCurrentCharacter().getCharacterClass();
+        if (saved != null && !saved.isBlank()) {
+            for (ClassDef def : CLASSES) {
+                if (def.name.equals(saved)) {
+                    selectClass(def);
+                    break;
+                }
+            }
+        }
+    }
+
+    private void updateNextButton() {
+        boolean valid = selectedClass != null;
+        btnNext.setDisable(!valid);
+        if (!valid) {
+            Tooltip.install(btnNext, new Tooltip("Bitte wähle eine Klasse."));
+        } else {
+            Tooltip.uninstall(btnNext, btnNext.getTooltip());
+        }
+    }
+
+    private static Node classIcon(String className, String fallbackEmoji) {
+        String path = "/com/dnd/creator/pics/" + className.toLowerCase() + ".png";
+        InputStream is = SelectClassView.class.getResourceAsStream(path);
+        if (is != null) {
+            ImageView iv = new ImageView(new Image(is));
+            iv.setFitWidth(48);
+            iv.setFitHeight(48);
+            iv.setPreserveRatio(true);
+            return iv;
+        }
+        Label l = new Label(fallbackEmoji);
+        l.getStyleClass().add("card-icon");
+        l.setStyle("-fx-font-size: 28px;");
+        return l;
+    }
+
+    private void wireNavigation() {
+        btnBack.setOnAction(e -> {
+            CreateCharacterView prev = new CreateCharacterView();
+            Stage stage = (Stage) root.getScene().getWindow();
+            stage.setScene(new Scene(prev.getRoot(), stage.getScene().getWidth(), stage.getScene().getHeight()));
+        });
+        btnNext.setOnAction(e -> {
+            AbilityScoresView next = new AbilityScoresView();
+            Stage stage = (Stage) root.getScene().getWindow();
+            stage.setScene(new Scene(next.getRoot(), stage.getScene().getWidth(), stage.getScene().getHeight()));
+        });
     }
 }
