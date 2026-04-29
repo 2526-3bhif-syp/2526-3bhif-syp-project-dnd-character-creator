@@ -1,103 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.TilePane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.layout.FlowPane?>
-<?import javafx.geometry.Insets?>
 
-<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" style="-fx-background-color: #F5F5DC;">
-    <!-- Top: Header & Progress -->
-    <top>
-        <VBox alignment="CENTER" spacing="10">
-            <BorderPane.margin>
-                <Insets top="20" bottom="20"/>
-            </BorderPane.margin>
-            <Label text="Schritt 1: Rasse wählen" style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #8B0000;"/>
-            <Label text="Wähle deine Rasse. Sie bestimmt deine grundlegenden körperlichen Merkmale und Fähigkeiten." style="-fx-font-size: 16px; -fx-text-fill: #1A1A1A;"/>
-            <VBox alignment="CENTER" spacing="6">
-                <Label text="Charaktername*" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B0000;"/>
-                <TextField fx:id="txtCharacterName" promptText="z. B. Arannis" prefWidth="240" style="-fx-background-color: #F5F5DC; -fx-border-color: #C6A664; -fx-border-width: 2; -fx-border-radius: 8; -fx-background-radius: 8; -fx-text-fill: #1A1A1A; -fx-font-size: 14px;"/>
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      styleClass="creation-root" spacing="0">
+
+    <!-- Stepper bar (filled in Java) -->
+    <HBox fx:id="stepperContainer"/>
+
+    <!-- Header -->
+    <VBox alignment="CENTER" spacing="6">
+        <padding><Insets top="4" bottom="14" left="40" right="40"/></padding>
+        <Label text="Schritt 1 — Wer bist du?" styleClass="section-title"/>
+        <Label text="Gib deinem Helden einen Namen und wähle eine Rasse." styleClass="section-subtitle"/>
+    </VBox>
+
+    <!-- Body: left = name + race grid, right = preview -->
+    <HBox spacing="20" VBox.vgrow="ALWAYS">
+        <padding><Insets left="40" right="40" top="0" bottom="10"/></padding>
+
+        <!-- LEFT -->
+        <VBox spacing="16" HBox.hgrow="ALWAYS">
+            <VBox spacing="4">
+                <Label text="Charaktername" styleClass="section-title" style="-fx-font-size: 14px;"/>
+                <TextField fx:id="txtCharacterName" promptText="z. B. Thorin Eisenherz"
+                           styleClass="input-field" maxWidth="360"/>
             </VBox>
+
+            <Label text="Wähle eine Rasse" styleClass="section-title" style="-fx-font-size: 14px;"/>
+            <HBox fx:id="filterBar" spacing="8"/>
+
+            <ScrollPane fx:id="raceScroll" fitToWidth="true" VBox.vgrow="ALWAYS">
+                <TilePane fx:id="raceGrid" hgap="14" vgap="14" prefColumns="3"
+                          prefTileWidth="220" prefTileHeight="160">
+                    <padding><Insets top="4" bottom="14" left="2" right="2"/></padding>
+                </TilePane>
+            </ScrollPane>
         </VBox>
-    </top>
 
-    <!-- Center: Race Selection Tiles (Progressive Disclosure prepared) -->
-    <center>
-        <!-- Use ScrollPane so tiles don't overflow when there are many -->
-        <javafx.scene.control.ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent; -fx-padding: 0;">
-            <VBox alignment="CENTER" spacing="20">
-                <padding>
-                    <Insets top="20" bottom="20" left="40" right="40"/>
-                </padding>
+        <!-- RIGHT: preview placeholder -->
+        <VBox fx:id="previewContainer" spacing="8"/>
+    </HBox>
 
-                <!-- ROW 1 (Dwarf bis Dragonborn) -->
-                <HBox alignment="CENTER" spacing="20">
-                    <!-- Dwarf -->
-                    <Button fx:id="btnDwarf" text="Dwarf&#10;+2 CON" style="-fx-padding: 20; -fx-border-color: #C6A664; -fx-border-width: 3; -fx-border-radius: 10; -fx-background-radius: 10; -fx-background-color: transparent; -fx-cursor: hand; -fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B0000;" prefWidth="150" prefHeight="180"/>
-
-                    <!-- Elf -->
-                    <Button fx:id="btnElf" text="Elf&#10;+2 DEX" style="-fx-padding: 20; -fx-border-color: #C6A664; -fx-border-width: 3; -fx-border-radius: 10; -fx-background-radius: 10; -fx-background-color: transparent; -fx-cursor: hand; -fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B0000;" prefWidth="150" prefHeight="180"/>
-
-                    <!-- Halfling -->
-                    <Button fx:id="btnHalfling" text="Halfling&#10;+2 DEX" style="-fx-padding: 20; -fx-border-color: #C6A664; -fx-border-width: 3; -fx-border-radius: 10; -fx-background-radius: 10; -fx-background-color: transparent; -fx-cursor: hand; -fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B0000;" prefWidth="150" prefHeight="180"/>
-
-                    <!-- Human -->
-                    <Button fx:id="btnHuman" text="Human&#10;+1 All" style="-fx-padding: 20; -fx-border-color: #C6A664; -fx-border-width: 3; -fx-border-radius: 10; -fx-background-radius: 10; -fx-background-color: transparent; -fx-cursor: hand; -fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B0000;" prefWidth="150" prefHeight="180"/>
-
-                    <!-- Dragonborn -->
-                    <Button fx:id="btnDragonborn" text="Dragonborn&#10;+2 STR&#10;+1 CHA" style="-fx-padding: 20; -fx-border-color: #C6A664; -fx-border-width: 3; -fx-border-radius: 10; -fx-background-radius: 10; -fx-background-color: transparent; -fx-cursor: hand; -fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B0000;" prefWidth="150" prefHeight="180"/>
-                </HBox>
-
-                <!-- ROW 2 (Gnome, Half-Elf, Half-Orc, Tiefling) -->
-                <HBox alignment="CENTER" spacing="20">
-                    <!-- Gnome -->
-                    <Button fx:id="btnGnome" text="Gnome&#10;+2 INT" style="-fx-padding: 20; -fx-border-color: #C6A664; -fx-border-width: 3; -fx-border-radius: 10; -fx-background-radius: 10; -fx-background-color: transparent; -fx-cursor: hand; -fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B0000;" prefWidth="150" prefHeight="180"/>
-
-                    <!-- Half-Elf -->
-                    <Button fx:id="btnHalfElf" text="Half-Elf&#10;+2 CHA" style="-fx-padding: 20; -fx-border-color: #C6A664; -fx-border-width: 3; -fx-border-radius: 10; -fx-background-radius: 10; -fx-background-color: transparent; -fx-cursor: hand; -fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B0000;" prefWidth="150" prefHeight="180"/>
-
-                    <!-- Half-Orc -->
-                    <Button fx:id="btnHalfOrc" text="Half-Orc&#10;+2 STR&#10;+1 CON" style="-fx-padding: 20; -fx-border-color: #C6A664; -fx-border-width: 3; -fx-border-radius: 10; -fx-background-radius: 10; -fx-background-color: transparent; -fx-cursor: hand; -fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B0000;" prefWidth="150" prefHeight="180"/>
-
-                    <!-- Tiefling -->
-                    <Button fx:id="btnTiefling" text="Tiefling&#10;+2 CHA&#10;+1 INT" style="-fx-padding: 20; -fx-border-color: #C6A664; -fx-border-width: 3; -fx-border-radius: 10; -fx-background-radius: 10; -fx-background-color: transparent; -fx-cursor: hand; -fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B0000;" prefWidth="150" prefHeight="180"/>
-                </HBox>
-            </VBox>
-        </javafx.scene.control.ScrollPane>
-    </center>
-
-    <!-- Bottom: Navigation Buttons (Zurück / Weiter) -->
-    <bottom>
-        <VBox spacing="20">
-            <BorderPane.margin>
-                <Insets left="40" right="40" top="10" bottom="20"/>
-            </BorderPane.margin>
-
-            <!-- Legend/Explanation Section -->
-            <VBox alignment="CENTER_LEFT" spacing="5" style="-fx-background-color: transparent; -fx-padding: 10;">
-                <Label text="Begriffserklärungen" style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #8B0000;"/>
-                <HBox spacing="40">
-                    <VBox spacing="5">
-                        <Label text="STR = Stärke (Muskelkraft, Nahkampf)" style="-fx-font-size: 12px; -fx-text-fill: #1A1A1A;"/>
-                        <Label text="DEX = Geschicklichkeit (Schnelligkeit, Zielen)" style="-fx-font-size: 12px; -fx-text-fill: #1A1A1A;"/>
-                        <Label text="CON = Konstitution (Leben, Ausdauer)" style="-fx-font-size: 12px; -fx-text-fill: #1A1A1A;"/>
-                    </VBox>
-                    <VBox spacing="5">
-                        <Label text="INT = Intelligenz (Buchwissen, Magie studieren)" style="-fx-font-size: 12px; -fx-text-fill: #1A1A1A;"/>
-                        <Label text="WIS = Weisheit (Sinne, Instinkt, Natur)" style="-fx-font-size: 12px; -fx-text-fill: #1A1A1A;"/>
-                        <Label text="CHA = Charisma (Reden, Ausstrahlung)" style="-fx-font-size: 12px; -fx-text-fill: #1A1A1A;"/>
-                    </VBox>
-                </HBox>
-            </VBox>
-
-            <!-- Navigation Buttons -->
-            <HBox alignment="CENTER" spacing="50">
-                <Button fx:id="btnBack" text="Zurück" style="-fx-background-color: #F5F5DC; -fx-border-color: #C6A664; -fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10; -fx-text-fill: #1A1A1A; -fx-font-size: 18px;" prefWidth="150" prefHeight="50"/>
-                <Button fx:id="btnNext" text="Weiter" style="-fx-background-color: #8B0000; -fx-text-fill: #F5F5DC; -fx-border-width: 0; -fx-background-radius: 10; -fx-font-size: 18px; -fx-font-weight: bold;" prefWidth="150" prefHeight="50"/>
-            </HBox>
-        </VBox>
-    </bottom>
-</BorderPane>
+    <!-- Bottom navigation -->
+    <HBox alignment="CENTER" spacing="40">
+        <padding><Insets top="10" bottom="20" left="40" right="40"/></padding>
+        <Button fx:id="btnBack" text="Zurück" styleClass="nav-button-back"/>
+        <Button fx:id="btnNext" text="Weiter" styleClass="nav-button-next"/>
+    </HBox>
+</VBox>
