@@ -331,41 +331,31 @@ public class DbManager {
         return result;
     }
 
-    public List<Map<String, Object>> getClassSkillProficiencies(String className) {
-        List<Map<String, Object>> result = new ArrayList<>();
-        Map<String, Object> config = getClassSkillSelectionConfig(className);
-        Map<String, Object> entry = new HashMap<>();
-        entry.put("description", "Choose " + config.get("choose") + " skills");
-        entry.put("choose", config.get("choose"));
-        result.add(entry);
-        return result;
-    }
-
     public Map<String, Object> getClassSkillSelectionConfig(String className) {
         Map<String, Object> config = new HashMap<>();
-        List<String> options = new ArrayList<>();
         int choose = 2;
+        List<String> options = new ArrayList<>();
 
-        String skillQuery = "SELECT skill_name FROM class_skill_choice WHERE class_name = ? ORDER BY skill_name";
-        try (PreparedStatement stmt = connection.prepareStatement(skillQuery)) {
-            stmt.setString(1, className);
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                options.add(rs.getString("skill_name"));
-            }
-        } catch (SQLException e) {
-            System.err.println("Error loading class skill choices: " + e.getMessage());
-        }
-
-        String countQuery = "SELECT skill_count FROM class_skill_count WHERE class_name = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(countQuery)) {
-            stmt.setString(1, className);
+        String choiceQuery = "SELECT choose, desc FROM classes_proficiency_choices " +
+                "WHERE classes_index = ? AND type = 'proficiencies' " +
+                "ORDER BY order_num LIMIT 1";
+        try (PreparedStatement stmt = connection.prepareStatement(choiceQuery)) {
+            stmt.setString(1, className.toLowerCase());
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                choose = rs.getInt("skill_count");
+                choose = rs.getInt("choose");
+                String desc = rs.getString("desc");
+                if (desc != null && !desc.toLowerCase().contains("any")) {
+                    List<String> allSkills = getAllSkills();
+                    for (String skill : allSkills) {
+                        if (desc.contains(skill)) {
+                            options.add(skill);
+                        }
+                    }
+                }
             }
         } catch (SQLException e) {
-            System.err.println("Error loading class skill count: " + e.getMessage());
+            System.err.println("Error loading class skill config: " + e.getMessage());
         }
 
         if (options.isEmpty()) {
