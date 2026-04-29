@@ -186,7 +186,9 @@ public class DbManager {
             while (rs.next()) {
                 String traitName = rs.getString("trait_name");
                 String desc = rs.getString("description");
-                if (desc != null && desc.length() > 100) desc = desc.substring(0, 100) + "...";
+                if (desc != null && desc.length() > 100) {
+                    desc = desc.substring(0, 100) + "...";
+                }
                 race.addTrait(new Race.Trait(traitName, traitName, desc));
             }
         } catch (SQLException e) {
@@ -236,7 +238,20 @@ public class DbManager {
     }
 
     public Map<String, Object> getClassByIndex(String className) {
-        return getClassByName(className);
+        String query = "SELECT name, hit_die FROM class WHERE name = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, className);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                Map<String, Object> classData = new HashMap<>();
+                classData.put("name", rs.getString("name"));
+                classData.put("hit_die", rs.getInt("hit_die"));
+                return classData;
+            }
+        } catch (SQLException e) {
+            System.err.println("Error loading class by index: " + e.getMessage());
+        }
+        return null;
     }
 
     private List<String> getClassProficiencies(String className) {
@@ -248,7 +263,9 @@ public class DbManager {
             stmt.setString(1, className);
             stmt.setString(2, className);
             ResultSet rs = stmt.executeQuery();
-            while (rs.next()) result.add(rs.getString("proficiency"));
+            while (rs.next()) {
+                result.add(rs.getString("proficiency"));
+            }
         } catch (SQLException e) {
             System.err.println("Error loading class proficiencies: " + e.getMessage());
         }
@@ -261,7 +278,9 @@ public class DbManager {
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, className);
             ResultSet rs = stmt.executeQuery();
-            while (rs.next()) result.add(rs.getString("ability"));
+            while (rs.next()) {
+                result.add(rs.getString("ability"));
+            }
         } catch (SQLException e) {
             System.err.println("Error loading class saving throws: " + e.getMessage());
         }
@@ -282,7 +301,9 @@ public class DbManager {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 String item = rs.getString("mandatory_item");
-                if (item != null && !item.isBlank()) result.add(item);
+                if (item != null && !item.trim().isEmpty()) {
+                    result.add(item);
+                }
             }
         } catch (SQLException e) {
             System.err.println("Error loading starting equipment: " + e.getMessage());
@@ -301,18 +322,19 @@ public class DbManager {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 Map<String, Object> option = new HashMap<>();
-                option.put("id",        rs.getInt("id"));
+                option.put("id", rs.getInt("id"));
                 option.put("order_num", rs.getInt("choice_order"));
-                option.put("choose",    1);
+                option.put("choose", 1);
 
+                String optA = rs.getString("option_a");
+                String optB = rs.getString("option_b");
+                String optC = rs.getString("option_c");
                 List<String> parts = new ArrayList<>();
-                String a = rs.getString("option_a");
-                String b = rs.getString("option_b");
-                String c = rs.getString("option_c");
-                if (a != null && !a.isBlank()) parts.add(a);
-                if (b != null && !b.isBlank()) parts.add(b);
-                if (c != null && !c.isBlank()) parts.add(c);
+                if (optA != null && !optA.isBlank()) parts.add(optA);
+                if (optB != null && !optB.isBlank()) parts.add(optB);
+                if (optC != null && !optC.isBlank()) parts.add(optC);
                 option.put("description", String.join(" or ", parts));
+
                 result.add(option);
             }
         } catch (SQLException e) {
