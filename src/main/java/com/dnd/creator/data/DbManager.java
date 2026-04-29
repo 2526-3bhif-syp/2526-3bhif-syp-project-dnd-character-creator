@@ -444,7 +444,7 @@ public class DbManager {
 
     public List<String> getAllBackgrounds() {
         List<String> result = new ArrayList<>();
-        String query = "SELECT name FROM background ORDER BY name";
+        String query = "SELECT name FROM backgrounds ORDER BY name";
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
             while (rs.next()) {
@@ -458,7 +458,7 @@ public class DbManager {
 
     public List<String> getAllSkills() {
         List<String> result = new ArrayList<>();
-        String query = "SELECT name FROM skill ORDER BY name";
+        String query = "SELECT name FROM skills ORDER BY name";
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
             while (rs.next()) {
