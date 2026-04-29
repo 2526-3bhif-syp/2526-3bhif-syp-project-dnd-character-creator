@@ -1,7 +1,6 @@
 package com.dnd.creator.data;
 
 import com.dnd.creator.model.Race;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -32,10 +31,9 @@ public class DbManager {
 
     public void connect() {
         try {
-            boolean isNew = !new File("src/main/data/data.db").exists();
             connection = DriverManager.getConnection(DB_URL);
             System.out.println("Connection with Database successful!");
-            if (isNew) {
+            if (!isDatabaseInitialized()) {
                 initializeDatabase();
             }
         } catch (SQLException e) {
@@ -43,10 +41,27 @@ public class DbManager {
         }
     }
 
+    private boolean isDatabaseInitialized() {
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM race")) {
+            return rs.next() && rs.getInt(1) > 0;
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
     private void initializeDatabase() {
-        System.out.println("Database not found — initializing from SQL script...");
-        runSqlScript("src/main/data/dnd5e.sql");
-        System.out.println("Database initialized successfully!");
+        System.out.println("Database empty — initializing from SQL script...");
+        try {
+            connection.setAutoCommit(false);
+            runSqlScript("src/main/data/dnd5e.sql");
+            connection.commit();
+            connection.setAutoCommit(true);
+            System.out.println("Database initialized successfully!");
+        } catch (SQLException e) {
+            System.err.println("Initialization failed, rolling back: " + e.getMessage());
+            try { connection.rollback(); connection.setAutoCommit(true); } catch (SQLException ignored) {}
+        }
     }
 
     private void runSqlScript(String scriptPath) {
