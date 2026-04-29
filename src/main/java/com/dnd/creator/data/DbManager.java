@@ -691,4 +691,50 @@ public class DbManager {
         return result;
     }
 
+    public List<Map<String, String>> getSpellsForClass(String classIndex, int level) {
+        List<Map<String, String>> result = new ArrayList<>();
+        String query = "SELECT s.name, s.school_index, s.casting_time, s.range, s.duration " +
+                "FROM spells s " +
+                "JOIN spells_classes sc ON s.\"index\" = sc.spells_index " +
+                "WHERE sc.classes_index = ? AND s.level = ? " +
+                "ORDER BY s.name";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, classIndex.toLowerCase());
+            stmt.setInt(2, level);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Map<String, String> spell = new HashMap<>();
+                spell.put("name",         rs.getString("name"));
+                spell.put("school",       rs.getString("school_index"));
+                spell.put("casting_time", rs.getString("casting_time"));
+                spell.put("range",        rs.getString("range"));
+                spell.put("duration",     rs.getString("duration"));
+                result.add(spell);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error loading spells: " + e.getMessage());
+        }
+        return result;
+    }
+
+    public Map<String, Integer> getSpellSlotsAtLevel(String classIndex, int characterLevel) {
+        Map<String, Integer> slots = new LinkedHashMap<>();
+        String query = "SELECT spellcasting_cantrips_known, spellcasting_spells_known, " +
+                "spellcasting_spell_slots_level_1 " +
+                "FROM levels WHERE class_index = ? AND level = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, classIndex.toLowerCase());
+            stmt.setInt(2, characterLevel);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                slots.put("cantrips_known", rs.getInt("spellcasting_cantrips_known"));
+                slots.put("spells_known",   rs.getInt("spellcasting_spells_known"));
+                slots.put("slots_level_1",  rs.getInt("spellcasting_spell_slots_level_1"));
+            }
+        } catch (SQLException e) {
+            System.err.println("Error loading spell slots: " + e.getMessage());
+        }
+        return slots;
+    }
+
 }
