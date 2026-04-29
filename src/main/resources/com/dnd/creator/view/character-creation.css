@@ -453,6 +453,12 @@
     -fx-text-fill: #8B0000;
 }
 
+.skill-counter-done {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #4CAF50;
+}
+
 .check-box .label {
     -fx-text-fill: #1A1A1A;
 }
@@ -549,4 +555,48 @@
     -fx-background-color: #8B0000;
     -fx-border-color: #8B0000;
     -fx-text-fill: #F5F5DC;
+}
+
+/* ---------- Spell cards (Step 7) ---------- */
+.spell-card {
+    -fx-background-color: #FFFBF0;
+    -fx-border-color: #C6A664;
+    -fx-border-width: 2;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 10;
+    -fx-cursor: hand;
+}
+
+.spell-card:hover {
+    -fx-border-color: #8B0000;
+    -fx-effect: dropshadow(gaussian, rgba(139,0,0,0.3), 8, 0.3, 0, 0);
+}
+
+.spell-card-selected {
+    -fx-background-color: #8B0000;
+    -fx-border-color: #8B0000;
+}
+
+.spell-card-selected .spell-card-name,
+.spell-card-selected .spell-card-school,
+.spell-card-selected .spell-card-meta {
+    -fx-text-fill: #F5F5DC;
+}
+
+.spell-card-name {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1A1A1A;
+}
+
+.spell-card-school {
+    -fx-font-size: 11px;
+    -fx-font-style: italic;
+    -fx-text-fill: #8B0000;
+}
+
+.spell-card-meta {
+    -fx-font-size: 10px;
+    -fx-text-fill: #666;
 }

@@ -9,7 +9,7 @@ import javafx.scene.layout.VBox;
 public class StepperBar {
 
     private static final String[] STEP_LABELS = {
-        "Identität", "Klasse", "Werte", "Fähigkeiten", "Ausrüstung", "Gesinnung"
+        "Identität", "Klasse", "Werte", "Fähigkeiten", "Ausrüstung", "Gesinnung", "Zauber"
     };
 
     private final HBox root;

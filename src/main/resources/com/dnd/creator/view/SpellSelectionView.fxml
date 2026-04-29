@@ -1,57 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.geometry.Insets?>
 
-<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-            style="-fx-background-color: #F5F5DC;">
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      styleClass="creation-root" spacing="0">
 
-    <top>
-        <VBox alignment="CENTER" spacing="10">
-            <BorderPane.margin><Insets top="20" bottom="10"/></BorderPane.margin>
-            <Label text="Schritt 7: Zauber" style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #8B0000;"/>
-            <Label text="Wähle deine Zauber für Level 1" style="-fx-font-size: 16px; -fx-text-fill: #1A1A1A;"/>
-        </VBox>
-    </top>
+    <HBox fx:id="stepperContainer"/>
 
-    <center>
-        <ScrollPane fitToWidth="true" style="-fx-background-color: #F5F5DC; -fx-background: #F5F5DC;">
+    <VBox alignment="CENTER" spacing="6">
+        <padding><Insets top="4" bottom="14" left="40" right="40"/></padding>
+        <Label text="Schritt 7 — Zauber" styleClass="section-title"/>
+        <Label text="Wähle deine Cantrips und Zauber für Level 1." styleClass="section-subtitle"/>
+    </VBox>
+
+    <HBox spacing="20" VBox.vgrow="ALWAYS">
+        <padding><Insets left="40" right="40" top="0" bottom="10"/></padding>
+
+        <ScrollPane fitToWidth="true" HBox.hgrow="ALWAYS">
             <VBox spacing="20">
-                <padding><Insets top="15" bottom="15" left="40" right="40"/></padding>
+                <padding><Insets top="2" bottom="14" left="2" right="2"/></padding>
 
                 <!-- Cantrips -->
                 <VBox fx:id="cantripSection" spacing="10" visible="false" managed="false">
-                    <Label fx:id="lblCantripTitle" text="Cantrips wählen:"
-                           style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #8B0000;"/>
-                    <FlowPane fx:id="cantripPane" hgap="15" vgap="10" prefWrapLength="700"/>
+                    <HBox alignment="CENTER_LEFT" spacing="12">
+                        <Label fx:id="lblCantripTitle" text="Cantrips" styleClass="choice-block-title"/>
+                        <Label fx:id="lblCantripCounter" text="0 / 0" styleClass="skill-counter"/>
+                    </HBox>
+                    <Label text="Cantrips haben keine Begrenzung — du kannst sie beliebig oft wirken."
+                           styleClass="muted"/>
+                    <FlowPane fx:id="cantripPane" hgap="10" vgap="10"/>
                 </VBox>
 
                 <!-- Level 1 Spells -->
                 <VBox fx:id="spellSection" spacing="10" visible="false" managed="false">
-                    <Label fx:id="lblSpellTitle" text="Level-1-Zauber wählen:"
-                           style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #8B0000;"/>
-                    <FlowPane fx:id="spellPane" hgap="15" vgap="10" prefWrapLength="700"/>
+                    <HBox alignment="CENTER_LEFT" spacing="12">
+                        <Label fx:id="lblSpellTitle" text="Level-1-Zauber" styleClass="choice-block-title"/>
+                        <Label fx:id="lblSpellCounter" text="0 / 0" styleClass="skill-counter"/>
+                    </HBox>
+                    <Label text="Level-1-Zauber kosten Zauberplätze. Du kannst sie nach einer langen Rast erneut wirken."
+                           styleClass="muted"/>
+                    <FlowPane fx:id="spellPane" hgap="10" vgap="10"/>
                 </VBox>
 
             </VBox>
         </ScrollPane>
-    </center>
 
-    <bottom>
-        <HBox alignment="CENTER" spacing="50">
-            <BorderPane.margin><Insets left="40" right="40" top="15" bottom="20"/></BorderPane.margin>
-            <Button fx:id="btnBack" text="Zurück"
-                    style="-fx-background-color: #F5F5DC; -fx-border-color: #C6A664; -fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10; -fx-text-fill: #1A1A1A; -fx-font-size: 18px;"
-                    prefWidth="150" prefHeight="50"/>
-            <Button fx:id="btnNext" text="Weiter"
-                    style="-fx-background-color: #8B0000; -fx-text-fill: #F5F5DC; -fx-border-width: 0; -fx-background-radius: 10; -fx-font-size: 18px; -fx-font-weight: bold;"
-                    prefWidth="150" prefHeight="50"/>
-        </HBox>
-    </bottom>
+        <VBox fx:id="previewContainer" spacing="8"/>
+    </HBox>
 
-</BorderPane>
+    <HBox alignment="CENTER" spacing="40">
+        <padding><Insets top="10" bottom="20" left="40" right="40"/></padding>
+        <Button fx:id="btnBack" text="Zurück" styleClass="nav-button-back"/>
+        <Button fx:id="btnNext" text="Weiter" styleClass="nav-button-next"/>
+    </HBox>
+</VBox>
