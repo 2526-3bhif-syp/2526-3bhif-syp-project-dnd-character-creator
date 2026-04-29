@@ -1,236 +1,289 @@
 package com.dnd.creator.view;
+
 import com.dnd.creator.data.DbManager;
 import com.dnd.creator.model.CharacterSession;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.Tooltip;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.io.IOException;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.FlowPane;
 
 public class SkillsView {
-    private Parent root;
 
+    /** Skill -> ability that governs it (D&D 5e). */
+    private static final Map<String, String> SKILL_ABILITY = new LinkedHashMap<>() {{
+        put("Athletics", "STR");
+        put("Acrobatics", "DEX");
+        put("Sleight of Hand", "DEX");
+        put("Stealth", "DEX");
+        put("Arcana", "INT");
+        put("History", "INT");
+        put("Investigation", "INT");
+        put("Nature", "INT");
+        put("Religion", "INT");
+        put("Animal Handling", "WIS");
+        put("Insight", "WIS");
+        put("Medicine", "WIS");
+        put("Perception", "WIS");
+        put("Survival", "WIS");
+        put("Deception", "CHA");
+        put("Intimidation", "CHA");
+        put("Performance", "CHA");
+        put("Persuasion", "CHA");
+    }};
+
+    private static final Map<String, String> ABILITY_GROUP_LABEL = Map.of(
+        "STR", "Stärke",
+        "DEX", "Geschicklichkeit",
+        "INT", "Intelligenz",
+        "WIS", "Weisheit",
+        "CHA", "Charisma"
+    );
+
+    /** Background -> short German tagline. */
+    private static final Map<String, String> BACKGROUND_TAGLINES = new LinkedHashMap<>() {{
+        put("Acolyte",       "Tempeldiener. Kennt Religion und heilige Stätten.");
+        put("Charlatan",     "Schwindler. Täuscht Leute geschickt.");
+        put("Criminal",      "Verbrecher. Kennt die Unterwelt.");
+        put("Entertainer",   "Künstler. Lieder, Geschichten, Auftritte.");
+        put("Folk Hero",     "Volksheld. Das einfache Volk mag dich.");
+        put("Guild Artisan", "Zunfthandwerker. Geschickt mit Werkzeugen.");
+        put("Hermit",        "Einsiedler. Lange in Abgeschiedenheit gelebt.");
+        put("Noble",         "Adliger. Bildung, Manieren, Privilegien.");
+        put("Outlander",     "Wildnisbewohner. Überlebt in der Wildnis.");
+        put("Sage",          "Gelehrter. Tiefes Wissen über die Welt.");
+        put("Sailor",        "Seemann. Schiffe, Knoten, Stürme.");
+        put("Soldier",       "Soldat. Militärische Ausbildung und Taktik.");
+    }};
+
+    @FXML private HBox stepperContainer;
+    @FXML private VBox previewContainer;
+    @FXML private VBox backgroundContainer;
+    @FXML private VBox skillsContainer;
+    @FXML private Label lblSkillsCounter;
+    @FXML private Label lblSkillsHint;
     @FXML private Button btnBack;
     @FXML private Button btnNext;
-    @FXML private FlowPane backgroundContainer;
-    @FXML private FlowPane skillsContainer;
-    @FXML private Label lblSkillsTitle;
-    @FXML private VBox backgroundSkillContainer;
-    @FXML private FlowPane backgroundSkillDisplay;
 
+    private Parent root;
     private final DbManager dbManager = new DbManager();
-    private final ToggleGroup backgroundToggleGroup = new ToggleGroup();
+    private final CharacterPreviewPanel preview = new CharacterPreviewPanel();
+    private final Map<String, VBox> backgroundCards = new LinkedHashMap<>();
     private final List<CheckBox> skillCheckboxes = new ArrayList<>();
-    private int maxSkillsToChoose = 2;
-    private List<String> backgroundGrantedSkills = new ArrayList<>();
-
+    private String selectedBackground = null;
+    private int maxSkills = 2;
 
     public SkillsView() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/dnd/creator/view/SkillsView.fxml"));
             loader.setController(this);
             root = loader.load();
+            CreationStyles.attach(root);
 
             dbManager.connect();
-            setupNavigationButtons();
-            loadStepData();
+
+            stepperContainer.getChildren().setAll(new StepperBar(4).getRoot());
+            previewContainer.getChildren().setAll(preview.getRoot());
+
+            buildBackgrounds();
+            buildSkills();
+            restoreSession();
+            updateCounter();
+            wireNavigation();
+            updateNextButton();
 
         } catch (IOException e) {
             throw new RuntimeException("Failed to load SkillsView.fxml", e);
         }
     }
 
-    private void setupNavigationButtons() {
-        if (btnBack != null) {
-            btnBack.setOnAction(e -> navigateBack());
-        }
-
-        if (btnNext != null) {
-            btnNext.setOnAction(e -> navigateNext());
-        }
+    public Parent getRoot() {
+        return root;
     }
 
-    private void loadStepData() {
-        loadBackgroundOptions();
-        loadSkillOptions();
-        restoreSavedSelections();
-    }
-
-    private void loadBackgroundOptions() {
-        backgroundContainer.getChildren().clear();
+    private void buildBackgrounds() {
         List<String> backgrounds = dbManager.getAllBackgrounds();
-
-        if (backgrounds.isEmpty()) {
-            backgrounds = List.of("Acolyte");
-        }
-
-        for (String background : backgrounds) {
-            RadioButton radio = new RadioButton(background);
-            radio.setToggleGroup(backgroundToggleGroup);
-            radio.setStyle("-fx-font-size: 14px; -fx-text-fill: #1A1A1A;");
-            radio.setOnAction(e -> updateBackgroundSkills(background));
-            backgroundContainer.getChildren().add(radio);
+        if (backgrounds.isEmpty()) backgrounds = new ArrayList<>(BACKGROUND_TAGLINES.keySet());
+        for (String bg : backgrounds) {
+            VBox card = buildBackgroundCard(bg);
+            backgroundCards.put(bg, card);
+            backgroundContainer.getChildren().add(card);
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private void loadSkillOptions() {
-        loadSkillOptionsFiltered(backgroundGrantedSkills);
+    private VBox buildBackgroundCard(String name) {
+        VBox card = new VBox(4);
+        card.getStyleClass().add("selection-card");
+        card.setAlignment(Pos.TOP_LEFT);
+
+        Label nameLabel = new Label(name);
+        nameLabel.getStyleClass().add("card-title");
+        nameLabel.setStyle("-fx-font-size: 14px;");
+
+        Label tagline = new Label(BACKGROUND_TAGLINES.getOrDefault(name, ""));
+        tagline.getStyleClass().add("card-tagline");
+        tagline.setWrapText(true);
+
+        card.getChildren().addAll(nameLabel, tagline);
+        card.setOnMouseClicked(e -> selectBackground(name));
+        return card;
+    }
+
+    private void selectBackground(String name) {
+        selectedBackground = name;
+        for (Map.Entry<String, VBox> entry : backgroundCards.entrySet()) {
+            VBox c = entry.getValue();
+            c.getStyleClass().remove("selection-card-selected");
+            if (entry.getKey().equals(name)) c.getStyleClass().add("selection-card-selected");
+        }
+        CharacterSession.getInstance().getCurrentCharacter().setSelectedBackground(name);
+        preview.refresh();
+        updateNextButton();
     }
 
     @SuppressWarnings("unchecked")
-    private void loadSkillOptionsFiltered(List<String> exclude) {
-        skillsContainer.getChildren().clear();
-        skillCheckboxes.clear();
-
+    private void buildSkills() {
         var character = CharacterSession.getInstance().getCurrentCharacter();
         String classIndex = character.getClassIndex();
 
-        List<String> skillOptions;
+        List<String> options;
         if (classIndex != null && !classIndex.isBlank()) {
             Map<String, Object> config = dbManager.getClassSkillSelectionConfig(classIndex);
-            maxSkillsToChoose = (int) config.getOrDefault("choose", 2);
-            skillOptions = (List<String>) config.getOrDefault("options", dbManager.getAllSkills());
+            maxSkills = (int) config.getOrDefault("choose", 2);
+            options = (List<String>) config.getOrDefault("options", dbManager.getAllSkills());
         } else {
-            maxSkillsToChoose = 2;
-            skillOptions = dbManager.getAllSkills();
+            maxSkills = 2;
+            options = dbManager.getAllSkills();
         }
 
-        if (lblSkillsTitle != null) {
-            lblSkillsTitle.setText("Fertigkeiten wählen (" + maxSkillsToChoose + "):");
+        lblSkillsHint.setText("Wähle " + maxSkills + " Fähigkeiten, in denen dein Held besonders gut ist.");
+
+        // Group by ability
+        Map<String, List<String>> grouped = new LinkedHashMap<>();
+        for (String skill : options) {
+            String ability = SKILL_ABILITY.getOrDefault(skill, "INT");
+            grouped.computeIfAbsent(ability, k -> new ArrayList<>()).add(skill);
         }
 
-        for (String skill : skillOptions) {
-            if (exclude.contains(skill)) continue;
-            CheckBox checkBox = new CheckBox(skill);
-            checkBox.setStyle("-fx-font-size: 14px; -fx-text-fill: #1A1A1A;");
-            checkBox.setOnAction(e -> enforceSkillLimit());
-            skillCheckboxes.add(checkBox);
-            skillsContainer.getChildren().add(checkBox);
+        // Render each group in a fixed ability order
+        String[] order = {"STR", "DEX", "INT", "WIS", "CHA"};
+        for (String ability : order) {
+            List<String> skills = grouped.get(ability);
+            if (skills == null || skills.isEmpty()) continue;
+            skillsContainer.getChildren().add(buildSkillGroup(ability, skills));
         }
     }
 
-    private void restoreSavedSelections() {
-        var character = CharacterSession.getInstance().getCurrentCharacter();
+    private VBox buildSkillGroup(String ability, List<String> skills) {
+        VBox box = new VBox(6);
+        box.getStyleClass().add("skill-group");
 
-        if (character.getSelectedBackground() != null) {
-            for (var node : backgroundContainer.getChildren()) {
-                if (node instanceof RadioButton radio && character.getSelectedBackground().equals(radio.getText())) {
-                    radio.setSelected(true);
-                    break;
-                }
-            }
+        Label title = new Label(ABILITY_GROUP_LABEL.getOrDefault(ability, ability) + " (" + ability + ")");
+        title.getStyleClass().add("skill-group-title");
+
+        VBox checks = new VBox(4);
+        for (String skill : skills) {
+            CheckBox cb = new CheckBox(skill);
+            Tooltip.install(cb, makeSkillTooltip(skill, ability));
+            cb.setOnAction(e -> {
+                enforceSkillLimit();
+                saveSkills();
+                updateCounter();
+                updateNextButton();
+            });
+            skillCheckboxes.add(cb);
+            checks.getChildren().add(cb);
         }
 
-        List<String> selectedSkills = character.getSelectedSkills();
-        if (selectedSkills == null || selectedSkills.isEmpty()) {
-            return;
-        }
+        box.getChildren().addAll(title, checks);
+        return box;
+    }
 
-        for (CheckBox checkBox : skillCheckboxes) {
-            checkBox.setSelected(selectedSkills.contains(checkBox.getText()));
-        }
-        enforceSkillLimit();
-
-        if (character.getSelectedBackground() != null) {
-            updateBackgroundSkills(character.getSelectedBackground());
-        }
+    private Tooltip makeSkillTooltip(String skill, String ability) {
+        Tooltip t = new Tooltip(skill + " — basiert auf "
+            + ABILITY_GROUP_LABEL.getOrDefault(ability, ability) + " (" + ability + ")");
+        t.setShowDelay(Duration.millis(300));
+        return t;
     }
 
     private void enforceSkillLimit() {
-        long selectedCount = skillCheckboxes.stream().filter(CheckBox::isSelected).count();
-        boolean limitReached = selectedCount >= maxSkillsToChoose;
-
-        for (CheckBox checkBox : skillCheckboxes) {
-            if (!checkBox.isSelected()) {
-                checkBox.setDisable(limitReached);
-            }
-        }
-    }
-
-    private void navigateBack() {
-        AbilityScoresView prevView = new AbilityScoresView();
-        Stage stage = (Stage) root.getScene().getWindow();
-        stage.setScene(new Scene(prevView.getRoot(), stage.getScene().getWidth(), stage.getScene().getHeight()));
-    }
-
-    private void navigateNext() {
-        RadioButton selectedBackground = (RadioButton) backgroundToggleGroup.getSelectedToggle();
-        if (selectedBackground == null) {
-            showError("Bitte wähle einen Hintergrund aus.");
-            return;
-        }
-
-        List<String> chosenSkills = skillCheckboxes.stream()
-                .filter(CheckBox::isSelected)
-                .map(CheckBox::getText)
-                .toList();
-
-        if (chosenSkills.size() != maxSkillsToChoose) {
-            showError("Bitte wähle genau " + maxSkillsToChoose + " Fertigkeiten aus.");
-            return;
-        }
-
-        List<String> allSkills = new ArrayList<>(backgroundGrantedSkills);
-        allSkills.addAll(chosenSkills);
-
-        var character = CharacterSession.getInstance().getCurrentCharacter();
-        character.setSelectedBackground(selectedBackground.getText());
-        character.setSelectedSkills(allSkills);
-
-        EquipmentView nextView = new EquipmentView();
-        Stage stage = (Stage) root.getScene().getWindow();
-        stage.setScene(new Scene(nextView.getRoot(), stage.getScene().getWidth(), stage.getScene().getHeight()));
-    }
-
-    private void showError(String message) {
-        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.WARNING);
-        alert.setTitle("Unvollständige Auswahl");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    public Parent getRoot() { return root; }
-
-    private void updateBackgroundSkills(String backgroundName) {
-        backgroundGrantedSkills = dbManager.getBackgroundSkills(backgroundName);
-
-        backgroundSkillDisplay.getChildren().clear();
-        for (String skill : backgroundGrantedSkills) {
-            CheckBox cb = new CheckBox(skill);
-            cb.setSelected(true);
-            cb.setDisable(true);
-            cb.setStyle("-fx-font-size: 13px; -fx-text-fill: #2d5a3d; -fx-opacity: 1;");
-            backgroundSkillDisplay.getChildren().add(cb);
-        }
-        backgroundSkillContainer.setVisible(!backgroundGrantedSkills.isEmpty());
-        backgroundSkillContainer.setManaged(!backgroundGrantedSkills.isEmpty());
-
-        loadSkillOptionsFiltered(backgroundGrantedSkills);
-        restoreChosenClassSkills();
-    }
-
-    private void restoreChosenClassSkills() {
-        List<String> saved = CharacterSession.getInstance()
-                .getCurrentCharacter().getSelectedSkills();
-        if (saved == null) return;
+        long selected = skillCheckboxes.stream().filter(CheckBox::isSelected).count();
+        boolean limit = selected >= maxSkills;
         for (CheckBox cb : skillCheckboxes) {
-            if (saved.contains(cb.getText())) cb.setSelected(true);
+            if (!cb.isSelected()) cb.setDisable(limit);
         }
-        enforceSkillLimit();
+    }
+
+    private void saveSkills() {
+        List<String> chosen = skillCheckboxes.stream()
+            .filter(CheckBox::isSelected)
+            .map(CheckBox::getText)
+            .toList();
+        CharacterSession.getInstance().getCurrentCharacter().setSelectedSkills(new ArrayList<>(chosen));
+    }
+
+    private void updateCounter() {
+        long selected = skillCheckboxes.stream().filter(CheckBox::isSelected).count();
+        lblSkillsCounter.setText(selected + " / " + maxSkills + " gewählt");
+    }
+
+    private void restoreSession() {
+        var character = CharacterSession.getInstance().getCurrentCharacter();
+
+        String savedBg = character.getSelectedBackground();
+        if (savedBg != null && backgroundCards.containsKey(savedBg)) {
+            selectBackground(savedBg);
+        }
+
+        List<String> savedSkills = character.getSelectedSkills();
+        if (savedSkills != null && !savedSkills.isEmpty()) {
+            for (CheckBox cb : skillCheckboxes) {
+                cb.setSelected(savedSkills.contains(cb.getText()));
+            }
+            enforceSkillLimit();
+        }
+    }
+
+    private void updateNextButton() {
+        long selected = skillCheckboxes.stream().filter(CheckBox::isSelected).count();
+        boolean valid = selectedBackground != null && selected == maxSkills;
+        btnNext.setDisable(!valid);
+        if (!valid) {
+            String reason;
+            if (selectedBackground == null) reason = "Bitte wähle einen Hintergrund.";
+            else if (selected < maxSkills) reason = "Bitte wähle " + maxSkills + " Fähigkeiten.";
+            else reason = "Du hast zu viele Fähigkeiten gewählt.";
+            Tooltip.install(btnNext, new Tooltip(reason));
+        } else {
+            Tooltip.uninstall(btnNext, btnNext.getTooltip());
+        }
+    }
+
+    private void wireNavigation() {
+        btnBack.setOnAction(e -> {
+            AbilityScoresView prev = new AbilityScoresView();
+            Stage stage = (Stage) root.getScene().getWindow();
+            stage.setScene(new Scene(prev.getRoot(), stage.getScene().getWidth(), stage.getScene().getHeight()));
+        });
+        btnNext.setOnAction(e -> {
+            saveSkills();
+            EquipmentView next = new EquipmentView();
+            Stage stage = (Stage) root.getScene().getWindow();
+            stage.setScene(new Scene(next.getRoot(), stage.getScene().getWidth(), stage.getScene().getHeight()));
+        });
     }
 }

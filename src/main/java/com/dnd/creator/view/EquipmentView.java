@@ -1,264 +1,240 @@
 package com.dnd.creator.view;
+
 import com.dnd.creator.data.DbManager;
 import com.dnd.creator.model.CharacterSession;
-import javafx.geometry.Insets;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
 public class EquipmentView {
+
+    @FXML private HBox stepperContainer;
+    @FXML private VBox previewContainer;
+    @FXML private VBox mandatoryContainer;
+    @FXML private VBox choicesContainer;
+    @FXML private Button btnBack;
+    @FXML private Button btnNext;
+
     private Parent root;
     private final DbManager dbManager = new DbManager();
+    private final CharacterPreviewPanel preview = new CharacterPreviewPanel();
+    /** orderNum -> selected entry (e.g. "A) chain mail") */
     private final Map<Integer, String> selectedChoices = new LinkedHashMap<>();
-    private int totalOptions = 0;
-    private java.util.List<String> savedEquipment;
+    /** orderNum -> list of bundle card nodes for visual update */
+    private final Map<Integer, List<VBox>> bundleCardsByOrder = new LinkedHashMap<>();
+    private int totalChoiceBlocks = 0;
+
     public EquipmentView() {
-        dbManager.connect();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/dnd/creator/view/EquipmentView.fxml"));
+            loader.setController(this);
+            root = loader.load();
+            CreationStyles.attach(root);
 
-        // Lade bereits gespeicherte Equipment-Auswahl (nicht löschen!)
-        var character = CharacterSession.getInstance().getCurrentCharacter();
-        java.util.List<String> existingEquipment = character.getSelectedEquipment();
-        if (existingEquipment != null) {
-            for (String equipment : existingEquipment) {
-                // Parse equipment string to get the choice letter and update selectedChoices
-                if (equipment.contains(")")) {
-                    String[] parts = equipment.split("\\)", 2);
-                    if (parts.length == 2) {
-                        String choiceStr = parts[0].trim(); // e.g., "A"
-                        String description = parts[1].trim();
-                        // Versuche die order_num zu rekonstruieren (wird später durchlaufen)
-                    }
-                }
-            }
+            dbManager.connect();
+
+            stepperContainer.getChildren().setAll(new StepperBar(5).getRoot());
+            previewContainer.getChildren().setAll(preview.getRoot());
+
+            buildContent();
+            wireNavigation();
+            updateNextButton();
+
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load EquipmentView.fxml", e);
         }
-
-        VBox mainBox = new VBox(20);
-        mainBox.setPadding(new Insets(20));
-        mainBox.setStyle("-fx-background-color: #F5F5DC;");
-        Label title = new Label("Schritt 5: Ausrüstung");
-        title.setStyle("-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #8B0000;");
-        Label subtitle = new Label("Wähle deine Startausrüstung");
-        subtitle.setStyle("-fx-font-size: 14px; -fx-text-fill: #666666;");
-        VBox headerBox = new VBox(8);
-        headerBox.getChildren().addAll(title, subtitle);
-        headerBox.setAlignment(javafx.geometry.Pos.CENTER);
-        VBox equipmentContent = createEquipmentSelection();
-        HBox buttonBox = new HBox(50);
-        buttonBox.setPadding(new Insets(20));
-        buttonBox.setAlignment(javafx.geometry.Pos.CENTER);
-        Button btnBack = new Button("Zurück");
-        btnBack.setPrefWidth(150);
-        btnBack.setPrefHeight(50);
-        btnBack.setStyle("-fx-background-color: #F5F5DC; -fx-border-color: #C6A664; -fx-border-width: 2; -fx-font-size: 16px;");
-        btnBack.setOnAction(e -> {
-            SkillsView prevView = new SkillsView();
-            Stage stage = (Stage) root.getScene().getWindow();
-            stage.setScene(new Scene(prevView.getRoot(), stage.getScene().getWidth(), stage.getScene().getHeight()));
-        });
-        Button btnNext = new Button("Weiter");
-        btnNext.setPrefWidth(150);
-        btnNext.setPrefHeight(50);
-        btnNext.setStyle("-fx-background-color: #8B0000; -fx-text-fill: #F5F5DC; -fx-font-size: 16px; -fx-font-weight: bold;");
-        btnNext.setOnAction(e -> {
-            if (selectedChoices.size() < totalOptions) {
-                Alert alert = new Alert(Alert.AlertType.WARNING);
-                alert.setTitle("Unvollständige Auswahl");
-                alert.setHeaderText(null);
-                alert.setContentText("Bitte wähle alle Ausrüstungs-Optionen aus bevor du fortfährst!");
-                alert.showAndWait();
-                return;
-            }
-
-            try {
-                var figure = CharacterSession.getInstance().getCurrentCharacter();
-                String classIdx = figure.getClassIndex();
-
-                List<String> allEquipment = new ArrayList<>();
-                List<String> mandatory = dbManager.getStartingEquipment(classIdx);
-                new java.util.LinkedHashSet<>(mandatory).forEach(allEquipment::add);
-
-                if (classIdx != null) {
-                    String lower = classIdx.toLowerCase();
-                    if (lower.equals("cleric") || lower.equals("paladin")) {
-                        allEquipment.add("Holy Symbol");
-                    }
-                }
-
-                allEquipment.addAll(selectedChoices.values());
-                figure.setSelectedEquipment(allEquipment);
-
-                AlignmentView nextView = new AlignmentView();
-                Stage stage = (Stage) root.getScene().getWindow();
-                stage.setScene(new Scene(nextView.getRoot(), stage.getScene().getWidth(), stage.getScene().getHeight()));
-
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Fehler");
-                alert.setHeaderText(null);
-                alert.setContentText("Fehler: " + ex.getMessage());
-                alert.showAndWait();
-            }
-        });
-        buttonBox.getChildren().addAll(btnBack, btnNext);
-        ScrollPane scrollPane = new ScrollPane(equipmentContent);
-        scrollPane.setFitToWidth(true);
-        scrollPane.setStyle("-fx-background-color: #F5F5DC;");
-        mainBox.getChildren().addAll(headerBox, scrollPane, buttonBox);
-        VBox.setVgrow(scrollPane, javafx.scene.layout.Priority.ALWAYS);
-        root = mainBox;
     }
-    private VBox createEquipmentSelection() {
-        VBox container = new VBox(15);
-        container.setPadding(new Insets(20, 40, 20, 40));
-        container.setAlignment(javafx.geometry.Pos.TOP_LEFT);
-        var character = CharacterSession.getInstance().getCurrentCharacter();
-        String classIndex = character.getClassIndex();
-        if (classIndex == null || classIndex.isEmpty()) {
-            Label error = new Label("Keine Klasse ausgewählt!");
-            container.getChildren().add(error);
-            return container;
-        }
-        // Lade bereits gespeicherte Equipment-Auswahl und rekonstruiere selectedChoices
-        java.util.List<String> savedEquipment = character.getSelectedEquipment();
 
-        // Wahl-Ausrüstung
-        List<Map<String, Object>> options = dbManager.getEquipmentOptions(classIndex);
-        Map<Integer, Map<String, Object>> uniqueOptions = new LinkedHashMap<>();
-        for (Map<String, Object> option : options) {
-            int orderNum = (Integer) option.get("order_num");
-            if (!uniqueOptions.containsKey(orderNum)) {
-                uniqueOptions.put(orderNum, option);
-            }
-        }
-
-        // Rekonstruiere selectedChoices mit den richtigen orderNum keys
-        selectedChoices.clear();
-        int index = 0;
-        for (Integer orderNum : uniqueOptions.keySet()) {
-            if (index < savedEquipment.size() && savedEquipment.get(index) != null) {
-                String equipment = savedEquipment.get(index);
-                if (!equipment.isEmpty()) {
-                    selectedChoices.put(orderNum, equipment);
-                }
-            }
-            index++;
-        }
-        // Pflicht-Ausrüstung (de-dupliziert)
-        List<String> mandatory = dbManager.getStartingEquipment(classIndex);
-        java.util.Set<String> uniqueMandatory = new java.util.LinkedHashSet<>(mandatory);
-        if (!uniqueMandatory.isEmpty()) {
-            Label mandatoryTitle = new Label("Pflicht-Ausrüstung:");
-            mandatoryTitle.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #8B0000; -fx-padding: 10 0 5 0;");
-            container.getChildren().add(mandatoryTitle);
-            for (String item : uniqueMandatory) {
-                // Überspringe leere Items
-                if (item == null || item.trim().isEmpty()) {
-                    continue;
-                }
-                HBox itemBox = new HBox(10);
-                itemBox.setStyle("-fx-padding: 5;");
-                Label bullet = new Label("✓");
-                bullet.setStyle("-fx-font-size: 12px; -fx-text-fill: #4CAF50; -fx-font-weight: bold;");
-                Label itemLabel = new Label(item);
-                itemLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #1A1A1A;");
-                itemLabel.setWrapText(true);
-                itemBox.getChildren().addAll(bullet, itemLabel);
-                container.getChildren().add(itemBox);
-            }
-            Label spacing = new Label("");
-            container.getChildren().add(spacing);
-        }
-        // Wahl-Ausrüstung bereits definiert oben
-        totalOptions = uniqueOptions.size();
-        if (!uniqueOptions.isEmpty()) {
-            Label optionsTitle = new Label("Wähle deine Ausrüstung:");
-            optionsTitle.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #8B0000; -fx-padding: 10 0 10 0;");
-            container.getChildren().add(optionsTitle);
-            for (Map.Entry<Integer, Map<String, Object>> entry : uniqueOptions.entrySet()) {
-                int orderNum = entry.getKey();
-                String desc = (String) entry.getValue().get("description");
-                List<String> optionChoices = parseEquipmentOptions(desc);
-                VBox optionBox = createOptionBox(orderNum, desc, optionChoices);
-                container.getChildren().add(optionBox);
-            }
-        }
-        return container;
-    }
-    private VBox createOptionBox(int orderNum, String fullDescription, List<String> optionChoices) {
-        VBox optionBox = new VBox(8);
-        optionBox.setStyle("-fx-border-color: #D4A574; -fx-border-width: 1; -fx-padding: 12; " +
-                          "-fx-background-color: #FFFBF5; -fx-border-radius: 5;");
-        // Große Überschrift mit vollständiger Beschreibung
-        Label descLabel = new Label(fullDescription);
-        descLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #333333; -fx-wrap-text: true;");
-        descLabel.setWrapText(true);
-        optionBox.getChildren().add(descLabel);
-        Label spacer = new Label("");
-        optionBox.getChildren().add(spacer);
-        // RadioButtons nur mit A, B, C, etc.
-        ToggleGroup group = new ToggleGroup();
-
-        // Überprüfe, ob für diesen orderNum bereits eine Auswahl gespeichert ist
-        String savedSelection = selectedChoices.get(orderNum);
-
-        for (int i = 0; i < optionChoices.size(); i++) {
-            String choice = optionChoices.get(i);
-            String letter = (char) ('A' + i) + "";
-            HBox choiceBox = new HBox(15);
-            choiceBox.setStyle("-fx-padding: 6;");
-            choiceBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
-            RadioButton radio = new RadioButton(letter);
-            radio.setToggleGroup(group);
-            radio.setStyle("-fx-font-size: 12px;");
-            radio.setPrefWidth(40);
-            Label choiceLabel = new Label(choice);
-            choiceLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #444444;");
-            choiceLabel.setWrapText(true);
-
-            // Wenn diese Option bereits ausgewählt war, markiere sie
-            String choiceStr = letter + ") " + choice;
-            if (savedSelection != null && savedSelection.equals(choiceStr)) {
-                radio.setSelected(true);
-            }
-
-            radio.setOnAction(e -> {
-                if (radio.isSelected()) {
-                    selectedChoices.put(orderNum, letter + ") " + choice);
-                    CharacterSession.getInstance().getCurrentCharacter().addSelectedEquipment(letter + ") " + choice);
-                }
-            });
-            choiceBox.getChildren().addAll(radio, choiceLabel);
-            optionBox.getChildren().add(choiceBox);
-        }
-        return optionBox;
-    }
-    private List<String> parseEquipmentOptions(String description) {
-        List<String> choices = new ArrayList<>();
-        String[] parts = description.split(" or ");
-        for (String part : parts) {
-            String cleaned = part.trim();
-            if (cleaned.matches("^\\([a-z]\\)\\s*.*")) {
-                cleaned = cleaned.replaceFirst("^\\([a-z]\\)\\s*", "");
-            }
-            if (!cleaned.isEmpty()) {
-                choices.add(cleaned);
-            }
-        }
-        return choices;
-    }
     public Parent getRoot() {
         return root;
+    }
+
+    private void buildContent() {
+        var character = CharacterSession.getInstance().getCurrentCharacter();
+        String classIndex = character.getClassIndex();
+
+        if (classIndex == null || classIndex.isBlank()) {
+            mandatoryContainer.getChildren().add(makeMutedLine("Keine Klasse gewählt — bitte gehe zurück zu Schritt 2."));
+            return;
+        }
+
+        // Mandatory items
+        List<String> mandatory = dbManager.getStartingEquipment(classIndex);
+        java.util.Set<String> uniqueMandatory = new java.util.LinkedHashSet<>(mandatory);
+        if (uniqueMandatory.isEmpty()) {
+            mandatoryContainer.getChildren().add(makeMutedLine("Keine Pflicht-Ausrüstung."));
+        } else {
+            for (String item : uniqueMandatory) {
+                if (item == null || item.isBlank()) continue;
+                mandatoryContainer.getChildren().add(makeMandatoryRow(item));
+            }
+        }
+
+        // Choices
+        List<Map<String, Object>> options = dbManager.getEquipmentOptions(classIndex);
+        Map<Integer, String> uniqueDescriptions = new LinkedHashMap<>();
+        for (Map<String, Object> option : options) {
+            int orderNum = (Integer) option.get("order_num");
+            uniqueDescriptions.putIfAbsent(orderNum, (String) option.get("description"));
+        }
+        totalChoiceBlocks = uniqueDescriptions.size();
+
+        // Restore prior selections (matched by saved entry strings)
+        List<String> previouslySelected = character.getSelectedEquipment();
+
+        int blockIndex = 0;
+        for (Map.Entry<Integer, String> entry : uniqueDescriptions.entrySet()) {
+            int orderNum = entry.getKey();
+            String description = entry.getValue();
+            List<String> bundles = parseBundles(description);
+
+            VBox block = buildChoiceBlock(blockIndex + 1, orderNum, bundles, previouslySelected);
+            choicesContainer.getChildren().add(block);
+            blockIndex++;
+        }
+    }
+
+    private Label makeMutedLine(String text) {
+        Label l = new Label(text);
+        l.getStyleClass().add("muted");
+        return l;
+    }
+
+    private HBox makeMandatoryRow(String item) {
+        Label bullet = new Label("✓");
+        bullet.setStyle("-fx-text-fill: #4CAF50; -fx-font-weight: bold; -fx-font-size: 13px;");
+        Label text = new Label(item);
+        text.getStyleClass().add("mandatory-item");
+        text.setWrapText(true);
+        HBox row = new HBox(8, bullet, text);
+        row.setAlignment(Pos.CENTER_LEFT);
+        return row;
+    }
+
+    private List<String> parseBundles(String description) {
+        // Description is "option_a or option_b or option_c" from DbManager.
+        // Each option may have a leading "(a)" prefix in source data — strip it.
+        List<String> result = new ArrayList<>();
+        if (description == null) return result;
+        for (String part : description.split(" or ")) {
+            String cleaned = part.trim();
+            cleaned = cleaned.replaceFirst("^\\([a-z]\\)\\s*", "");
+            if (!cleaned.isEmpty()) result.add(cleaned);
+        }
+        return result;
+    }
+
+    private VBox buildChoiceBlock(int blockNumber, int orderNum, List<String> bundles, List<String> previouslySelected) {
+        VBox block = new VBox(8);
+
+        Label title = new Label("Wahl " + blockNumber + " — wähle eines:");
+        title.getStyleClass().add("choice-block-title");
+
+        HBox cardsRow = new HBox(12);
+        cardsRow.setAlignment(Pos.TOP_LEFT);
+
+        List<VBox> cards = new ArrayList<>();
+        for (int i = 0; i < bundles.size(); i++) {
+            String letter = String.valueOf((char) ('A' + i));
+            String bundleText = bundles.get(i);
+            String entry = letter + ") " + bundleText;
+
+            VBox card = buildBundleCard(letter, bundleText, orderNum, entry);
+            cards.add(card);
+            HBox.setHgrow(card, Priority.ALWAYS);
+            cardsRow.getChildren().add(card);
+
+            if (previouslySelected != null && previouslySelected.contains(entry)) {
+                applyBundleSelection(orderNum, entry, cards);
+            }
+        }
+        bundleCardsByOrder.put(orderNum, cards);
+
+        block.getChildren().addAll(title, cardsRow);
+        return block;
+    }
+
+    private VBox buildBundleCard(String letter, String bundleText, int orderNum, String entry) {
+        VBox card = new VBox(6);
+        card.getStyleClass().add("bundle-card");
+        card.setAlignment(Pos.TOP_LEFT);
+        card.setMinWidth(200);
+
+        Label letterLabel = new Label(letter);
+        letterLabel.getStyleClass().add("bundle-letter");
+
+        Label content = new Label(bundleText);
+        content.getStyleClass().add("bundle-text");
+        content.setWrapText(true);
+
+        Tooltip.install(card, new Tooltip(letter + ") " + bundleText));
+
+        card.getChildren().addAll(letterLabel, content);
+        card.setOnMouseClicked(e -> {
+            applyBundleSelection(orderNum, entry, bundleCardsByOrder.get(orderNum));
+            saveToSession();
+            preview.refresh();
+            updateNextButton();
+        });
+        return card;
+    }
+
+    private void applyBundleSelection(int orderNum, String entry, List<VBox> cardsForBlock) {
+        selectedChoices.put(orderNum, entry);
+        if (cardsForBlock == null) return;
+        char chosenLetter = entry.charAt(0);
+        for (int i = 0; i < cardsForBlock.size(); i++) {
+            VBox c = cardsForBlock.get(i);
+            c.getStyleClass().remove("bundle-card-selected");
+            if ((char) ('A' + i) == chosenLetter) {
+                c.getStyleClass().add("bundle-card-selected");
+            }
+        }
+    }
+
+    private void saveToSession() {
+        // Persist selected choices in orderNum order so Step 6 sees stable ordering.
+        List<String> entries = new ArrayList<>(selectedChoices.values());
+        CharacterSession.getInstance().getCurrentCharacter().setSelectedEquipment(entries);
+    }
+
+    private void updateNextButton() {
+        boolean valid = totalChoiceBlocks == 0 || selectedChoices.size() == totalChoiceBlocks;
+        btnNext.setDisable(!valid);
+        if (!valid) {
+            int missing = totalChoiceBlocks - selectedChoices.size();
+            Tooltip.install(btnNext, new Tooltip("Bitte triff noch " + missing + " Auswahl(en)."));
+        } else {
+            Tooltip.uninstall(btnNext, btnNext.getTooltip());
+        }
+    }
+
+    private void wireNavigation() {
+        btnBack.setOnAction(e -> {
+            SkillsView prev = new SkillsView();
+            Stage stage = (Stage) root.getScene().getWindow();
+            stage.setScene(new Scene(prev.getRoot(), stage.getScene().getWidth(), stage.getScene().getHeight()));
+        });
+        btnNext.setOnAction(e -> {
+            saveToSession();
+            AlignmentView next = new AlignmentView();
+            Stage stage = (Stage) root.getScene().getWindow();
+            stage.setScene(new Scene(next.getRoot(), stage.getScene().getWidth(), stage.getScene().getHeight()));
+        });
     }
 }
