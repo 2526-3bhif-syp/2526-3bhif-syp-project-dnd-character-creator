@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.io.IOException;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.FlowPane;
 
 public class SkillsView {
     private Parent root;
@@ -27,11 +28,15 @@ public class SkillsView {
     @FXML private FlowPane backgroundContainer;
     @FXML private FlowPane skillsContainer;
     @FXML private Label lblSkillsTitle;
+    @FXML private VBox backgroundSkillContainer;
+    @FXML private FlowPane backgroundSkillDisplay;
 
     private final DbManager dbManager = new DbManager();
     private final ToggleGroup backgroundToggleGroup = new ToggleGroup();
     private final List<CheckBox> skillCheckboxes = new ArrayList<>();
     private int maxSkillsToChoose = 2;
+    private List<String> backgroundGrantedSkills = new ArrayList<>();
+
 
     public SkillsView() {
         try {
@@ -76,12 +81,18 @@ public class SkillsView {
             RadioButton radio = new RadioButton(background);
             radio.setToggleGroup(backgroundToggleGroup);
             radio.setStyle("-fx-font-size: 14px; -fx-text-fill: #1A1A1A;");
+            radio.setOnAction(e -> updateBackgroundSkills(background));
             backgroundContainer.getChildren().add(radio);
         }
     }
 
     @SuppressWarnings("unchecked")
     private void loadSkillOptions() {
+        loadSkillOptionsFiltered(backgroundGrantedSkills);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void loadSkillOptionsFiltered(List<String> exclude) {
         skillsContainer.getChildren().clear();
         skillCheckboxes.clear();
 
@@ -99,10 +110,11 @@ public class SkillsView {
         }
 
         if (lblSkillsTitle != null) {
-            lblSkillsTitle.setText("Fertigkeiten (wähle " + maxSkillsToChoose + "):" );
+            lblSkillsTitle.setText("Fertigkeiten wählen (" + maxSkillsToChoose + "):");
         }
 
         for (String skill : skillOptions) {
+            if (exclude.contains(skill)) continue;
             CheckBox checkBox = new CheckBox(skill);
             checkBox.setStyle("-fx-font-size: 14px; -fx-text-fill: #1A1A1A;");
             checkBox.setOnAction(e -> enforceSkillLimit());
@@ -132,6 +144,10 @@ public class SkillsView {
             checkBox.setSelected(selectedSkills.contains(checkBox.getText()));
         }
         enforceSkillLimit();
+
+        if (character.getSelectedBackground() != null) {
+            updateBackgroundSkills(character.getSelectedBackground());
+        }
     }
 
     private void enforceSkillLimit() {
@@ -158,19 +174,22 @@ public class SkillsView {
             return;
         }
 
-        List<String> selectedSkills = skillCheckboxes.stream()
-            .filter(CheckBox::isSelected)
-            .map(CheckBox::getText)
-            .toList();
+        List<String> chosenSkills = skillCheckboxes.stream()
+                .filter(CheckBox::isSelected)
+                .map(CheckBox::getText)
+                .toList();
 
-        if (selectedSkills.size() != maxSkillsToChoose) {
+        if (chosenSkills.size() != maxSkillsToChoose) {
             showError("Bitte wähle genau " + maxSkillsToChoose + " Fertigkeiten aus.");
             return;
         }
 
+        List<String> allSkills = new ArrayList<>(backgroundGrantedSkills);
+        allSkills.addAll(chosenSkills);
+
         var character = CharacterSession.getInstance().getCurrentCharacter();
         character.setSelectedBackground(selectedBackground.getText());
-        character.setSelectedSkills(new ArrayList<>(selectedSkills));
+        character.setSelectedSkills(allSkills);
 
         EquipmentView nextView = new EquipmentView();
         Stage stage = (Stage) root.getScene().getWindow();
@@ -186,4 +205,32 @@ public class SkillsView {
     }
 
     public Parent getRoot() { return root; }
+
+    private void updateBackgroundSkills(String backgroundName) {
+        backgroundGrantedSkills = dbManager.getBackgroundSkills(backgroundName);
+
+        backgroundSkillDisplay.getChildren().clear();
+        for (String skill : backgroundGrantedSkills) {
+            CheckBox cb = new CheckBox(skill);
+            cb.setSelected(true);
+            cb.setDisable(true);
+            cb.setStyle("-fx-font-size: 13px; -fx-text-fill: #2d5a3d; -fx-opacity: 1;");
+            backgroundSkillDisplay.getChildren().add(cb);
+        }
+        backgroundSkillContainer.setVisible(!backgroundGrantedSkills.isEmpty());
+        backgroundSkillContainer.setManaged(!backgroundGrantedSkills.isEmpty());
+
+        loadSkillOptionsFiltered(backgroundGrantedSkills);
+        restoreChosenClassSkills();
+    }
+
+    private void restoreChosenClassSkills() {
+        List<String> saved = CharacterSession.getInstance()
+                .getCurrentCharacter().getSelectedSkills();
+        if (saved == null) return;
+        for (CheckBox cb : skillCheckboxes) {
+            if (saved.contains(cb.getText())) cb.setSelected(true);
+        }
+        enforceSkillLimit();
+    }
 }
