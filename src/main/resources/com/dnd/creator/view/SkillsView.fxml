@@ -1,60 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.geometry.Insets?>
 
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" style="-fx-background-color: #F5F5DC;">
-    <!-- Top: Header & Progress -->
+
+    <!-- Top: Header -->
     <top>
         <VBox alignment="CENTER" spacing="10">
             <BorderPane.margin>
-                <Insets top="20" bottom="20"/>
+                <Insets top="20" bottom="10"/>
             </BorderPane.margin>
             <Label text="Schritt 4: Hintergrund &amp; Fertigkeiten" style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #8B0000;"/>
             <Label text="Wähle deinen Hintergrund und Fertigkeiten aus." style="-fx-font-size: 16px; -fx-text-fill: #1A1A1A;"/>
         </VBox>
     </top>
 
-    <!-- Center: Background & Skills Selection -->
+    <!-- Center: scrollbarer Inhalt -->
     <center>
-        <VBox alignment="CENTER" spacing="30">
-            <padding>
-                <Insets top="20" bottom="20" left="40" right="40"/>
-            </padding>
+        <ScrollPane fitToWidth="true" style="-fx-background-color: #F5F5DC; -fx-background: #F5F5DC;">
+            <VBox spacing="25">
+                <padding>
+                    <Insets top="15" bottom="15" left="40" right="40"/>
+                </padding>
 
-            <!-- Background Selection -->
-            <VBox alignment="CENTER_LEFT" spacing="15">
-                <Label text="Hintergrund:" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #8B0000;"/>
-                <VBox fx:id="backgroundContainer" spacing="10">
-                    <!-- Background options will be added dynamically -->
+                <!-- Background Selection -->
+                <VBox alignment="CENTER_LEFT" spacing="10">
+                    <Label text="Hintergrund:" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #8B0000;"/>
+                    <FlowPane fx:id="backgroundContainer" hgap="15" vgap="8" prefWrapLength="700"/>
+                </VBox>
+
+                <!-- Skills Selection -->
+                <VBox alignment="CENTER_LEFT" spacing="10">
+                    <Label fx:id="lblSkillsTitle" text="Fertigkeiten:" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #8B0000;"/>
+                    <FlowPane fx:id="skillsContainer" hgap="20" vgap="10" prefWrapLength="700"/>
                 </VBox>
             </VBox>
-
-            <!-- Skills Selection -->
-            <VBox alignment="CENTER_LEFT" spacing="15">
-                <Label fx:id="lblSkillsTitle" text="Fertigkeiten:" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #8B0000;"/>
-                <VBox fx:id="skillsContainer" spacing="8">
-                    <!-- Skill checkboxes will be added dynamically -->
-                </VBox>
-            </VBox>
-        </VBox>
+        </ScrollPane>
     </center>
 
-    <!-- Bottom: Navigation Buttons -->
+    <!-- Bottom: Buttons — immer sichtbar -->
     <bottom>
-        <VBox spacing="20">
+        <HBox alignment="CENTER" spacing="50">
             <BorderPane.margin>
-                <Insets left="40" right="40" top="10" bottom="20"/>
+                <Insets left="40" right="40" top="15" bottom="20"/>
             </BorderPane.margin>
-
-            <HBox alignment="CENTER" spacing="50">
-                <Button fx:id="btnBack" text="Zurück" style="-fx-background-color: #F5F5DC; -fx-border-color: #C6A664; -fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10; -fx-text-fill: #1A1A1A; -fx-font-size: 18px;" prefWidth="150" prefHeight="50"/>
-                <Button fx:id="btnNext" text="Weiter" style="-fx-background-color: #8B0000; -fx-text-fill: #F5F5DC; -fx-border-width: 0; -fx-background-radius: 10; -fx-font-size: 18px; -fx-font-weight: bold;" prefWidth="150" prefHeight="50"/>
-            </HBox>
-        </VBox>
+            <Button fx:id="btnBack" text="Zurück" style="-fx-background-color: #F5F5DC; -fx-border-color: #C6A664; -fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10; -fx-text-fill: #1A1A1A; -fx-font-size: 18px;" prefWidth="150" prefHeight="50"/>
+            <Button fx:id="btnNext" text="Weiter" style="-fx-background-color: #8B0000; -fx-text-fill: #F5F5DC; -fx-border-width: 0; -fx-background-radius: 10; -fx-font-size: 18px; -fx-font-weight: bold;" prefWidth="150" prefHeight="50"/>
+        </HBox>
     </bottom>
+
 </BorderPane>

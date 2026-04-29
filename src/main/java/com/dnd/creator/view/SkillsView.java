@@ -17,14 +17,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.io.IOException;
+import javafx.scene.layout.FlowPane;
 
 public class SkillsView {
     private Parent root;
 
     @FXML private Button btnBack;
     @FXML private Button btnNext;
-    @FXML private VBox backgroundContainer;
-    @FXML private VBox skillsContainer;
+    @FXML private FlowPane backgroundContainer;
+    @FXML private FlowPane skillsContainer;
     @FXML private Label lblSkillsTitle;
 
     private final DbManager dbManager = new DbManager();
