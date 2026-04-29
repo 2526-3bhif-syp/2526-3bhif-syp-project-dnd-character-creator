@@ -22,6 +22,7 @@ import javafx.scene.layout.Priority;
 import javafx.geometry.Insets;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Map;
 
 public class CharacterSummaryView {
@@ -132,10 +133,58 @@ public class CharacterSummaryView {
 
     private void populateRightColumn(CharacterModel character) {
         rightColumn.setSpacing(5);
-        rightColumn.getChildren().add(createTextBox("PERSONALITY TRAITS", true));
-        rightColumn.getChildren().add(createTextBox("IDEALS", true));
-        rightColumn.getChildren().add(createTextBox("BONDS", true));
-        rightColumn.getChildren().add(createTextBox("FLAWS", true));
+
+        // --- EQUIPMENT ---
+        VBox equipBox = new VBox(4);
+        equipBox.setStyle("-fx-border-color: #1A1A1A; -fx-padding: 5; -fx-background-color: white; -fx-background-radius: 5; -fx-border-radius: 5;");
+        VBox.setVgrow(equipBox, Priority.ALWAYS);
+        Label equipTitle = new Label("EQUIPMENT");
+        equipTitle.setStyle("-fx-font-size: 10px; -fx-font-weight: bold;");
+        equipBox.getChildren().add(equipTitle);
+
+        ArrayList<String> equipment = (ArrayList<String>) character.getSelectedEquipment();
+        if (equipment == null || equipment.isEmpty()) {
+            Label none = new Label("—");
+            none.setStyle("-fx-font-size: 11px; -fx-text-fill: #888;");
+            equipBox.getChildren().add(none);
+        } else {
+            for (String item : equipment) {
+                Label lbl = new Label("• " + item);
+                lbl.setStyle("-fx-font-size: 11px;");
+                lbl.setWrapText(true);
+                equipBox.getChildren().add(lbl);
+            }
+        }
+
+        // --- LANGUAGES ---
+        VBox langBox = new VBox(4);
+        langBox.setStyle("-fx-border-color: #1A1A1A; -fx-padding: 5; -fx-background-color: white; -fx-background-radius: 5; -fx-border-radius: 5;");
+        Label langTitle = new Label("LANGUAGES");
+        langTitle.setStyle("-fx-font-size: 10px; -fx-font-weight: bold;");
+        langBox.getChildren().add(langTitle);
+
+        if (character.getRace() != null && !character.getRace().getLanguages().isEmpty()) {
+            for (String lang : character.getRace().getLanguages()) {
+                String display = lang.substring(0, 1).toUpperCase() + lang.substring(1);
+                Label lbl = new Label("• " + display);
+                lbl.setStyle("-fx-font-size: 11px;");
+                langBox.getChildren().add(lbl);
+            }
+        } else {
+            Label none = new Label("—");
+            none.setStyle("-fx-font-size: 11px; -fx-text-fill: #888;");
+            langBox.getChildren().add(none);
+        }
+
+        // --- PERSONALITY TRAITS / IDEALS / BONDS / FLAWS ---
+        rightColumn.getChildren().addAll(
+                equipBox,
+                langBox,
+                createTextBox("PERSONALITY TRAITS", true),
+                createTextBox("IDEALS", true),
+                createTextBox("BONDS", true),
+                createTextBox("FLAWS", true)
+        );
     }
 
     private VBox createTextBox(String title, boolean grow) {

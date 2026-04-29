@@ -267,17 +267,17 @@ public class DbManager {
 
     public List<String> getStartingEquipment(String className) {
         List<String> result = new ArrayList<>();
-        String query = "SELECT mandatory_item FROM class_starting_equipment " +
-                       "WHERE class_name = ? AND is_mandatory = 1 AND mandatory_item IS NOT NULL " +
-                       "ORDER BY choice_order";
+        String query = "SELECT e.name, cse.quantity " +
+                "FROM classes_starting_equipment cse " +
+                "JOIN equipment e ON cse.equipment_index = e.\"index\" " +
+                "WHERE cse.classes_index = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, className);
+            stmt.setString(1, className.toLowerCase());
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                String item = rs.getString("mandatory_item");
-                if (item != null && !item.trim().isEmpty()) {
-                    result.add(item);
-                }
+                int qty = rs.getInt("quantity");
+                String name = rs.getString("name");
+                result.add(qty > 1 ? qty + "x " + name : name);
             }
         } catch (SQLException e) {
             System.err.println("Error loading starting equipment: " + e.getMessage());
@@ -287,28 +287,19 @@ public class DbManager {
 
     public List<Map<String, Object>> getEquipmentOptions(String className) {
         List<Map<String, Object>> result = new ArrayList<>();
-        String query = "SELECT id, choice_order, option_a, option_b, option_c " +
-                       "FROM class_starting_equipment " +
-                       "WHERE class_name = ? AND is_mandatory = 0 " +
-                       "ORDER BY choice_order";
+        String query = "SELECT id, order_num, desc " +
+                "FROM classes_starting_equipment_options " +
+                "WHERE classes_index = ? " +
+                "ORDER BY order_num";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, className);
+            stmt.setString(1, className.toLowerCase());
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 Map<String, Object> option = new HashMap<>();
                 option.put("id", rs.getInt("id"));
-                option.put("order_num", rs.getInt("choice_order"));
+                option.put("order_num", rs.getInt("order_num"));
                 option.put("choose", 1);
-
-                String optA = rs.getString("option_a");
-                String optB = rs.getString("option_b");
-                String optC = rs.getString("option_c");
-                List<String> parts = new ArrayList<>();
-                if (optA != null && !optA.isBlank()) parts.add(optA);
-                if (optB != null && !optB.isBlank()) parts.add(optB);
-                if (optC != null && !optC.isBlank()) parts.add(optC);
-                option.put("description", String.join(" or ", parts));
-
+                option.put("description", rs.getString("desc"));
                 result.add(option);
             }
         } catch (SQLException e) {
@@ -316,7 +307,6 @@ public class DbManager {
         }
         return result;
     }
-
     public Map<String, Object> getClassSkillSelectionConfig(String className) {
         Map<String, Object> config = new HashMap<>();
         int choose = 2;

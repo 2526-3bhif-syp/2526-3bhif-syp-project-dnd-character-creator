@@ -71,7 +71,6 @@ public class EquipmentView {
         btnNext.setPrefHeight(50);
         btnNext.setStyle("-fx-background-color: #8B0000; -fx-text-fill: #F5F5DC; -fx-font-size: 16px; -fx-font-weight: bold;");
         btnNext.setOnAction(e -> {
-            // Prüfe, ob alle Optionen ausgewählt sind
             if (selectedChoices.size() < totalOptions) {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
                 alert.setTitle("Unvollständige Auswahl");
@@ -80,6 +79,30 @@ public class EquipmentView {
                 alert.showAndWait();
                 return;
             }
+
+            var figure= CharacterSession.getInstance().getCurrentCharacter();
+            String classIdx = figure.getClassIndex();
+
+            // Komplett neu aufbauen um Duplikate zu vermeiden
+            List<String> allEquipment = new ArrayList<>();
+
+            // 1. Pflichtausrüstung
+            List<String> mandatory = dbManager.getStartingEquipment(classIdx);
+            new java.util.LinkedHashSet<>(mandatory).forEach(allEquipment::add);
+
+            // 2. Holy Symbol für divine Klassen
+            if (classIdx != null) {
+                String lower = classIdx.toLowerCase();
+                if (lower.equals("cleric") || lower.equals("paladin")) {
+                    allEquipment.add("Holy Symbol");
+                }
+            }
+
+            // 3. Gewählte Optionen
+            allEquipment.addAll(selectedChoices.values());
+
+            character.setSelectedEquipment(allEquipment);
+
             CharacterSummaryView nextView = new CharacterSummaryView();
             Stage stage = (Stage) root.getScene().getWindow();
             stage.setScene(new Scene(nextView.getRoot(), stage.getScene().getWidth(), stage.getScene().getHeight()));
