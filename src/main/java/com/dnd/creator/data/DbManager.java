@@ -445,14 +445,17 @@ public class DbManager {
             return false;
         }
 
-        String insertChar = "INSERT INTO \"character\" (character_name, race_name, class_name, background_name, character_picture) " +
-                            "VALUES (?, ?, ?, ?, ?)";
+        String insertChar = "INSERT INTO characters (name, race_index, class_index, background, alignment, hit_die, spellcasting_ability, image_path) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(insertChar, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, character.getName());
-            stmt.setString(2, character.getRace().getName());
+            stmt.setString(2, character.getRace() != null ? character.getRace().getName() : null);
             stmt.setString(3, character.getCharacterClass());
             stmt.setString(4, character.getSelectedBackground());
-            stmt.setString(5, character.getImagePath());
+            stmt.setString(5, character.getAlignment());
+            stmt.setInt(6, character.getClassHitDie());
+            stmt.setString(7, character.getSpellcastingAbility());
+            stmt.setString(8, character.getImagePath());
 
             if (stmt.executeUpdate() == 0) return false;
 
@@ -578,6 +581,7 @@ public class DbManager {
 
                 character.setDbId(id);
                 character.setSelectedBackground(rs.getString("background_name"));
+                character.setAlignment(rs.getString("alignment") != null ? rs.getString("alignment") : "Neutral");
                 character.setSelectedSkills(getCharacterSkills(id));
                 character.setSelectedEquipment(getCharacterEquipment(id));
                 character.setSelectedSpells(getCharacterSpells(id));
@@ -674,4 +678,17 @@ public class DbManager {
         }
         return result;
     }
+
+    public List<String> getAlignments() {
+        List<String> result = new ArrayList<>();
+        String query = "SELECT name FROM alignments ORDER BY \"index\"";
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+            while (rs.next()) result.add(rs.getString("name"));
+        } catch (SQLException e) {
+            System.err.println("Error loading alignments: " + e.getMessage());
+        }
+        return result;
+    }
+
 }
