@@ -1,0 +1,526 @@
+/* =========================================================================
+   D&D Character Creator — Character Creation Flow
+   Color palette: Beige #F5F5DC, Dark Red #8B0000, Ink #1A1A1A, Gold #C6A664
+   ========================================================================= */
+
+/* ---------- Root & Generic ---------- */
+.creation-root {
+    -fx-background-color: #F5F5DC;
+}
+
+.section-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #8B0000;
+}
+
+.section-subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: #1A1A1A;
+}
+
+.muted {
+    -fx-text-fill: #666666;
+    -fx-font-size: 12px;
+}
+
+.label {
+    -fx-text-fill: #1A1A1A;
+}
+
+/* ---------- Stepper Bar ---------- */
+.stepper-bar {
+    -fx-background-color: transparent;
+    -fx-padding: 16 24 16 24;
+}
+
+.stepper-step {
+    -fx-alignment: center;
+    -fx-spacing: 6;
+}
+
+.stepper-circle {
+    -fx-min-width: 36;
+    -fx-min-height: 36;
+    -fx-pref-width: 36;
+    -fx-pref-height: 36;
+    -fx-max-width: 36;
+    -fx-max-height: 36;
+    -fx-background-radius: 18;
+    -fx-border-radius: 18;
+    -fx-border-width: 2;
+    -fx-alignment: center;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.stepper-circle-future {
+    -fx-background-color: transparent;
+    -fx-border-color: #C6A664;
+    -fx-text-fill: #C6A664;
+}
+
+.stepper-circle-active {
+    -fx-background-color: #8B0000;
+    -fx-border-color: #8B0000;
+    -fx-text-fill: #F5F5DC;
+}
+
+.stepper-circle-done {
+    -fx-background-color: #4CAF50;
+    -fx-border-color: #4CAF50;
+    -fx-text-fill: #F5F5DC;
+}
+
+.stepper-label {
+    -fx-font-size: 11px;
+    -fx-text-fill: #666666;
+}
+
+.stepper-label-active {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #8B0000;
+}
+
+.stepper-label-done {
+    -fx-font-size: 11px;
+    -fx-text-fill: #4CAF50;
+}
+
+.stepper-arrow-wrap {
+    -fx-min-width: 50;
+    -fx-pref-width: 50;
+    -fx-translate-y: -9;
+}
+
+.stepper-arrow {
+    -fx-font-size: 22px;
+    -fx-text-fill: #C6A664;
+}
+
+.stepper-arrow-done {
+    -fx-text-fill: #4CAF50;
+}
+
+/* ---------- Selection Cards (race / class / bundle) ---------- */
+.selection-card {
+    -fx-background-color: #FFFBF0;
+    -fx-border-color: #C6A664;
+    -fx-border-width: 2;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-padding: 14;
+    -fx-cursor: hand;
+}
+
+.selection-card:hover {
+    -fx-border-color: #8B0000;
+    -fx-effect: dropshadow(gaussian, rgba(139,0,0,0.35), 12, 0.4, 0, 0);
+}
+
+.selection-card-selected {
+    -fx-background-color: #FFF1E0;
+    -fx-border-color: #8B0000;
+    -fx-border-width: 3;
+    -fx-effect: dropshadow(gaussian, rgba(198,166,100,0.7), 16, 0.5, 0, 0);
+}
+
+.card-icon {
+    -fx-font-size: 36px;
+    -fx-text-fill: #8B0000;
+}
+
+.card-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #8B0000;
+}
+
+.card-tagline {
+    -fx-font-size: 11px;
+    -fx-text-fill: #1A1A1A;
+    -fx-wrap-text: true;
+}
+
+/* Ability bonus chip on race card */
+.ability-chip {
+    -fx-background-color: #C6A664;
+    -fx-text-fill: #1A1A1A;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-padding: 2 7 2 7;
+    -fx-background-radius: 8;
+}
+
+/* ---------- Role tags (class card) ---------- */
+.role-tag {
+    -fx-text-fill: white;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-padding: 2 8 2 8;
+    -fx-background-radius: 10;
+}
+
+.role-tank     { -fx-background-color: #2C5DA0; }
+.role-dps      { -fx-background-color: #C0392B; }
+.role-caster   { -fx-background-color: #7B3FA8; }
+.role-stealth  { -fx-background-color: #4A4A4A; }
+.role-support  { -fx-background-color: #2E8B57; }
+
+.difficulty-stars {
+    -fx-font-size: 12px;
+    -fx-text-fill: #C6A664;
+}
+
+/* ---------- Filter chips ---------- */
+.filter-chip {
+    -fx-background-color: transparent;
+    -fx-border-color: #C6A664;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 14;
+    -fx-background-radius: 14;
+    -fx-text-fill: #8B0000;
+    -fx-font-size: 12px;
+    -fx-padding: 5 14 5 14;
+    -fx-cursor: hand;
+}
+
+.filter-chip:hover {
+    -fx-background-color: #FFF1E0;
+}
+
+.filter-chip-active {
+    -fx-background-color: #8B0000;
+    -fx-text-fill: #F5F5DC;
+    -fx-border-color: #8B0000;
+}
+
+/* ---------- Ability score row (Step 3) ---------- */
+.stat-row {
+    -fx-background-color: #FFFBF0;
+    -fx-border-color: #C6A664;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 10 14 10 14;
+}
+
+.stat-row-primary {
+    -fx-border-color: #8B0000;
+    -fx-border-width: 2;
+    -fx-background-color: #FFF1E0;
+}
+
+.stat-icon {
+    -fx-font-size: 22px;
+}
+
+.stat-name {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #8B0000;
+}
+
+.stat-desc {
+    -fx-font-size: 11px;
+    -fx-text-fill: #1A1A1A;
+}
+
+.stat-modifier {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1A1A1A;
+}
+
+.stat-bar-bg {
+    -fx-background-color: #E5DDC2;
+    -fx-background-radius: 6;
+    -fx-min-height: 8;
+    -fx-pref-height: 8;
+}
+
+.stat-bar-fill {
+    -fx-background-color: #C6A664;
+    -fx-background-radius: 6;
+    -fx-min-height: 8;
+    -fx-pref-height: 8;
+}
+
+.stat-bar-fill-primary {
+    -fx-background-color: #8B0000;
+}
+
+.primary-badge {
+    -fx-background-color: #8B0000;
+    -fx-text-fill: #F5F5DC;
+    -fx-font-size: 9px;
+    -fx-font-weight: bold;
+    -fx-padding: 2 7 2 7;
+    -fx-background-radius: 8;
+}
+
+/* Combo box for ability assignment */
+.value-combo {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-pref-width: 70;
+    -fx-background-color: #F5F5DC;
+    -fx-border-color: #C6A664;
+    -fx-border-width: 2;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}
+
+.value-combo .list-cell {
+    -fx-text-fill: #1A1A1A;
+    -fx-font-size: 14px;
+}
+
+/* Pool of unassigned values */
+.value-pool-pill {
+    -fx-background-color: #8B0000;
+    -fx-text-fill: #F5F5DC;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 4 10 4 10;
+    -fx-background-radius: 12;
+}
+
+.value-pool-pill-used {
+    -fx-background-color: #C6A664;
+    -fx-text-fill: #666666;
+}
+
+/* ---------- Inputs ---------- */
+.input-field {
+    -fx-background-color: #FFFBF0;
+    -fx-border-color: #C6A664;
+    -fx-border-width: 2;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-text-fill: #1A1A1A;
+    -fx-font-size: 14px;
+    -fx-padding: 8 12 8 12;
+}
+
+.input-field:focused {
+    -fx-border-color: #8B0000;
+}
+
+/* ---------- Navigation buttons ---------- */
+.nav-button-back {
+    -fx-background-color: transparent;
+    -fx-border-color: #C6A664;
+    -fx-border-width: 2;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-text-fill: #1A1A1A;
+    -fx-font-size: 15px;
+    -fx-padding: 10 28 10 28;
+    -fx-cursor: hand;
+}
+
+.nav-button-back:hover {
+    -fx-background-color: #FFF1E0;
+}
+
+.nav-button-next {
+    -fx-background-color: #8B0000;
+    -fx-text-fill: #F5F5DC;
+    -fx-background-radius: 10;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 28 10 28;
+    -fx-cursor: hand;
+}
+
+.nav-button-next:hover {
+    -fx-background-color: #A52A2A;
+}
+
+.nav-button-next:disabled {
+    -fx-background-color: #C6A664;
+    -fx-opacity: 0.6;
+    -fx-cursor: default;
+}
+
+.action-button {
+    -fx-background-color: #FFFBF0;
+    -fx-border-color: #C6A664;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-text-fill: #8B0000;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 6 14 6 14;
+    -fx-cursor: hand;
+}
+
+.action-button:hover {
+    -fx-background-color: #FFF1E0;
+    -fx-border-color: #8B0000;
+}
+
+/* ---------- Preview panel (right side) ---------- */
+.preview-panel {
+    -fx-background-color: #FFFBF0;
+    -fx-border-color: #C6A664;
+    -fx-border-width: 2;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-padding: 20;
+}
+
+.preview-portrait {
+    -fx-font-size: 64px;
+    -fx-text-fill: #8B0000;
+    -fx-alignment: center;
+    -fx-min-height: 110;
+    -fx-pref-height: 110;
+    -fx-background-color: #F5F5DC;
+    -fx-background-radius: 12;
+    -fx-border-color: #C6A664;
+    -fx-border-width: 2;
+    -fx-border-radius: 12;
+}
+
+.preview-name {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #8B0000;
+}
+
+.preview-line {
+    -fx-font-size: 13px;
+    -fx-text-fill: #1A1A1A;
+}
+
+.preview-divider {
+    -fx-background-color: #C6A664;
+    -fx-min-height: 1;
+    -fx-pref-height: 1;
+    -fx-opacity: 0.5;
+}
+
+.preview-stat-name {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #8B0000;
+    -fx-min-width: 36;
+}
+
+.preview-stat-value {
+    -fx-font-size: 12px;
+    -fx-text-fill: #1A1A1A;
+    -fx-min-width: 40;
+}
+
+.preview-mini-bar-bg {
+    -fx-background-color: #E5DDC2;
+    -fx-background-radius: 4;
+    -fx-min-height: 6;
+    -fx-pref-height: 6;
+}
+
+.preview-mini-bar-fill {
+    -fx-background-color: #C6A664;
+    -fx-background-radius: 4;
+    -fx-min-height: 6;
+    -fx-pref-height: 6;
+}
+
+/* ---------- Skill grouping (Step 4) ---------- */
+.skill-group {
+    -fx-background-color: #FFFBF0;
+    -fx-border-color: #C6A664;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 10 14 10 14;
+}
+
+.skill-group-title {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #8B0000;
+}
+
+.skill-counter {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #8B0000;
+}
+
+.check-box .label {
+    -fx-text-fill: #1A1A1A;
+}
+
+.check-box {
+    -fx-font-size: 12px;
+}
+
+/* ---------- Equipment bundle card (Step 5) ---------- */
+.bundle-card {
+    -fx-background-color: #FFFBF0;
+    -fx-border-color: #C6A664;
+    -fx-border-width: 2;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 16;
+    -fx-cursor: hand;
+}
+
+.bundle-card:hover {
+    -fx-border-color: #8B0000;
+    -fx-effect: dropshadow(gaussian, rgba(139,0,0,0.3), 10, 0.4, 0, 0);
+}
+
+.bundle-card-selected {
+    -fx-background-color: #FFF1E0;
+    -fx-border-color: #8B0000;
+    -fx-border-width: 3;
+}
+
+.bundle-letter {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #8B0000;
+}
+
+.bundle-text {
+    -fx-font-size: 12px;
+    -fx-text-fill: #1A1A1A;
+    -fx-wrap-text: true;
+}
+
+.mandatory-list {
+    -fx-background-color: #FFFBF0;
+    -fx-border-color: #C6A664;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 12 16 12 16;
+}
+
+.mandatory-item {
+    -fx-font-size: 12px;
+    -fx-text-fill: #1A1A1A;
+}
+
+.choice-block-title {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #8B0000;
+}
+
+/* ---------- ScrollPane theming ---------- */
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
