@@ -7,17 +7,13 @@
     <!-- Top: Header (Full Width) -->
     <top>
         <HBox spacing="20" alignment="CENTER_LEFT" style="-fx-border-color: #C6A664; -fx-border-width: 0 0 2 0; -fx-padding: 20;">
-            <!-- Left: Character Name -->
-            <VBox alignment="BOTTOM_LEFT" HBox.hgrow="SOMETIMES" minWidth="200">
-                <Label fx:id="lblCharacterName" text="CHARACTER NAME" style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #1A1A1A;"/>
-            </VBox>
 
-            <!-- Right: 2 Rows of fields -->
-            <GridPane hgap="15" vgap="10" HBox.hgrow="ALWAYS" alignment="CENTER_RIGHT">
+            <!-- 2 Rows of fields, full width -->
+            <GridPane hgap="15" vgap="10" HBox.hgrow="ALWAYS" alignment="CENTER_LEFT">
                 <columnConstraints>
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="100"/>
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="100"/>
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="100"/>
+                    <ColumnConstraints hgrow="ALWAYS" minWidth="150"/>
+                    <ColumnConstraints hgrow="ALWAYS" minWidth="150"/>
+                    <ColumnConstraints hgrow="ALWAYS" minWidth="150"/>
                 </columnConstraints>
 
                 <!-- Row 1 -->
@@ -30,7 +26,7 @@
                     <Label text="BACKGROUND" style="-fx-font-size: 10px; -fx-text-fill: #555555;"/>
                 </VBox>
                 <VBox GridPane.columnIndex="2" GridPane.rowIndex="0">
-                    <Label fx:id="lblPlayerName" text="[Player Name]" style="-fx-font-size: 16px;"/>
+                    <Label fx:id="lblPlayerName" text="[Character Name]" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
                     <Label text="PLAYER NAME" style="-fx-font-size: 10px; -fx-text-fill: #555555;"/>
                 </VBox>
 
@@ -44,8 +40,8 @@
                     <Label text="ALIGNMENT" style="-fx-font-size: 10px; -fx-text-fill: #555555;"/>
                 </VBox>
                 <VBox GridPane.columnIndex="2" GridPane.rowIndex="1">
-                    <Label fx:id="lblExp" text="[Experience Points]" style="-fx-font-size: 16px;"/>
-                    <Label text="EXPERIENCE POINTS" style="-fx-font-size: 10px; -fx-text-fill: #555555;"/>
+                    <Label fx:id="lblExp" text="1" style="-fx-font-size: 16px;"/>
+                    <Label text="LEVEL" style="-fx-font-size: 10px; -fx-text-fill: #555555;"/>
                 </VBox>
             </GridPane>
         </HBox>
