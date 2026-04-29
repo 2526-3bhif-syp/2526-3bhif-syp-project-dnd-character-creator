@@ -28,9 +28,6 @@ public class CharacterSummaryView {
     private Parent root;
 
     @FXML
-    private Label lblCharacterName;
-
-    @FXML
     private Label lblClassLevel;
 
     @FXML
@@ -90,13 +87,6 @@ public class CharacterSummaryView {
     private void loadCharacterData() {
         var character = CharacterSession.getInstance().getCurrentCharacter();
 
-        // Character name
-        if (character.getName() != null && !character.getName().isEmpty()) {
-            lblCharacterName.setText(character.getName());
-        } else {
-            lblCharacterName.setText("Neuer Charakter");
-        }
-
         // Top Fields
         if (character.getCharacterClass() != null && !character.getCharacterClass().isEmpty()) {
             lblClassLevel.setText(character.getCharacterClass() + " 1");
@@ -110,7 +100,8 @@ public class CharacterSummaryView {
             lblBackground.setText("Kein Hintergrund");
         }
 
-        lblPlayerName.setText("Spieler");
+        lblPlayerName.setText(character.getName() != null && !character.getName().isBlank()
+                ? character.getName() : "Unbekannt");
 
         if (character.getRace() != null) {
             lblRace.setText(character.getRace().getName());
@@ -119,7 +110,7 @@ public class CharacterSummaryView {
         }
 
         lblAlignment.setText("Neutral");
-        lblExp.setText("0");
+        lblExp.setText("1");
 
         // Passive Wisdom
         int wisBonus = character.getRace() != null ? character.getRace().getAbilityBonuses().getOrDefault("WIS", 0) : 0;
