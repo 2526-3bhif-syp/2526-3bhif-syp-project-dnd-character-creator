@@ -198,22 +198,23 @@ public class DbManager {
     }
 
     public Map<String, Object> getClassByName(String className) {
-        String query = "SELECT name, hit_die, primary_ability, spellcasting_ability FROM class WHERE name = ?";
+        String query = "SELECT \"index\", name, hit_die, spellcasting_spellcasting_ability_index " +
+                "FROM classes WHERE name = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, className);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 Map<String, Object> classData = new HashMap<>();
                 String name = rs.getString("name");
-                String spellAbility = rs.getString("spellcasting_ability");
+                String classIndex = rs.getString("index"); // z.B. "fighter"
+                String spellAbility = rs.getString("spellcasting_spellcasting_ability_index");
                 classData.put("index", name);
                 classData.put("name", name);
                 classData.put("hit_die", rs.getInt("hit_die"));
-                classData.put("primary_ability", rs.getString("primary_ability"));
                 classData.put("spellcasting_ability", spellAbility);
                 classData.put("has_spells", spellAbility != null);
-                classData.put("proficiencies", getClassProficiencies(name));
-                classData.put("saving_throws", getClassSavingThrows(name));
+                classData.put("proficiencies", getClassProficiencies(classIndex));
+                classData.put("saving_throws", getClassSavingThrows(classIndex));
                 return classData;
             }
         } catch (SQLException e) {
@@ -223,33 +224,19 @@ public class DbManager {
     }
 
     public Map<String, Object> getClassByIndex(String className) {
-        String query = "SELECT name, hit_die FROM class WHERE name = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, className);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                Map<String, Object> classData = new HashMap<>();
-                classData.put("name", rs.getString("name"));
-                classData.put("hit_die", rs.getInt("hit_die"));
-                return classData;
-            }
-        } catch (SQLException e) {
-            System.err.println("Error loading class by index: " + e.getMessage());
-        }
-        return null;
+        return getClassByName(className);
     }
 
-    private List<String> getClassProficiencies(String className) {
+    private List<String> getClassProficiencies(String classIndex) {
         List<String> result = new ArrayList<>();
-        String query = "SELECT armour_type AS proficiency FROM class_armour_type_proficiency WHERE class_name = ? " +
-                       "UNION ALL " +
-                       "SELECT weapon_type FROM class_weapon_type_proficiency WHERE class_name = ?";
+        String query = "SELECT p.name FROM proficiencies_classes pc " +
+                "JOIN proficiencies p ON pc.proficiencies_index = p.\"index\" " +
+                "WHERE pc.classes_index = ? AND p.type IN ('Armor', 'Weapons')";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, className);
-            stmt.setString(2, className);
+            stmt.setString(1, classIndex);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                result.add(rs.getString("proficiency"));
+                result.add(rs.getString("name"));
             }
         } catch (SQLException e) {
             System.err.println("Error loading class proficiencies: " + e.getMessage());
@@ -257,14 +244,16 @@ public class DbManager {
         return result;
     }
 
-    private List<String> getClassSavingThrows(String className) {
+    private List<String> getClassSavingThrows(String classIndex) {
         List<String> result = new ArrayList<>();
-        String query = "SELECT ability FROM class_saving_throw WHERE class_name = ?";
+        String query = "SELECT p.name FROM proficiencies_classes pc " +
+                "JOIN proficiencies p ON pc.proficiencies_index = p.\"index\" " +
+                "WHERE pc.classes_index = ? AND p.type = 'Saving Throws'";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, className);
+            stmt.setString(1, classIndex);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                result.add(rs.getString("ability"));
+                result.add(rs.getString("name"));
             }
         } catch (SQLException e) {
             System.err.println("Error loading class saving throws: " + e.getMessage());
