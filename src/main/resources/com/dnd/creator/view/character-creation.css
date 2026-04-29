@@ -459,6 +459,76 @@
     -fx-text-fill: #4CAF50;
 }
 
+/* ---------- Race bonus chip (Step 3) ---------- */
+.race-bonus-chip {
+    -fx-background-color: #C6A664;
+    -fx-text-fill: #1A1A1A;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 2 6 2 6;
+    -fx-background-radius: 8;
+}
+
+/* ---------- Final stat label (Step 3) ---------- */
+.stat-final {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #555;
+    -fx-alignment: center;
+}
+
+/* ---------- Recommended badge (Step 4) ---------- */
+.recommended-badge {
+    -fx-background-color: #8B0000;
+    -fx-text-fill: #F5F5DC;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 2 6 2 6;
+    -fx-background-radius: 8;
+}
+
+/* ---------- Primary skill highlight (Step 4) ---------- */
+.skill-group-title-primary {
+    -fx-text-fill: #8B0000;
+}
+
+.skill-primary {
+    -fx-font-weight: bold;
+}
+
+.skill-primary-star {
+    -fx-text-fill: #C6A664;
+    -fx-font-size: 12px;
+}
+
+/* ---------- Stats reminder bar (Step 4) ---------- */
+.stat-reminder-pill {
+    -fx-background-color: #FFFBF0;
+    -fx-border-color: #C6A664;
+    -fx-border-width: 1;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 4 8 4 8;
+    -fx-min-width: 46;
+}
+
+.stat-reminder-key {
+    -fx-font-size: 9px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #8B0000;
+}
+
+.stat-reminder-val {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1A1A1A;
+}
+
+.stat-reminder-mod {
+    -fx-font-size: 10px;
+    -fx-text-fill: #555;
+}
+
 .check-box .label {
     -fx-text-fill: #1A1A1A;
 }

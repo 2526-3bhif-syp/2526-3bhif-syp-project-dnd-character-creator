@@ -39,6 +39,7 @@
                 <Label fx:id="lblSkillsCounter" text="0 / 2 gewählt" styleClass="skill-counter"/>
             </HBox>
             <Label fx:id="lblSkillsHint" text="Wähle aus den verfügbaren Fähigkeiten deiner Klasse." styleClass="muted"/>
+            <HBox fx:id="statsReminderBar" spacing="8" alignment="CENTER_LEFT"/>
             <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
                 <VBox fx:id="skillsContainer" spacing="10">
                     <padding><Insets top="2" bottom="14" left="2" right="2"/></padding>

@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class SkillsView {
 
@@ -54,6 +55,22 @@ public class SkillsView {
         "CHA", "Charisma"
     );
 
+    /** Background -> classes it fits best. */
+    private static final Map<String, List<String>> BACKGROUND_CLASS_FIT = new LinkedHashMap<>() {{
+        put("Soldier",       List.of("Fighter", "Paladin", "Barbarian"));
+        put("Sage",          List.of("Wizard", "Cleric", "Druid"));
+        put("Criminal",      List.of("Rogue", "Warlock"));
+        put("Acolyte",       List.of("Cleric", "Paladin", "Druid"));
+        put("Outlander",     List.of("Barbarian", "Ranger", "Druid"));
+        put("Sailor",        List.of("Fighter", "Rogue", "Ranger"));
+        put("Noble",         List.of("Paladin", "Bard", "Warlock"));
+        put("Entertainer",   List.of("Bard", "Rogue"));
+        put("Hermit",        List.of("Druid", "Monk", "Cleric"));
+        put("Guild Artisan", List.of("Rogue", "Wizard", "Bard"));
+        put("Folk Hero",     List.of("Fighter", "Barbarian", "Paladin"));
+        put("Charlatan",     List.of("Bard", "Rogue", "Sorcerer"));
+    }};
+
     /** Background -> short German tagline. */
     private static final Map<String, String> BACKGROUND_TAGLINES = new LinkedHashMap<>() {{
         put("Acolyte",       "Tempeldiener. Kennt Religion und heilige Stätten.");
@@ -74,6 +91,7 @@ public class SkillsView {
     @FXML private VBox previewContainer;
     @FXML private VBox backgroundContainer;
     @FXML private VBox skillsContainer;
+    @FXML private HBox statsReminderBar;
     @FXML private Label lblSkillsCounter;
     @FXML private Label lblSkillsHint;
     @FXML private Button btnBack;
@@ -101,6 +119,7 @@ public class SkillsView {
 
             buildBackgrounds();
             buildSkills();
+            buildStatsReminderBar();
             restoreSession();
             updateCounter();
             wireNavigation();
@@ -138,7 +157,18 @@ public class SkillsView {
         tagline.getStyleClass().add("card-tagline");
         tagline.setWrapText(true);
 
-        card.getChildren().addAll(nameLabel, tagline);
+        String currentClass = CharacterSession.getInstance().getCurrentCharacter().getCharacterClass();
+        List<String> fits = BACKGROUND_CLASS_FIT.getOrDefault(name, List.of());
+        HBox headerRow = new HBox(8);
+        headerRow.setAlignment(Pos.CENTER_LEFT);
+        headerRow.getChildren().add(nameLabel);
+        if (currentClass != null && fits.contains(currentClass)) {
+            Label badge = new Label("★ Empfohlen");
+            badge.getStyleClass().add("recommended-badge");
+            headerRow.getChildren().add(badge);
+        }
+
+        card.getChildren().addAll(headerRow, tagline);
         card.setOnMouseClicked(e -> selectBackground(name));
         return card;
     }
@@ -179,25 +209,31 @@ public class SkillsView {
             grouped.computeIfAbsent(ability, k -> new ArrayList<>()).add(skill);
         }
 
+        String className = character.getCharacterClass();
+        Set<String> primaryStats = AbilityScoresView.getPrimaryStats(className);
+
         // Render each group in a fixed ability order
         String[] order = {"STR", "DEX", "INT", "WIS", "CHA"};
         for (String ability : order) {
             List<String> skills = grouped.get(ability);
             if (skills == null || skills.isEmpty()) continue;
-            skillsContainer.getChildren().add(buildSkillGroup(ability, skills));
+            skillsContainer.getChildren().add(buildSkillGroup(ability, skills, primaryStats));
         }
     }
 
-    private VBox buildSkillGroup(String ability, List<String> skills) {
+    private VBox buildSkillGroup(String ability, List<String> skills, Set<String> primaryStats) {
         VBox box = new VBox(6);
         box.getStyleClass().add("skill-group");
 
+        boolean isPrimaryAbility = primaryStats.contains(ability);
         Label title = new Label(ABILITY_GROUP_LABEL.getOrDefault(ability, ability) + " (" + ability + ")");
         title.getStyleClass().add("skill-group-title");
+        if (isPrimaryAbility) title.getStyleClass().add("skill-group-title-primary");
 
         VBox checks = new VBox(4);
         for (String skill : skills) {
             CheckBox cb = new CheckBox(skill);
+            if (isPrimaryAbility) cb.getStyleClass().add("skill-primary");
             Tooltip.install(cb, makeSkillTooltip(skill, ability));
             cb.setOnAction(e -> {
                 enforceSkillLimit();
@@ -206,7 +242,16 @@ public class SkillsView {
                 updateNextButton();
             });
             skillCheckboxes.add(cb);
-            checks.getChildren().add(cb);
+
+            HBox skillRow = new HBox(6);
+            skillRow.setAlignment(Pos.CENTER_LEFT);
+            skillRow.getChildren().add(cb);
+            if (isPrimaryAbility) {
+                Label star = new Label("★");
+                star.getStyleClass().add("skill-primary-star");
+                skillRow.getChildren().add(star);
+            }
+            checks.getChildren().add(skillRow);
         }
 
         box.getChildren().addAll(title, checks);
@@ -270,6 +315,44 @@ public class SkillsView {
             Tooltip.install(btnNext, new Tooltip(reason));
         } else {
             Tooltip.uninstall(btnNext, btnNext.getTooltip());
+        }
+    }
+
+    private void buildStatsReminderBar() {
+        var character = CharacterSession.getInstance().getCurrentCharacter();
+        int[] vals = {
+            character.getStrength(), character.getDexterity(), character.getConstitution(),
+            character.getIntelligence(), character.getWisdom(), character.getCharisma()
+        };
+        boolean anyAssigned = false;
+        for (int v : vals) if (v != 0) { anyAssigned = true; break; }
+        if (!anyAssigned) return;
+
+        var race = character.getRace();
+        String[] keys   = {"STR", "DEX", "CON", "INT", "WIS", "CHA"};
+        String[] labels = {"STR", "GES", "KON", "INT", "WEI", "CHA"};
+
+        for (int i = 0; i < keys.length; i++) {
+            int base  = vals[i];
+            int bonus = race != null ? race.getAbilityBonuses().getOrDefault(keys[i], 0) : 0;
+            int total = base + bonus;
+
+            VBox pill = new VBox(2);
+            pill.getStyleClass().add("stat-reminder-pill");
+            pill.setAlignment(Pos.CENTER);
+
+            Label lblKey = new Label(labels[i]);
+            lblKey.getStyleClass().add("stat-reminder-key");
+
+            Label lblVal = new Label(base == 0 ? "—" : String.valueOf(total));
+            lblVal.getStyleClass().add("stat-reminder-val");
+
+            int mod = total == 0 ? 0 : (total - 10) / 2;
+            Label lblMod = new Label(base == 0 ? "" : (mod >= 0 ? "+" : "") + mod);
+            lblMod.getStyleClass().add("stat-reminder-mod");
+
+            pill.getChildren().addAll(lblKey, lblVal, lblMod);
+            statsReminderBar.getChildren().add(pill);
         }
     }
 

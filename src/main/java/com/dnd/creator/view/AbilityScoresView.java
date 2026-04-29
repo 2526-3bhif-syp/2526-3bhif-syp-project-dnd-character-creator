@@ -20,9 +20,11 @@ import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class AbilityScoresView {
 
@@ -68,6 +70,7 @@ public class AbilityScoresView {
     private final Map<String, Integer> assignments = new LinkedHashMap<>();
     private final Map<String, ComboBox<Integer>> combos = new LinkedHashMap<>();
     private final Map<String, Label> modifierLabels = new LinkedHashMap<>();
+    private final Map<String, Label> finalLabels = new LinkedHashMap<>();
     private final Map<String, Region> barFills = new LinkedHashMap<>();
     private final Map<String, StackPane> barContainers = new LinkedHashMap<>();
     private boolean suppressEvents = false;
@@ -111,14 +114,32 @@ public class AbilityScoresView {
     }
 
     private boolean isPrimary(String stat) {
-        String name = nameFromShort(stat);
         String className = CharacterSession.getInstance().getCurrentCharacter().getCharacterClass();
         if (className == null) return false;
-        // Use the recommended array's max entries as "primary" indicator (15 is always a primary).
         int[] arr = RECOMMENDED.get(className);
         if (arr == null) return false;
         int idx = indexOf(stat);
-        return arr[idx] == 15;
+        if (idx < 0) return false;
+        int[] sorted = arr.clone();
+        Arrays.sort(sorted);
+        int secondHighest = sorted[sorted.length - 2];
+        return arr[idx] >= secondHighest;
+    }
+
+    /** Returns the set of stat keys (e.g. "STR", "DEX") that are primary for the given class. */
+    static Set<String> getPrimaryStats(String className) {
+        if (className == null) return Set.of();
+        int[] arr = RECOMMENDED.get(className);
+        if (arr == null) return Set.of();
+        int[] sorted = arr.clone();
+        Arrays.sort(sorted);
+        int secondHighest = sorted[sorted.length - 2];
+        String[] keys = {"STR", "DEX", "CON", "INT", "WIS", "CHA"};
+        Set<String> result = new java.util.HashSet<>();
+        for (int i = 0; i < keys.length; i++) {
+            if (arr[i] >= secondHighest) result.add(keys[i]);
+        }
+        return result;
     }
 
     private static int indexOf(String stat) {
@@ -176,6 +197,16 @@ public class AbilityScoresView {
             ));
             titleRow.getChildren().add(primary);
         }
+        var race = CharacterSession.getInstance().getCurrentCharacter().getRace();
+        if (race != null) {
+            int bonus = race.getAbilityBonuses().getOrDefault(key, 0);
+            if (bonus > 0) {
+                Label raceChip = new Label("+" + bonus + " Rasse");
+                raceChip.getStyleClass().add("race-bonus-chip");
+                Tooltip.install(raceChip, new Tooltip("Rassenbonus wird zum Endwert addiert."));
+                titleRow.getChildren().add(raceChip);
+            }
+        }
 
         Label descLabel = new Label(desc);
         descLabel.getStyleClass().add("stat-desc");
@@ -219,7 +250,13 @@ public class AbilityScoresView {
         ));
         modifierLabels.put(key, modifier);
 
-        row.getChildren().addAll(iconLabel, middle, combo, modifier);
+        Label finalLabel = new Label("—");
+        finalLabel.getStyleClass().add("stat-final");
+        finalLabel.setMinWidth(40);
+        Tooltip.install(finalLabel, new Tooltip("Endwert inkl. Rassenbonus"));
+        finalLabels.put(key, finalLabel);
+
+        row.getChildren().addAll(iconLabel, middle, combo, modifier, finalLabel);
         return row;
     }
 
@@ -273,12 +310,19 @@ public class AbilityScoresView {
     private void refreshModifier(String key) {
         int v = assignments.getOrDefault(key, UNASSIGNED);
         Label l = modifierLabels.get(key);
+        Label fl = finalLabels.get(key);
         if (l == null) return;
+
+        var race = CharacterSession.getInstance().getCurrentCharacter().getRace();
+        int raceBonus = race != null ? race.getAbilityBonuses().getOrDefault(key, 0) : 0;
+
         if (v == UNASSIGNED) {
             l.setText("—");
+            if (fl != null) fl.setText(raceBonus > 0 ? "+" + raceBonus : "—");
         } else {
             int mod = (v - 10) / 2;
             l.setText((mod >= 0 ? "+" : "") + mod);
+            if (fl != null) fl.setText("= " + (v + raceBonus));
         }
     }
 
