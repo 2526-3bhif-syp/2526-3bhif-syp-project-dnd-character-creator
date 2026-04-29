@@ -53,7 +53,7 @@ public class SpellSelectionView {
     private void initialize() {
         CharacterModel character = CharacterSession.getInstance().getCurrentCharacter();
         String classIdx = character.getClassIndex() != null
-                ? character.getClassIndex().toLowerCase() : "";
+                ? character.getClassIndex() : "";
 
         Map<String, Integer> slots = dbManager.getSpellSlotsAtLevel(classIdx, 1);
         maxCantrips = slots.getOrDefault("cantrips_known", 0);
@@ -170,7 +170,8 @@ public class SpellSelectionView {
 
     public static boolean isSpellcaster(String classIndex) {
         if (classIndex == null) return false;
-        return SPELLCASTING_CLASSES.contains(classIndex.toLowerCase());
+        return SPELLCASTING_CLASSES.stream()
+                .anyMatch(c -> c.equalsIgnoreCase(classIndex));
     }
 
     public Parent getRoot() { return root; }

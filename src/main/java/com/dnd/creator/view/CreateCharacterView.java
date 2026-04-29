@@ -112,12 +112,13 @@ public class CreateCharacterView {
     }
 
     private void setupRaceButtons() {
-        btnDwarf.setOnAction(e -> selectRace(btnDwarf, "Dwarf"));
-        btnElf.setOnAction(e -> selectRace(btnElf, "Elf"));
-        btnHalfling.setOnAction(e -> selectRace(btnHalfling, "Halfling"));
+        btnDwarf.setOnAction(e -> selectRace(btnDwarf, "Hill Dwarf"));
+        btnElf.setOnAction(e -> selectRace(btnElf, "High Elf"));
+        btnHalfling.setOnAction(e -> selectRace(btnHalfling, "Lightfoot Halfling"));
+        btnGnome.setOnAction(e -> selectRace(btnGnome, "Forest Gnome"));
         btnHuman.setOnAction(e -> selectRace(btnHuman, "Human"));
         btnDragonborn.setOnAction(e -> selectRace(btnDragonborn, "Dragonborn"));
-        btnGnome.setOnAction(e -> selectRace(btnGnome, "Gnome"));
+
         btnHalfElf.setOnAction(e -> selectRace(btnHalfElf, "Half-Elf"));
         btnHalfOrc.setOnAction(e -> selectRace(btnHalfOrc, "Half-Orc"));
         btnTiefling.setOnAction(e -> selectRace(btnTiefling, "Tiefling"));
