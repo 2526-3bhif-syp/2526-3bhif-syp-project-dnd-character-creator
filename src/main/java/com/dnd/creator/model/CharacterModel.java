@@ -23,6 +23,7 @@ public class CharacterModel {
     private List<String> selectedSkills = new ArrayList<>();
     private String selectedBackground;
     private List<String[]> weaponAttacks = new ArrayList<>();
+    private String alignment;
 
 
 
@@ -217,6 +218,9 @@ public class CharacterModel {
     public void setSelectedBackground(String selectedBackground) {
         this.selectedBackground = selectedBackground;
     }
+
+    public String getAlignment() { return alignment; }
+    public void setAlignment(String alignment) { this.alignment = alignment; }
 
     /** Each entry is {name, atkBonus, damageAndType} — e.g. {"Longsword", "+4", "1d8 Slashing"} */
     public List<String[]> getWeaponAttacks() { return weaponAttacks; }

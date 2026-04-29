@@ -760,6 +760,18 @@ public class DbManager {
         return result;
     }
 
+    public List<String> getAlignments() {
+        List<String> result = new ArrayList<>();
+        String query = "SELECT name FROM alignments ORDER BY \"index\"";
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+            while (rs.next()) result.add(rs.getString("name"));
+        } catch (SQLException e) {
+            System.err.println("Error loading alignments: " + e.getMessage());
+        }
+        return result;
+    }
+
     private List<String[]> getCharacterWeaponAttacks(long characterId, com.dnd.creator.model.CharacterModel character) {
         List<String[]> result = new ArrayList<>();
         String query = "SELECT w.name, w.damage_dice, w.damage_type, w.range_normal " +
