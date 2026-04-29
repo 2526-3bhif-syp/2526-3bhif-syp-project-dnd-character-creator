@@ -19,26 +19,17 @@ import java.util.List;
 
 public class AlignmentView {
 
+    @FXML private HBox stepperContainer;
+    @FXML private VBox previewContainer;
     @FXML private VBox alignmentGrid;
     @FXML private Button btnBack;
     @FXML private Button btnNext;
 
     private Parent root;
     private final DbManager dbManager = new DbManager();
+    private final CharacterPreviewPanel preview = new CharacterPreviewPanel();
     private String selectedAlignment = null;
     private Button selectedButton = null;
-
-    private static final String BTN_DEFAULT =
-            "-fx-pref-width: 200; -fx-pref-height: 80; " +
-                    "-fx-border-color: #C6A664; -fx-border-width: 2; -fx-border-radius: 10; " +
-                    "-fx-background-radius: 10; -fx-background-color: transparent; " +
-                    "-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B0000; -fx-cursor: hand;";
-
-    private static final String BTN_SELECTED =
-            "-fx-pref-width: 200; -fx-pref-height: 80; " +
-                    "-fx-border-color: #C6A664; -fx-border-width: 2; -fx-border-radius: 10; " +
-                    "-fx-background-radius: 10; -fx-background-color: #8B0000; " +
-                    "-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #F5F5DC; -fx-cursor: hand;";
 
     public AlignmentView() {
         try {
@@ -46,8 +37,13 @@ public class AlignmentView {
                     getClass().getResource("/com/dnd/creator/view/AlignmentView.fxml"));
             loader.setController(this);
             root = loader.load();
+            CreationStyles.attach(root);
 
             dbManager.connect();
+
+            stepperContainer.getChildren().setAll(new StepperBar(6).getRoot());
+            previewContainer.getChildren().setAll(preview.getRoot());
+
             buildGrid();
             restoreSaved();
             setupButtons();
@@ -58,7 +54,6 @@ public class AlignmentView {
 
     private void buildGrid() {
         List<String> alignments = dbManager.getAlignments();
-        // 3x3 Grid
         for (int row = 0; row < 3; row++) {
             HBox hbox = new HBox(20);
             hbox.setAlignment(Pos.CENTER);
@@ -67,7 +62,7 @@ public class AlignmentView {
                 if (idx >= alignments.size()) break;
                 String name = alignments.get(idx);
                 Button btn = new Button(name);
-                btn.setStyle(BTN_DEFAULT);
+                btn.getStyleClass().add("alignment-btn");
                 btn.setWrapText(true);
                 btn.setTextAlignment(javafx.scene.text.TextAlignment.CENTER);
                 btn.setOnAction(e -> selectAlignment(name, btn));
@@ -78,16 +73,17 @@ public class AlignmentView {
     }
 
     private void selectAlignment(String name, Button btn) {
-        if (selectedButton != null) selectedButton.setStyle(BTN_DEFAULT);
+        if (selectedButton != null) {
+            selectedButton.getStyleClass().remove("alignment-btn-selected");
+        }
         selectedAlignment = name;
         selectedButton = btn;
-        btn.setStyle(BTN_SELECTED);
+        btn.getStyleClass().add("alignment-btn-selected");
     }
 
     private void restoreSaved() {
-        String saved = CharacterSession.getInstance()
-                .getCurrentCharacter().getAlignment();
-        if (saved == null || saved.equals("Neutral")) return;
+        String saved = CharacterSession.getInstance().getCurrentCharacter().getAlignment();
+        if (saved == null || saved.isBlank()) return;
         alignmentGrid.getChildren().forEach(row -> {
             if (row instanceof HBox hbox) {
                 hbox.getChildren().forEach(node -> {
@@ -102,8 +98,7 @@ public class AlignmentView {
     private void setupButtons() {
         btnBack.setOnAction(e -> {
             Stage stage = (Stage) root.getScene().getWindow();
-            EquipmentView prev = new EquipmentView();
-            stage.setScene(new Scene(prev.getRoot(),
+            stage.setScene(new Scene(new EquipmentView().getRoot(),
                     stage.getScene().getWidth(), stage.getScene().getHeight()));
         });
 

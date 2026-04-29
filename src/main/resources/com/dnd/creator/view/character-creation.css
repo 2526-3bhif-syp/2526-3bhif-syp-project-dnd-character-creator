@@ -524,3 +524,29 @@
 .scroll-pane > .viewport {
     -fx-background-color: transparent;
 }
+
+/* ---------- Alignment buttons (Step 6) ---------- */
+.alignment-btn {
+    -fx-pref-width: 180;
+    -fx-pref-height: 70;
+    -fx-background-color: #FFFBF0;
+    -fx-border-color: #C6A664;
+    -fx-border-width: 2;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #8B0000;
+    -fx-cursor: hand;
+}
+
+.alignment-btn:hover {
+    -fx-border-color: #8B0000;
+    -fx-effect: dropshadow(gaussian, rgba(139,0,0,0.3), 10, 0.4, 0, 0);
+}
+
+.alignment-btn-selected {
+    -fx-background-color: #8B0000;
+    -fx-border-color: #8B0000;
+    -fx-text-fill: #F5F5DC;
+}
