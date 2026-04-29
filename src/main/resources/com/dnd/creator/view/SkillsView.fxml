@@ -35,6 +35,13 @@
                     <FlowPane fx:id="backgroundContainer" hgap="15" vgap="8" prefWrapLength="700"/>
                 </VBox>
 
+                <!-- Skills vom Hintergrund (automatisch) -->
+                <VBox fx:id="backgroundSkillContainer" spacing="8" visible="false" managed="false">
+                    <Label text="Fertigkeiten durch Hintergrund (automatisch):"
+                           style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #4a7c59;"/>
+                    <FlowPane fx:id="backgroundSkillDisplay" hgap="15" vgap="6"/>
+                </VBox>
+
                 <!-- Skills Selection -->
                 <VBox alignment="CENTER_LEFT" spacing="10">
                     <Label fx:id="lblSkillsTitle" text="Fertigkeiten:" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #8B0000;"/>
