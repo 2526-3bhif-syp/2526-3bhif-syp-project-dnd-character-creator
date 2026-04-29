@@ -22,7 +22,6 @@ public class CharacterModel {
     private List<String> selectedSkills = new ArrayList<>();
     private String selectedBackground;
     private List<String[]> weaponAttacks = new ArrayList<>();
-    private String alignment;
 
     public CharacterModel() {}
 
@@ -175,9 +174,6 @@ public class CharacterModel {
     public void setSelectedEquipment(List<String> selectedEquipment) {
         this.selectedEquipmentOptions = selectedEquipment;
     }
-
-    public String getAlignment() { return alignment; }
-    public void setAlignment(String alignment) { this.alignment = alignment; }
 
     public void addSelectedEquipment(String equipment) {
         this.selectedEquipmentOptions.add(equipment);

@@ -112,13 +112,13 @@ public class DbManager {
     }
 
     public Race getRaceByName(String raceName) {
-        String query = "SELECT \"index\", name, size, speed FROM races WHERE name = ?";
+        String query = "SELECT name, size, speed FROM race WHERE name = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, raceName);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 Race race = new Race();
-                race.setIndex(rs.getString("index"));
+                race.setIndex(rs.getString("name"));
                 race.setName(rs.getString("name"));
                 race.setSpeed(rs.getInt("speed"));
                 race.setSize(rs.getString("size"));
@@ -138,14 +138,15 @@ public class DbManager {
     }
 
     private void loadAbilityBonuses(Race race) {
-        String query = "SELECT ability_score_index, bonus FROM races_ability_bonuses WHERE races_index = ?";
+        String query = "SELECT ability, increment FROM race_ability_score_increment WHERE race_name = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, race.getIndex()); // "dwarf", "elf", etc.
+            stmt.setString(1, race.getName());
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                String abilityIndex = rs.getString("ability_score_index"); // "str", "con", etc.
-                int bonus = rs.getInt("bonus");
-                race.addAbilityBonus(abilityIndex.toUpperCase(), bonus); // "STR", "CON", etc.
+                String fullName = rs.getString("ability");
+                int increment = rs.getInt("increment");
+                String shortName = ABILITY_TO_SHORT.getOrDefault(fullName, fullName);
+                race.addAbilityBonus(shortName, increment);
             }
         } catch (SQLException e) {
             System.err.println("Error loading ability bonuses: " + e.getMessage());
@@ -153,12 +154,12 @@ public class DbManager {
     }
 
     private void loadLanguages(Race race) {
-        String query = "SELECT languages_index FROM races_languages WHERE races_index = ?";
+        String query = "SELECT language FROM race_language WHERE race_name = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, race.getIndex());
+            stmt.setString(1, race.getName());
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                race.addLanguage(rs.getString("languages_index"));
+                race.addLanguage(rs.getString("language"));
             }
         } catch (SQLException e) {
             System.err.println("Error loading languages: " + e.getMessage());
@@ -166,15 +167,17 @@ public class DbManager {
     }
 
     private void loadTraits(Race race) {
-        String query = "SELECT t.name FROM races_traits rt " +
-                "JOIN traits t ON rt.traits_index = t.\"index\" " +
-                "WHERE rt.races_index = ?";
+        String query = "SELECT trait_name, description FROM race_trait WHERE race_name = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, race.getIndex());
+            stmt.setString(1, race.getName());
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                String traitName = rs.getString("name");
-                race.addTrait(new Race.Trait(traitName, traitName, ""));
+                String traitName = rs.getString("trait_name");
+                String desc = rs.getString("description");
+                if (desc != null && desc.length() > 100) {
+                    desc = desc.substring(0, 100) + "...";
+                }
+                race.addTrait(new Race.Trait(traitName, traitName, desc));
             }
         } catch (SQLException e) {
             System.err.println("Error loading traits: " + e.getMessage());
@@ -198,23 +201,22 @@ public class DbManager {
     }
 
     public Map<String, Object> getClassByName(String className) {
-        String query = "SELECT \"index\", name, hit_die, spellcasting_spellcasting_ability_index " +
-                "FROM classes WHERE name = ?";
+        String query = "SELECT name, hit_die, primary_ability, spellcasting_ability FROM class WHERE name = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, className);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 Map<String, Object> classData = new HashMap<>();
                 String name = rs.getString("name");
-                String classIndex = rs.getString("index"); // z.B. "fighter"
-                String spellAbility = rs.getString("spellcasting_spellcasting_ability_index");
+                String spellAbility = rs.getString("spellcasting_ability");
                 classData.put("index", name);
                 classData.put("name", name);
                 classData.put("hit_die", rs.getInt("hit_die"));
+                classData.put("primary_ability", rs.getString("primary_ability"));
                 classData.put("spellcasting_ability", spellAbility);
                 classData.put("has_spells", spellAbility != null);
-                classData.put("proficiencies", getClassProficiencies(classIndex));
-                classData.put("saving_throws", getClassSavingThrows(classIndex));
+                classData.put("proficiencies", getClassProficiencies(name));
+                classData.put("saving_throws", getClassSavingThrows(name));
                 return classData;
             }
         } catch (SQLException e) {
@@ -224,19 +226,33 @@ public class DbManager {
     }
 
     public Map<String, Object> getClassByIndex(String className) {
-        return getClassByName(className);
+        String query = "SELECT name, hit_die FROM class WHERE name = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, className);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                Map<String, Object> classData = new HashMap<>();
+                classData.put("name", rs.getString("name"));
+                classData.put("hit_die", rs.getInt("hit_die"));
+                return classData;
+            }
+        } catch (SQLException e) {
+            System.err.println("Error loading class by index: " + e.getMessage());
+        }
+        return null;
     }
 
-    private List<String> getClassProficiencies(String classIndex) {
+    private List<String> getClassProficiencies(String className) {
         List<String> result = new ArrayList<>();
-        String query = "SELECT p.name FROM proficiencies_classes pc " +
-                "JOIN proficiencies p ON pc.proficiencies_index = p.\"index\" " +
-                "WHERE pc.classes_index = ? AND p.type IN ('Armor', 'Weapons')";
+        String query = "SELECT armour_type AS proficiency FROM class_armour_type_proficiency WHERE class_name = ? " +
+                       "UNION ALL " +
+                       "SELECT weapon_type FROM class_weapon_type_proficiency WHERE class_name = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, classIndex);
+            stmt.setString(1, className);
+            stmt.setString(2, className);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                result.add(rs.getString("name"));
+                result.add(rs.getString("proficiency"));
             }
         } catch (SQLException e) {
             System.err.println("Error loading class proficiencies: " + e.getMessage());
@@ -244,16 +260,14 @@ public class DbManager {
         return result;
     }
 
-    private List<String> getClassSavingThrows(String classIndex) {
+    private List<String> getClassSavingThrows(String className) {
         List<String> result = new ArrayList<>();
-        String query = "SELECT p.name FROM proficiencies_classes pc " +
-                "JOIN proficiencies p ON pc.proficiencies_index = p.\"index\" " +
-                "WHERE pc.classes_index = ? AND p.type = 'Saving Throws'";
+        String query = "SELECT ability FROM class_saving_throw WHERE class_name = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, classIndex);
+            stmt.setString(1, className);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                result.add(rs.getString("name"));
+                result.add(rs.getString("ability"));
             }
         } catch (SQLException e) {
             System.err.println("Error loading class saving throws: " + e.getMessage());
@@ -267,17 +281,17 @@ public class DbManager {
 
     public List<String> getStartingEquipment(String className) {
         List<String> result = new ArrayList<>();
-        String query = "SELECT e.name, cse.quantity " +
-                "FROM classes_starting_equipment cse " +
-                "JOIN equipment e ON cse.equipment_index = e.\"index\" " +
-                "WHERE cse.classes_index = ?";
+        String query = "SELECT mandatory_item FROM class_starting_equipment " +
+                       "WHERE class_name = ? AND is_mandatory = 1 AND mandatory_item IS NOT NULL " +
+                       "ORDER BY choice_order";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, className.toLowerCase());
+            stmt.setString(1, className);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                int qty = rs.getInt("quantity");
-                String name = rs.getString("name");
-                result.add(qty > 1 ? qty + "x " + name : name);
+                String item = rs.getString("mandatory_item");
+                if (item != null && !item.trim().isEmpty()) {
+                    result.add(item);
+                }
             }
         } catch (SQLException e) {
             System.err.println("Error loading starting equipment: " + e.getMessage());
@@ -287,19 +301,28 @@ public class DbManager {
 
     public List<Map<String, Object>> getEquipmentOptions(String className) {
         List<Map<String, Object>> result = new ArrayList<>();
-        String query = "SELECT id, order_num, desc " +
-                "FROM classes_starting_equipment_options " +
-                "WHERE classes_index = ? " +
-                "ORDER BY order_num";
+        String query = "SELECT id, choice_order, option_a, option_b, option_c " +
+                       "FROM class_starting_equipment " +
+                       "WHERE class_name = ? AND is_mandatory = 0 " +
+                       "ORDER BY choice_order";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, className.toLowerCase());
+            stmt.setString(1, className);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 Map<String, Object> option = new HashMap<>();
                 option.put("id", rs.getInt("id"));
-                option.put("order_num", rs.getInt("order_num"));
+                option.put("order_num", rs.getInt("choice_order"));
                 option.put("choose", 1);
-                option.put("description", rs.getString("desc"));
+
+                String optA = rs.getString("option_a");
+                String optB = rs.getString("option_b");
+                String optC = rs.getString("option_c");
+                List<String> parts = new ArrayList<>();
+                if (optA != null && !optA.isBlank()) parts.add(optA);
+                if (optB != null && !optB.isBlank()) parts.add(optB);
+                if (optC != null && !optC.isBlank()) parts.add(optC);
+                option.put("description", String.join(" or ", parts));
+
                 result.add(option);
             }
         } catch (SQLException e) {
@@ -307,31 +330,42 @@ public class DbManager {
         }
         return result;
     }
+
+    public List<Map<String, Object>> getClassSkillProficiencies(String className) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        Map<String, Object> config = getClassSkillSelectionConfig(className);
+        Map<String, Object> entry = new HashMap<>();
+        entry.put("description", "Choose " + config.get("choose") + " skills");
+        entry.put("choose", config.get("choose"));
+        result.add(entry);
+        return result;
+    }
+
     public Map<String, Object> getClassSkillSelectionConfig(String className) {
         Map<String, Object> config = new HashMap<>();
-        int choose = 2;
         List<String> options = new ArrayList<>();
+        int choose = 2;
 
-        String choiceQuery = "SELECT choose, desc FROM classes_proficiency_choices " +
-                "WHERE classes_index = ? AND type = 'proficiencies' " +
-                "ORDER BY order_num LIMIT 1";
-        try (PreparedStatement stmt = connection.prepareStatement(choiceQuery)) {
-            stmt.setString(1, className.toLowerCase());
+        String skillQuery = "SELECT skill_name FROM class_skill_choice WHERE class_name = ? ORDER BY skill_name";
+        try (PreparedStatement stmt = connection.prepareStatement(skillQuery)) {
+            stmt.setString(1, className);
             ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                choose = rs.getInt("choose");
-                String desc = rs.getString("desc");
-                if (desc != null && !desc.toLowerCase().contains("any")) {
-                    List<String> allSkills = getAllSkills();
-                    for (String skill : allSkills) {
-                        if (desc.contains(skill)) {
-                            options.add(skill);
-                        }
-                    }
-                }
+            while (rs.next()) {
+                options.add(rs.getString("skill_name"));
             }
         } catch (SQLException e) {
-            System.err.println("Error loading class skill config: " + e.getMessage());
+            System.err.println("Error loading class skill choices: " + e.getMessage());
+        }
+
+        String countQuery = "SELECT skill_count FROM class_skill_count WHERE class_name = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(countQuery)) {
+            stmt.setString(1, className);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                choose = rs.getInt("skill_count");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error loading class skill count: " + e.getMessage());
         }
 
         if (options.isEmpty()) {
@@ -410,7 +444,7 @@ public class DbManager {
 
     public List<String> getAllBackgrounds() {
         List<String> result = new ArrayList<>();
-        String query = "SELECT name FROM backgrounds ORDER BY name";
+        String query = "SELECT name FROM background ORDER BY name";
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
             while (rs.next()) {
@@ -424,7 +458,7 @@ public class DbManager {
 
     public List<String> getAllSkills() {
         List<String> result = new ArrayList<>();
-        String query = "SELECT name FROM skills ORDER BY name";
+        String query = "SELECT name FROM skill ORDER BY name";
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
             while (rs.next()) {
@@ -445,17 +479,14 @@ public class DbManager {
             return false;
         }
 
-        String insertChar = "INSERT INTO characters (name, race_index, class_index, background, alignment, hit_die, spellcasting_ability, image_path) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String insertChar = "INSERT INTO \"character\" (character_name, race_name, class_name, background_name, character_picture) " +
+                            "VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(insertChar, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, character.getName());
-            stmt.setString(2, character.getRace() != null ? character.getRace().getName() : null);
+            stmt.setString(2, character.getRace().getName());
             stmt.setString(3, character.getCharacterClass());
             stmt.setString(4, character.getSelectedBackground());
-            stmt.setString(5, character.getAlignment());
-            stmt.setInt(6, character.getClassHitDie());
-            stmt.setString(7, character.getSpellcastingAbility());
-            stmt.setString(8, character.getImagePath());
+            stmt.setString(5, character.getImagePath());
 
             if (stmt.executeUpdate() == 0) return false;
 
@@ -581,7 +612,6 @@ public class DbManager {
 
                 character.setDbId(id);
                 character.setSelectedBackground(rs.getString("background_name"));
-                character.setAlignment(rs.getString("alignment") != null ? rs.getString("alignment") : "Neutral");
                 character.setSelectedSkills(getCharacterSkills(id));
                 character.setSelectedEquipment(getCharacterEquipment(id));
                 character.setSelectedSpells(getCharacterSpells(id));
@@ -603,21 +633,6 @@ public class DbManager {
             while (rs.next()) result.add(rs.getString("skill_name"));
         } catch (SQLException e) {
             System.err.println("Error loading character skills: " + e.getMessage());
-        }
-        return result;
-    }
-
-    public List<String> getBackgroundSkills(String backgroundName) {
-        List<String> result = new ArrayList<>();
-        String query = "SELECT skill_name FROM background_skill WHERE background = ? ORDER BY skill_name";
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, backgroundName);
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                result.add(rs.getString("skill_name"));
-            }
-        } catch (SQLException e) {
-            System.err.println("Error loading background skills: " + e.getMessage());
         }
         return result;
     }
@@ -678,17 +693,4 @@ public class DbManager {
         }
         return result;
     }
-
-    public List<String> getAlignments() {
-        List<String> result = new ArrayList<>();
-        String query = "SELECT name FROM alignments ORDER BY \"index\"";
-        try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery(query)) {
-            while (rs.next()) result.add(rs.getString("name"));
-        } catch (SQLException e) {
-            System.err.println("Error loading alignments: " + e.getMessage());
-        }
-        return result;
-    }
-
 }
