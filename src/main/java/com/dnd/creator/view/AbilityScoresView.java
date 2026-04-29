@@ -52,7 +52,6 @@ public class AbilityScoresView {
     private Integer selectedINT = null;
     private Integer selectedWIS = null;
     private Integer selectedCHA = null;
-    private Label currentlySelectedLabel = null;
 
     public AbilityScoresView() {
         try {
@@ -131,20 +130,27 @@ public class AbilityScoresView {
         }
 
         // Aktualisiere alle Label mit gespeicherten Werten
-        if (selectedSTR != null) strValue.setText(selectedSTR.toString());
-        if (selectedDEX != null) dexValue.setText(selectedDEX.toString());
-        if (selectedCON != null) conValue.setText(selectedCON.toString());
-        if (selectedINT != null) intValue.setText(selectedINT.toString());
-        if (selectedWIS != null) wisValue.setText(selectedWIS.toString());
-        if (selectedCHA != null) chaValue.setText(selectedCHA.toString());
+        strValue.setText(selectedSTR != null ? selectedSTR.toString() : "-");
+        dexValue.setText(selectedDEX != null ? selectedDEX.toString() : "-");
+        conValue.setText(selectedCON != null ? selectedCON.toString() : "-");
+        intValue.setText(selectedINT != null ? selectedINT.toString() : "-");
+        wisValue.setText(selectedWIS != null ? selectedWIS.toString() : "-");
+        chaValue.setText(selectedCHA != null ? selectedCHA.toString() : "-");
     }
 
     private void handleValueSelection(Integer value) {
-        if (currentlySelectedLabel != null) {
-            assignValueToAttribute(currentlySelectedLabel, value);
+        Label targetLabel = null;
+        if (selectedSTR == null) targetLabel = strValue;
+        else if (selectedDEX == null) targetLabel = dexValue;
+        else if (selectedCON == null) targetLabel = conValue;
+        else if (selectedINT == null) targetLabel = intValue;
+        else if (selectedWIS == null) targetLabel = wisValue;
+        else if (selectedCHA == null) targetLabel = chaValue;
+
+        if (targetLabel != null) {
+            assignValueToAttribute(targetLabel, value);
             availableValues.remove(value);
             initializeValuePool();
-            currentlySelectedLabel = null;
         }
     }
 
@@ -160,22 +166,29 @@ public class AbilityScoresView {
     }
 
     private void setupLabelHandlers() {
-        strValue.setOnMouseClicked(e -> selectLabel(strValue));
-        dexValue.setOnMouseClicked(e -> selectLabel(dexValue));
-        conValue.setOnMouseClicked(e -> selectLabel(conValue));
-        intValue.setOnMouseClicked(e -> selectLabel(intValue));
-        wisValue.setOnMouseClicked(e -> selectLabel(wisValue));
-        chaValue.setOnMouseClicked(e -> selectLabel(chaValue));
+        strValue.setOnMouseClicked(e -> unassignAttribute(strValue));
+        dexValue.setOnMouseClicked(e -> unassignAttribute(dexValue));
+        conValue.setOnMouseClicked(e -> unassignAttribute(conValue));
+        intValue.setOnMouseClicked(e -> unassignAttribute(intValue));
+        wisValue.setOnMouseClicked(e -> unassignAttribute(wisValue));
+        chaValue.setOnMouseClicked(e -> unassignAttribute(chaValue));
     }
 
-    private void selectLabel(Label label) {
-        if (currentlySelectedLabel != null) {
-            currentlySelectedLabel.getStyleClass().remove("selected");
-            currentlySelectedLabel.setStyle(currentlySelectedLabel.getStyle().replace("-fx-border-color: #C6A664;", "-fx-border-color: transparent;"));
+    private void unassignAttribute(Label label) {
+        Integer val = null;
+        if (label == strValue) { val = selectedSTR; selectedSTR = null; }
+        else if (label == dexValue) { val = selectedDEX; selectedDEX = null; }
+        else if (label == conValue) { val = selectedCON; selectedCON = null; }
+        else if (label == intValue) { val = selectedINT; selectedINT = null; }
+        else if (label == wisValue) { val = selectedWIS; selectedWIS = null; }
+        else if (label == chaValue) { val = selectedCHA; selectedCHA = null; }
+
+        if (val != null) {
+            label.setText("-");
+            availableValues.add(val);
+            availableValues.sort((a, b) -> b.compareTo(a));
+            initializeValuePool();
         }
-        currentlySelectedLabel = label;
-        label.getStyleClass().add("selected");
-        label.setStyle(label.getStyle() + "-fx-border-color: #C6A664; -fx-background-color: #FFF8DC;");
     }
 
     private void setupButtonHandlers() {
