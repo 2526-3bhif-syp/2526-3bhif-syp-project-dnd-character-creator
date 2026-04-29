@@ -613,6 +613,21 @@ public class DbManager {
         return result;
     }
 
+    public List<String> getBackgroundSkills(String backgroundName) {
+        List<String> result = new ArrayList<>();
+        String query = "SELECT skill_name FROM background_skill WHERE background = ? ORDER BY skill_name";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, backgroundName);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                result.add(rs.getString("skill_name"));
+            }
+        } catch (SQLException e) {
+            System.err.println("Error loading background skills: " + e.getMessage());
+        }
+        return result;
+    }
+
     private List<String> getCharacterEquipment(long characterId) {
         List<String> result = new ArrayList<>();
         String query = "SELECT item_name FROM character_equipment WHERE character_id = ?";
