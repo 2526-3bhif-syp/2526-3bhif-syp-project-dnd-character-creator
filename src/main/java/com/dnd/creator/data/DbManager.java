@@ -112,13 +112,13 @@ public class DbManager {
     }
 
     public Race getRaceByName(String raceName) {
-        String query = "SELECT name, size, speed FROM race WHERE name = ?";
+        String query = "SELECT \"index\", name, size, speed FROM races WHERE name = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, raceName);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 Race race = new Race();
-                race.setIndex(rs.getString("name"));
+                race.setIndex(rs.getString("index"));
                 race.setName(rs.getString("name"));
                 race.setSpeed(rs.getInt("speed"));
                 race.setSize(rs.getString("size"));
@@ -138,15 +138,14 @@ public class DbManager {
     }
 
     private void loadAbilityBonuses(Race race) {
-        String query = "SELECT ability, increment FROM race_ability_score_increment WHERE race_name = ?";
+        String query = "SELECT ability_score_index, bonus FROM races_ability_bonuses WHERE races_index = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, race.getName());
+            stmt.setString(1, race.getIndex()); // "dwarf", "elf", etc.
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                String fullName = rs.getString("ability");
-                int increment = rs.getInt("increment");
-                String shortName = ABILITY_TO_SHORT.getOrDefault(fullName, fullName);
-                race.addAbilityBonus(shortName, increment);
+                String abilityIndex = rs.getString("ability_score_index"); // "str", "con", etc.
+                int bonus = rs.getInt("bonus");
+                race.addAbilityBonus(abilityIndex.toUpperCase(), bonus); // "STR", "CON", etc.
             }
         } catch (SQLException e) {
             System.err.println("Error loading ability bonuses: " + e.getMessage());
@@ -154,12 +153,12 @@ public class DbManager {
     }
 
     private void loadLanguages(Race race) {
-        String query = "SELECT language FROM race_language WHERE race_name = ?";
+        String query = "SELECT languages_index FROM races_languages WHERE races_index = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, race.getName());
+            stmt.setString(1, race.getIndex());
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                race.addLanguage(rs.getString("language"));
+                race.addLanguage(rs.getString("languages_index"));
             }
         } catch (SQLException e) {
             System.err.println("Error loading languages: " + e.getMessage());
@@ -167,17 +166,15 @@ public class DbManager {
     }
 
     private void loadTraits(Race race) {
-        String query = "SELECT trait_name, description FROM race_trait WHERE race_name = ?";
+        String query = "SELECT t.name FROM races_traits rt " +
+                "JOIN traits t ON rt.traits_index = t.\"index\" " +
+                "WHERE rt.races_index = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, race.getName());
+            stmt.setString(1, race.getIndex());
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                String traitName = rs.getString("trait_name");
-                String desc = rs.getString("description");
-                if (desc != null && desc.length() > 100) {
-                    desc = desc.substring(0, 100) + "...";
-                }
-                race.addTrait(new Race.Trait(traitName, traitName, desc));
+                String traitName = rs.getString("name");
+                race.addTrait(new Race.Trait(traitName, traitName, ""));
             }
         } catch (SQLException e) {
             System.err.println("Error loading traits: " + e.getMessage());
