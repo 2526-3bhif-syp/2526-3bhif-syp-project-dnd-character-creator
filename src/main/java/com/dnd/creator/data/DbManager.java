@@ -126,7 +126,11 @@ public class DbManager {
 
     public List<String> getAllRaces() {
         List<String> result = new ArrayList<>();
-        String query = "SELECT name FROM race ORDER BY name";
+
+        String query = "SELECT name FROM race " +
+                "WHERE parent_race IS NOT NULL " +
+                "OR name NOT IN (SELECT parent_race FROM race WHERE parent_race IS NOT NULL) " +
+                "ORDER BY name";
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
             while (rs.next()) {
