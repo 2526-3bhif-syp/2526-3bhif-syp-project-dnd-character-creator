@@ -4,6 +4,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
@@ -40,6 +41,12 @@
             </HBox>
             <Label fx:id="lblSkillsHint" text="Wähle aus den verfügbaren Fähigkeiten deiner Klasse." styleClass="muted"/>
             <HBox fx:id="statsReminderBar" spacing="8" alignment="CENTER_LEFT"/>
+            <!-- Live proficiency summary -->
+            <VBox fx:id="proficiencyBox" spacing="4" styleClass="proficiency-summary-box">
+                <padding><Insets top="6" bottom="6" left="10" right="10"/></padding>
+                <Label text="Proficiencies deines Charakters:" styleClass="proficiency-summary-title"/>
+                <FlowPane fx:id="proficiencyPane" hgap="6" vgap="4"/>
+            </VBox>
             <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
                 <VBox fx:id="skillsContainer" spacing="10">
                     <padding><Insets top="2" bottom="14" left="2" right="2"/></padding>

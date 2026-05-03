@@ -537,6 +537,51 @@
     -fx-font-size: 12px;
 }
 
+/* Auto-granted skill chip (shown on background cards and in the background section) */
+.skill-auto-chip {
+    -fx-background-color: #2E8B57;
+    -fx-text-fill: #F5F5DC;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-padding: 2 7 2 7;
+    -fx-background-radius: 8;
+}
+
+/* Small inline tag next to disabled class-skill checkboxes */
+.skill-from-bg-tag {
+    -fx-background-color: #2E8B57;
+    -fx-text-fill: #F5F5DC;
+    -fx-font-size: 9px;
+    -fx-font-weight: bold;
+    -fx-padding: 1 5 1 5;
+    -fx-background-radius: 6;
+}
+
+/* Chosen class-skill chip in proficiency summary */
+.skill-chosen-chip {
+    -fx-background-color: #8B0000;
+    -fx-text-fill: #F5F5DC;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-padding: 2 7 2 7;
+    -fx-background-radius: 8;
+}
+
+/* Proficiency summary box */
+.proficiency-summary-box {
+    -fx-background-color: #FFFBF0;
+    -fx-border-color: #C6A664;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+.proficiency-summary-title {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1A1A1A;
+}
+
 /* ---------- Equipment bundle card (Step 5) ---------- */
 .bundle-card {
     -fx-background-color: #FFFBF0;
