@@ -6,12 +6,14 @@ import com.dnd.creator.model.Race;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Rectangle;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -20,36 +22,6 @@ public class CharacterPreviewPanel {
 
     private static final int BAR_WIDTH = 110; // fixed px — avoids binding-to-unrendered-node bug
 
-    private static final Map<String, String> RACE_ICONS = Map.ofEntries(
-        Map.entry("Dwarf",     "⛏"),  Map.entry("Elf",      "🏹"),
-        Map.entry("Halfling",  "🍃"),  Map.entry("Human",    "🛡"),
-        Map.entry("Dragonborn","🐉"),  Map.entry("Gnome",    "🔮"),
-        Map.entry("Half-Elf",  "✨"),  Map.entry("Half-Orc", "⚔"),
-        Map.entry("Tiefling",  "😈")
-    );
-
-    private static final Map<String, String> CLASS_ICONS = Map.ofEntries(
-        Map.entry("Barbarian","🪓"), Map.entry("Bard",    "🎵"),
-        Map.entry("Cleric",  "✝"),  Map.entry("Druid",   "🌿"),
-        Map.entry("Fighter", "⚔"),  Map.entry("Monk",    "👊"),
-        Map.entry("Paladin", "🛡"),  Map.entry("Ranger",  "🏹"),
-        Map.entry("Rogue",   "🗡"),  Map.entry("Sorcerer","✨"),
-        Map.entry("Warlock", "👁"),  Map.entry("Wizard",  "🔮")
-    );
-
-    /** Race names whose image file doesn't match raceName.toLowerCase(). */
-    private static final Map<String, String> RACE_IMAGE_FILE = Map.of(
-        "Half-Orc",          "orc",
-        "Hill Dwarf",        "dwarf",
-        "Mountain Dwarf",    "dwarf",
-        "High Elf",          "elf",
-        "Wood Elf",          "elf",
-        "Drow",              "elf",
-        "Lightfoot Halfling","halfling",
-        "Stout Halfling",    "halfling",
-        "Forest Gnome",      "gnome",
-        "Rock Gnome",        "gnome"
-    );
 
     private static final String[][] STAT_DEFS = {
         {"STR", "ST"}, {"DEX", "GE"}, {"CON", "KO"},
@@ -78,7 +50,7 @@ public class CharacterPreviewPanel {
         portraitBox = new StackPane();
         portraitBox.getStyleClass().add("preview-portrait");
         portraitBox.setMinHeight(110);
-        portraitBox.setPrefHeight(110);
+        portraitBox.setPrefHeight(130);
         portraitBox.setMaxWidth(Double.MAX_VALUE);
         portraitBox.setAlignment(Pos.CENTER);
 
@@ -131,8 +103,7 @@ public class CharacterPreviewPanel {
         String bg = c.getSelectedBackground();
         backgroundLabel.setText("Hintergrund: " + (bg != null && !bg.isBlank() ? bg : "—"));
 
-        // Portrait — try real image (class first, then race), emoji fallback
-        refreshPortrait(className, raceName);
+        refreshPortrait(className, raceName); // args unused but kept for signature compat
 
         // Stat bars
         rebuildStats(c);
@@ -143,39 +114,35 @@ public class CharacterPreviewPanel {
     private void refreshPortrait(String className, String raceName) {
         portraitBox.getChildren().clear();
 
-        // 1. Try class image
-        if (className != null && !className.isBlank()) {
-            ImageView iv = tryImage(className.toLowerCase());
-            if (iv != null) { portraitBox.getChildren().add(iv); return; }
+        CharacterModel c = CharacterSession.getInstance().getCurrentCharacter();
+        String imgPath = c.getImagePath();
+
+        if (imgPath != null && !imgPath.equals("placeholder.png")) {
+            File file = new File(imgPath);
+            if (file.exists()) {
+                // panel prefWidth=300 minus 20px padding each side = 260, box height = 128 (130 - 2px border)
+                double w = 256, h = 126;
+                Image image = new Image(file.toURI().toString());
+
+                // cover: scale so the image fills the box, crop overflow
+                double iw = image.getWidth(), ih = image.getHeight();
+                double scale = Math.max(w / iw, h / ih);
+                double sw = iw * scale, sh = ih * scale;
+                double ox = (w - sw) / 2, oy = (h - sh) / 2;
+
+                Rectangle rect = new Rectangle(w, h);
+                rect.setArcWidth(24);
+                rect.setArcHeight(24);
+                rect.setFill(new ImagePattern(image, ox, oy, sw, sh, false));
+                portraitBox.getChildren().add(rect);
+                return;
+            }
         }
 
-        // 2. Try race image
-        if (raceName != null) {
-            String key = RACE_IMAGE_FILE.getOrDefault(raceName,
-                raceName.toLowerCase().replace(" ", "-").replace("'", ""));
-            ImageView iv = tryImage(key);
-            if (iv != null) { portraitBox.getChildren().add(iv); return; }
-        }
-
-        // 3. Emoji fallback
-        String emoji = null;
-        if (className != null) emoji = CLASS_ICONS.get(className);
-        if (emoji == null && raceName != null) emoji = RACE_ICONS.get(raceName);
-        if (emoji == null) emoji = "⚔";
-        Label l = new Label(emoji);
-        l.setStyle("-fx-font-size: 52px;");
-        portraitBox.getChildren().add(l);
-    }
-
-    private ImageView tryImage(String fileKey) {
-        InputStream is = CharacterPreviewPanel.class.getResourceAsStream(
-            "/com/dnd/creator/pics/" + fileKey + ".png");
-        if (is == null) return null;
-        ImageView iv = new ImageView(new Image(is));
-        iv.setFitWidth(90);
-        iv.setFitHeight(90);
-        iv.setPreserveRatio(true);
-        return iv;
+        Label noImg = new Label("Kein Bild\nhochgeladen");
+        noImg.setStyle("-fx-font-size: 13px; -fx-text-alignment: center; -fx-text-fill: #888;");
+        noImg.setWrapText(true);
+        portraitBox.getChildren().add(noImg);
     }
 
     // ── Stats ─────────────────────────────────────────────────────────────────

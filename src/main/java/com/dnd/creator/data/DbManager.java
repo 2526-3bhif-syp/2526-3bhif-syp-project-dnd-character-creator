@@ -568,6 +568,27 @@ public class DbManager {
 
     // ===== CHARACTER PERSISTENCE =====
 
+    private String copyPortraitToStorage(String srcPath) {
+        if (srcPath == null || srcPath.equals("placeholder.png")) return srcPath;
+        try {
+            java.io.File src = new java.io.File(srcPath);
+            if (!src.exists()) return srcPath;
+
+            java.io.File dir = new java.io.File("src/main/data/portraits");
+            dir.mkdirs();
+
+            String ext = srcPath.contains(".") ? srcPath.substring(srcPath.lastIndexOf('.')) : ".png";
+            String filename = "portrait_" + System.currentTimeMillis() + ext;
+            java.io.File dest = new java.io.File(dir, filename);
+
+            Files.copy(src.toPath(), dest.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            return dest.getPath();
+        } catch (IOException e) {
+            System.err.println("Could not copy portrait: " + e.getMessage());
+            return srcPath;
+        }
+    }
+
     public boolean saveCharacter(com.dnd.creator.model.CharacterModel character) {
         if (character.getRace() == null || character.getCharacterClass() == null
                 || character.getSelectedBackground() == null) {
@@ -588,6 +609,8 @@ public class DbManager {
             }
         }
 
+        String portraitPath = copyPortraitToStorage(character.getImagePath());
+
         String insertChar = "INSERT INTO \"character\" " +
                 "(character_name, race_name, class_name, background_name, alignment_id, level, character_picture) " +
                 "VALUES (?, ?, ?, ?, ?, 1, ?)";
@@ -598,7 +621,7 @@ public class DbManager {
             stmt.setString(4, character.getSelectedBackground());
             if (alignmentId != null) stmt.setInt(5, alignmentId);
             else stmt.setNull(5, java.sql.Types.INTEGER);
-            stmt.setString(6, character.getImagePath());
+            stmt.setString(6, portraitPath);
 
             if (stmt.executeUpdate() == 0) return false;
 

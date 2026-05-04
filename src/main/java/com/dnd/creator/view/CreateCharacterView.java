@@ -10,7 +10,9 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
@@ -19,9 +21,11 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -145,6 +149,7 @@ public class CreateCharacterView {
     @FXML private TilePane raceGrid;
     @FXML private Button btnBack;
     @FXML private Button btnNext;
+    @FXML private Button btnUploadImage;
 
     private Parent root;
     private final DbManager dbManager = new DbManager();
@@ -170,6 +175,7 @@ public class CreateCharacterView {
             buildFilterBar();
             restoreSession();
             wireNameField();
+            wireUploadButton();
             wireNavigation();
             updateNextButton();
 
@@ -357,6 +363,21 @@ public class CreateCharacterView {
         }
     }
 
+    private void wireUploadButton() {
+        btnUploadImage.setOnAction(e -> {
+            FileChooser chooser = new FileChooser();
+            chooser.setTitle("Charakterbild auswählen");
+            chooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Bilder", "*.png", "*.jpg", "*.jpeg", "*.gif", "*.bmp", "*.webp")
+            );
+            File file = chooser.showOpenDialog(root.getScene().getWindow());
+            if (file != null) {
+                CharacterSession.getInstance().getCurrentCharacter().setImagePath(file.getAbsolutePath());
+                preview.refresh();
+            }
+        });
+    }
+
     private void wireNavigation() {
         btnBack.setOnAction(e -> {
             MainView mainView = new MainView();
@@ -366,9 +387,25 @@ public class CreateCharacterView {
         });
         btnNext.setOnAction(e -> {
             CharacterSession.getInstance().getCurrentCharacter().setName(txtCharacterName.getText().trim());
-            SelectClassView next = new SelectClassView();
-            Stage stage = (Stage) root.getScene().getWindow();
-            stage.setScene(new Scene(next.getRoot(), stage.getScene().getWidth(), stage.getScene().getHeight()));
+            String img = CharacterSession.getInstance().getCurrentCharacter().getImagePath();
+            boolean hasImage = img != null && !img.equals("placeholder.png");
+            if (!hasImage) {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Kein Bild hochgeladen");
+                alert.setHeaderText("Du hast noch kein Bild für deinen Charakter hochgeladen.");
+                alert.setContentText("Möchtest du trotzdem fortfahren?");
+                alert.showAndWait().ifPresent(result -> {
+                    if (result == ButtonType.OK) goToNextStep();
+                });
+            } else {
+                goToNextStep();
+            }
         });
+    }
+
+    private void goToNextStep() {
+        SelectClassView next = new SelectClassView();
+        Stage stage = (Stage) root.getScene().getWindow();
+        stage.setScene(new Scene(next.getRoot(), stage.getScene().getWidth(), stage.getScene().getHeight()));
     }
 }
