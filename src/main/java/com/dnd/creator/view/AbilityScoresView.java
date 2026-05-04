@@ -11,6 +11,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -32,12 +34,12 @@ public class AbilityScoresView {
     private static final List<Integer> STANDARD_ARRAY = List.of(15, 14, 13, 12, 10, 8);
 
     private static final String[][] STATS = {
-        {"STR", "Stärke",         "💪", "Wie hart du zuschlägst und wie viel du tragen kannst."},
-        {"DEX", "Geschicklichkeit","🎯", "Schnelligkeit, Zielen und Reflexe."},
-        {"CON", "Konstitution",   "❤", "Wie viele Lebenspunkte du hast — wie viel du aushältst."},
-        {"INT", "Intelligenz",    "📚", "Buchwissen und logisches Denken — wichtig für Magier."},
-        {"WIS", "Weisheit",       "👁", "Wahrnehmung, Intuition und Naturverbundenheit."},
-        {"CHA", "Charisma",       "🗣", "Reden, Auftreten und Überzeugungskraft."}
+        {"STR", "Stärke",          "biceps.png",  "Wie hart du zuschlägst und wie viel du tragen kannst."},
+        {"DEX", "Geschicklichkeit", "target.png",  "Schnelligkeit, Zielen und Reflexe."},
+        {"CON", "Konstitution",     "heart.png",   "Wie viele Lebenspunkte du hast — wie viel du aushältst."},
+        {"INT", "Intelligenz",      "book.png",    "Buchwissen und logisches Denken — wichtig für Magier."},
+        {"WIS", "Weisheit",         "weisheit.png","Wahrnehmung, Intuition und Naturverbundenheit."},
+        {"CHA", "Charisma",         "speak.png",   "Reden, Auftreten und Überzeugungskraft."}
     };
 
     /** Recommended distributions by class — STR,DEX,CON,INT,WIS,CHA */
@@ -178,7 +180,11 @@ public class AbilityScoresView {
         row.setAlignment(Pos.CENTER_LEFT);
         if (isPrimary(key)) row.getStyleClass().add("stat-row-primary");
 
-        Label iconLabel = new Label(icon);
+        ImageView iconLabel = new ImageView(new Image(
+            getClass().getResourceAsStream("/com/dnd/creator/pics/" + icon)));
+        iconLabel.setFitWidth(32);
+        iconLabel.setFitHeight(32);
+        iconLabel.setPreserveRatio(true);
         iconLabel.getStyleClass().add("stat-icon");
 
         VBox middle = new VBox(2);
