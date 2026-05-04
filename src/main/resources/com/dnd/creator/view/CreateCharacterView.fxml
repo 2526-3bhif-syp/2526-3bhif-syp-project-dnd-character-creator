@@ -33,6 +33,7 @@
                 <Label text="Charaktername" styleClass="section-title" style="-fx-font-size: 14px;"/>
                 <TextField fx:id="txtCharacterName" promptText="z. B. Thorin Eisenherz"
                            styleClass="input-field" maxWidth="360"/>
+                <Button fx:id="btnUploadImage" text="Bild hochladen" styleClass="upload-button" maxWidth="360"/>
             </VBox>
 
             <Label text="Wähle eine Rasse" styleClass="section-title" style="-fx-font-size: 14px;"/>

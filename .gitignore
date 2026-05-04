@@ -66,5 +66,7 @@ docs/slides/revealjs
 
 #ai helper files
 /ai-files
+CLAUDE.md
+GEMINI.md
 #databank
 *.db

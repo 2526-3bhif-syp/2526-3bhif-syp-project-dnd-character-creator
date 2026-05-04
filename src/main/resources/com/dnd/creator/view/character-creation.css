@@ -715,3 +715,20 @@
     -fx-font-size: 10px;
     -fx-text-fill: #666;
 }
+
+.upload-button {
+    -fx-background-color: #8B0000;
+    -fx-border-color: #6B0000;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-text-fill: #F5F5DC;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 6 16 6 16;
+    -fx-cursor: hand;
+}
+
+.upload-button:hover {
+    -fx-background-color: #A50000;
+}
