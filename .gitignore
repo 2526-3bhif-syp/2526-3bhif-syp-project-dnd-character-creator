@@ -68,3 +68,4 @@ docs/slides/revealjs
 /ai-files
 #databank
 *.db
+/src/main/data/portraits
