@@ -173,6 +173,37 @@
     -fx-text-fill: #C6A664;
 }
 
+.difficulty-legend-label {
+    -fx-font-size: 11px;
+    -fx-text-fill: #888888;
+    -fx-font-style: italic;
+}
+
+.difficulty-legend-item {
+    -fx-font-size: 11px;
+    -fx-text-fill: #C6A664;
+}
+
+.difficulty-legend-box {
+    -fx-background-color: #FFFBF0;
+    -fx-border-color: #C6A664;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+}
+
+.difficulty-legend-heading {
+    -fx-font-size: 17px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1A1A1A;
+}
+
+.difficulty-legend-row {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1A1A1A;
+}
+
 /* ---------- Filter chips ---------- */
 .filter-chip {
     -fx-background-color: transparent;

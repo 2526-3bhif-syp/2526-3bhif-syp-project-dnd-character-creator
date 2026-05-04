@@ -30,13 +30,20 @@
                     <padding><Insets top="4" bottom="14" left="2" right="2"/></padding>
                 </TilePane>
             </ScrollPane>
+            <VBox styleClass="difficulty-legend-box" spacing="6">
+                <padding><Insets top="8" bottom="8" left="12" right="12"/></padding>
+                <Label text="Schwierigkeit" styleClass="difficulty-legend-heading"/>
+                <Label text="★☆☆  —  Einfach  —  Gut für Einsteiger" styleClass="difficulty-legend-row"/>
+                <Label text="★★☆  —  Mittel  —  Etwas Erfahrung von Vorteil" styleClass="difficulty-legend-row"/>
+                <Label text="★★★  —  Komplex  —  Viele Regeln zu lernen" styleClass="difficulty-legend-row"/>
+            </VBox>
         </VBox>
 
         <VBox fx:id="previewContainer" spacing="8"/>
     </HBox>
 
     <HBox alignment="CENTER" spacing="40">
-        <padding><Insets top="10" bottom="20" left="40" right="40"/></padding>
+        <padding><Insets top="6" bottom="20" left="40" right="40"/></padding>
         <Button fx:id="btnBack" text="Zurück" styleClass="nav-button-back"/>
         <Button fx:id="btnNext" text="Weiter" styleClass="nav-button-next"/>
     </HBox>
