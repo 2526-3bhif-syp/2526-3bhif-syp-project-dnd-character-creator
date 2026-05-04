@@ -52,7 +52,7 @@
                          -fx-background-color: #BCA882;
                          -fx-effect: innershadow(gaussian, rgba(0,0,0,0.55), 8, 0, 0, 2);">
                 <ImageView fx:id="imageView" fitHeight="148" fitWidth="214"
-                           preserveRatio="true" pickOnBounds="true"/>
+                           preserveRatio="false" pickOnBounds="true"/>
             </VBox>
         </StackPane>
 
