@@ -40,6 +40,7 @@ public class CharacterSheetPopupView {
 
     private Parent root;
     private final CharacterModel character;
+    private java.util.function.Consumer<CharacterModel> onEditCallback;
 
     public CharacterSheetPopupView(CharacterModel character) {
         this.character = character;
@@ -65,6 +66,10 @@ public class CharacterSheetPopupView {
         stage.setMinWidth(800);
         stage.setMinHeight(600);
         stage.show();
+    }
+
+    public void setOnEditCallback(java.util.function.Consumer<CharacterModel> callback) {
+        this.onEditCallback = callback;
     }
 
     private void populate() {
@@ -294,7 +299,15 @@ public class CharacterSheetPopupView {
 
     private void setupButtons() {
         btnClose.setOnAction(e -> ((Stage) btnClose.getScene().getWindow()).close());
-        // Delete and Edit are stubs — implemented in stories #6 and #5
+
+        btnEdit.setOnAction(e -> {
+            if (onEditCallback != null) {
+                onEditCallback.accept(character);
+            }
+            ((Stage) btnEdit.getScene().getWindow()).close();
+        });
+
+        // Delete is stub — implemented in story #6
     }
 
     // ---- Helpers ----
