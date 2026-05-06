@@ -764,8 +764,9 @@
 
 /* ---------- Alignment buttons (Step 6) ---------- */
 .alignment-btn {
-    -fx-pref-width: 180;
-    -fx-pref-height: 70;
+    -fx-pref-width: 220;
+    -fx-pref-height: 95;
+    -fx-font-size: 15px;
     -fx-background-color: #FFFBED;
     -fx-border-color: #C6A664;
     -fx-border-width: 2;
