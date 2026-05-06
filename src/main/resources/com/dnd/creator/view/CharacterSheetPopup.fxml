@@ -5,84 +5,163 @@
 <?import javafx.geometry.Insets?>
 
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-            style="-fx-background-color: #FBF2D8;">
+            style="-fx-background-color: radial-gradient(center 50% 38%, radius 90%, #FBF2D8, #E8D8A8);">
 
-    <!-- Header -->
+    <!-- ══════════════════════════════════════
+         HEADER: portrait + name + tags
+         ══════════════════════════════════════ -->
     <top>
-        <HBox style="-fx-background-color: #FFF8E2; -fx-border-color: #C6A664; -fx-border-width: 0 0 2 0; -fx-padding: 12 20 10 20;"
-              spacing="16" alignment="CENTER_LEFT">
+        <VBox style="-fx-background-color: linear-gradient(to bottom, #FFF8E2, #F0E2B0); -fx-border-color: #C6A664; -fx-border-width: 0 0 3 0;">
+            <!-- thin gold accent strip -->
+            <Region prefHeight="3" style="-fx-background-color: linear-gradient(to right, transparent, #D4AF37, transparent);"/>
 
-            <!-- Portrait -->
-            <StackPane fx:id="portraitPane"
-                       style="-fx-background-color: #F5EBD0; -fx-border-color: #D4AF37 #8A6A20 #8A6A20 #D4AF37; -fx-border-width: 2; -fx-background-radius: 6; -fx-border-radius: 6;"
-                       minWidth="90" minHeight="110" maxWidth="90" maxHeight="110">
-                <ImageView fx:id="imgPortrait" fitWidth="86" fitHeight="106" preserveRatio="true"/>
-            </StackPane>
+            <HBox style="-fx-padding: 16 24 14 24;" spacing="20" alignment="CENTER_LEFT">
 
-            <!-- Name + fields -->
-            <VBox spacing="4" HBox.hgrow="ALWAYS">
-                <Label fx:id="lblCharacterName" text="CHARACTER NAME"
-                       style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-font-family: 'Serif'; -fx-text-fill: #6B0000; -fx-effect: dropshadow(gaussian, rgba(212,175,55,0.5), 6, 0, 0, 0);"/>
-                <HBox spacing="30">
-                    <VBox>
-                        <Label fx:id="lblClassLevel" text="Class | Level"
-                               style="-fx-font-size: 14px; -fx-text-fill: #3A2410;"/>
-                        <Label text="CLASS &amp; LEVEL"
-                               style="-fx-font-size: 9px; -fx-font-weight: bold; -fx-text-fill: #8B7355;"/>
-                    </VBox>
-                    <VBox>
-                        <Label fx:id="lblBackground" text="Background"
-                               style="-fx-font-size: 14px; -fx-text-fill: #3A2410;"/>
-                        <Label text="BACKGROUND"
-                               style="-fx-font-size: 9px; -fx-font-weight: bold; -fx-text-fill: #8B7355;"/>
-                    </VBox>
-                    <VBox>
-                        <Label fx:id="lblRace" text="Race"
-                               style="-fx-font-size: 14px; -fx-text-fill: #3A2410;"/>
-                        <Label text="RACE"
-                               style="-fx-font-size: 9px; -fx-font-weight: bold; -fx-text-fill: #8B7355;"/>
-                    </VBox>
-                </HBox>
-            </VBox>
-        </HBox>
+                <!-- Portrait — beveled gold frame, image fills entire frame (stretched) -->
+                <StackPane fx:id="portraitPane"
+                           style="-fx-background-color: #F5EBD0;
+                                  -fx-border-color: #D4AF37 #8A6A20 #8A6A20 #D4AF37;
+                                  -fx-border-width: 3;
+                                  -fx-background-radius: 6;
+                                  -fx-border-radius: 6;
+                                  -fx-effect: dropshadow(three-pass-box, rgba(60,40,10,0.5), 12, 0, 0, 4);"
+                           minWidth="120" minHeight="150" maxWidth="120" maxHeight="150">
+                    <ImageView fx:id="imgPortrait"
+                               fitWidth="120" fitHeight="150"
+                               preserveRatio="false" pickOnBounds="true"/>
+                </StackPane>
+
+                <!-- Name + decorative rule + tag fields -->
+                <VBox spacing="6" HBox.hgrow="ALWAYS">
+                    <HBox alignment="CENTER_LEFT" spacing="10">
+                        <Label text="✦"
+                               style="-fx-font-size: 20px; -fx-text-fill: #D4AF37;
+                                      -fx-effect: dropshadow(gaussian, rgba(212,175,55,0.7), 6, 0, 0, 0);"/>
+                        <Label fx:id="lblCharacterName" text="CHARACTER NAME"
+                               style="-fx-font-size: 30px; -fx-font-weight: bold; -fx-font-family: 'Serif';
+                                      -fx-text-fill: #6B0000;
+                                      -fx-effect: dropshadow(gaussian, rgba(212,175,55,0.55), 8, 0, 0, 0);"/>
+                        <Label text="✦"
+                               style="-fx-font-size: 20px; -fx-text-fill: #D4AF37;
+                                      -fx-effect: dropshadow(gaussian, rgba(212,175,55,0.7), 6, 0, 0, 0);"/>
+                    </HBox>
+
+                    <!-- gold rule under the name -->
+                    <Region prefHeight="2" maxWidth="Infinity"
+                            style="-fx-background-color: linear-gradient(to right, transparent, #C6A664 30%, #C6A664 70%, transparent);"/>
+
+                    <HBox spacing="34" alignment="CENTER_LEFT">
+                        <padding><Insets top="4"/></padding>
+                        <VBox spacing="1">
+                            <Label text="CLASS &amp; LEVEL"
+                                   style="-fx-font-size: 9px; -fx-font-weight: bold; -fx-text-fill: #8A6A20;"/>
+                            <Label fx:id="lblClassLevel" text="Class | Level"
+                                   style="-fx-font-size: 15px; -fx-font-family: 'Serif'; -fx-text-fill: #3A2410; -fx-font-weight: bold;"/>
+                        </VBox>
+                        <VBox spacing="1">
+                            <Label text="BACKGROUND"
+                                   style="-fx-font-size: 9px; -fx-font-weight: bold; -fx-text-fill: #8A6A20;"/>
+                            <Label fx:id="lblBackground" text="Background"
+                                   style="-fx-font-size: 15px; -fx-font-family: 'Serif'; -fx-text-fill: #3A2410; -fx-font-weight: bold;"/>
+                        </VBox>
+                        <VBox spacing="1">
+                            <Label text="RACE"
+                                   style="-fx-font-size: 9px; -fx-font-weight: bold; -fx-text-fill: #8A6A20;"/>
+                            <Label fx:id="lblRace" text="Race"
+                                   style="-fx-font-size: 15px; -fx-font-family: 'Serif'; -fx-text-fill: #3A2410; -fx-font-weight: bold;"/>
+                        </VBox>
+                    </HBox>
+                </VBox>
+            </HBox>
+        </VBox>
     </top>
 
-    <!-- 3-Column Sheet -->
+    <!-- ══════════════════════════════════════
+         3-COLUMN SHEET
+         ══════════════════════════════════════ -->
     <center>
         <ScrollPane fitToWidth="true" fitToHeight="false"
                     style="-fx-background-color: transparent; -fx-background: transparent;">
-            <HBox spacing="12" alignment="TOP_CENTER">
+            <HBox spacing="14" alignment="TOP_CENTER">
                 <padding>
-                    <Insets top="10" bottom="10" left="12" right="12"/>
+                    <Insets top="14" bottom="14" left="16" right="16"/>
                 </padding>
 
                 <VBox fx:id="leftColumn" spacing="7" HBox.hgrow="SOMETIMES"
-                      style="-fx-background-color: #FFFBED; -fx-border-color: #C6A664; -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 8;"/>
+                      style="-fx-background-color: #FFFBED;
+                             -fx-border-color: #D4AF37 #8A6A20 #8A6A20 #D4AF37;
+                             -fx-border-width: 2;
+                             -fx-border-radius: 8;
+                             -fx-background-radius: 8;
+                             -fx-padding: 12;
+                             -fx-effect: dropshadow(three-pass-box, rgba(60,40,10,0.25), 8, 0, 0, 3);"/>
 
                 <VBox fx:id="middleColumn" spacing="7" HBox.hgrow="SOMETIMES"
-                      style="-fx-background-color: #FFFBED; -fx-border-color: #C6A664; -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 8;"/>
+                      style="-fx-background-color: #FFFBED;
+                             -fx-border-color: #D4AF37 #8A6A20 #8A6A20 #D4AF37;
+                             -fx-border-width: 2;
+                             -fx-border-radius: 8;
+                             -fx-background-radius: 8;
+                             -fx-padding: 12;
+                             -fx-effect: dropshadow(three-pass-box, rgba(60,40,10,0.25), 8, 0, 0, 3);"/>
 
                 <VBox fx:id="rightColumn" spacing="7" HBox.hgrow="SOMETIMES"
-                      style="-fx-background-color: #FFFBED; -fx-border-color: #C6A664; -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 8;"/>
+                      style="-fx-background-color: #FFFBED;
+                             -fx-border-color: #D4AF37 #8A6A20 #8A6A20 #D4AF37;
+                             -fx-border-width: 2;
+                             -fx-border-radius: 8;
+                             -fx-background-radius: 8;
+                             -fx-padding: 12;
+                             -fx-effect: dropshadow(three-pass-box, rgba(60,40,10,0.25), 8, 0, 0, 3);"/>
             </HBox>
         </ScrollPane>
     </center>
 
-    <!-- Footer Buttons -->
+    <!-- ══════════════════════════════════════
+         FOOTER
+         ══════════════════════════════════════ -->
     <bottom>
-        <HBox alignment="CENTER" spacing="20" style="-fx-background-color: #FFF8E2; -fx-border-color: #C6A664; -fx-border-width: 2 0 0 0;">
-            <padding>
-                <Insets top="12" bottom="16" left="20" right="20"/>
-            </padding>
-            <Button fx:id="btnDelete" text="Delete"
-                    style="-fx-background-color: #FFF8E2; -fx-border-color: #8B0000; -fx-border-width: 2; -fx-border-radius: 8; -fx-background-radius: 8; -fx-text-fill: #8B0000; -fx-font-size: 14px; -fx-font-weight: bold; -fx-cursor: hand;"
-                    prefWidth="130" prefHeight="44"/>
-            <Button fx:id="btnEdit" text="Edit"
-                    style="-fx-background-color: #FFF8E2; -fx-border-color: #D4AF37; -fx-border-width: 2; -fx-border-radius: 8; -fx-background-radius: 8; -fx-text-fill: #6B0000; -fx-font-size: 14px; -fx-font-weight: bold; -fx-cursor: hand;"
-                    prefWidth="130" prefHeight="44"/>
-            <Button fx:id="btnClose" text="Close"
-                    style="-fx-background-color: #FFFBED; -fx-border-color: #C6A664; -fx-border-width: 2; -fx-border-radius: 8; -fx-background-radius: 8; -fx-text-fill: #6B4A1A; -fx-font-size: 14px; -fx-cursor: hand;"
-                    prefWidth="130" prefHeight="44"/>
-        </HBox>
+        <VBox style="-fx-background-color: linear-gradient(to top, #FFF8E2, #F0E2B0); -fx-border-color: #C6A664; -fx-border-width: 3 0 0 0;">
+            <Region prefHeight="3" style="-fx-background-color: linear-gradient(to right, transparent, #D4AF37, transparent);"/>
+            <HBox alignment="CENTER" spacing="22">
+                <padding>
+                    <Insets top="14" bottom="16" left="20" right="20"/>
+                </padding>
+                <Button fx:id="btnDelete" text="🗑  Delete"
+                        style="-fx-background-color: #FFF8E2;
+                               -fx-border-color: #8B0000;
+                               -fx-border-width: 2;
+                               -fx-border-radius: 10;
+                               -fx-background-radius: 10;
+                               -fx-text-fill: #8B0000;
+                               -fx-font-size: 14px;
+                               -fx-font-weight: bold;
+                               -fx-cursor: hand;
+                               -fx-effect: dropshadow(gaussian, rgba(139,0,0,0.3), 8, 0, 0, 0);"
+                        prefWidth="140" prefHeight="46"/>
+                <Button fx:id="btnEdit" text="✎  Edit"
+                        style="-fx-background-color: #FFF8E2;
+                               -fx-border-color: #D4AF37;
+                               -fx-border-width: 2;
+                               -fx-border-radius: 10;
+                               -fx-background-radius: 10;
+                               -fx-text-fill: #6B0000;
+                               -fx-font-size: 14px;
+                               -fx-font-weight: bold;
+                               -fx-cursor: hand;
+                               -fx-effect: dropshadow(gaussian, rgba(212,175,55,0.45), 10, 0, 0, 0);"
+                        prefWidth="140" prefHeight="46"/>
+                <Button fx:id="btnClose" text="Close"
+                        style="-fx-background-color: #FFFBED;
+                               -fx-border-color: #C6A664;
+                               -fx-border-width: 2;
+                               -fx-border-radius: 10;
+                               -fx-background-radius: 10;
+                               -fx-text-fill: #6B4A1A;
+                               -fx-font-size: 14px;
+                               -fx-cursor: hand;"
+                        prefWidth="140" prefHeight="46"/>
+            </HBox>
+        </VBox>
     </bottom>
 </BorderPane>
