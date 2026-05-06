@@ -611,6 +611,10 @@ public class DbManager {
 
         String portraitPath = copyPortraitToStorage(character.getImagePath());
 
+        if (character.getDbId() > 0) {
+            return updateCharacter(character, portraitPath, alignmentId);
+        }
+
         String insertChar = "INSERT INTO \"character\" " +
                 "(character_name, race_name, class_name, background_name, alignment_id, level, character_picture) " +
                 "VALUES (?, ?, ?, ?, ?, 1, ?)";
@@ -639,6 +643,41 @@ public class DbManager {
             System.err.println("Error saving character: " + e.getMessage());
         }
         return false;
+    }
+
+    private boolean updateCharacter(com.dnd.creator.model.CharacterModel character, String portraitPath, Integer alignmentId) {
+        long id = character.getDbId();
+        String updateQuery = "UPDATE \"character\" SET character_name = ?, race_name = ?, class_name = ?, " +
+                "background_name = ?, alignment_id = ?, character_picture = ? WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(updateQuery)) {
+            stmt.setString(1, character.getName());
+            stmt.setString(2, character.getRace().getName());
+            stmt.setString(3, character.getCharacterClass());
+            stmt.setString(4, character.getSelectedBackground());
+            if (alignmentId != null) stmt.setInt(5, alignmentId);
+            else stmt.setNull(5, java.sql.Types.INTEGER);
+            stmt.setString(6, portraitPath);
+            stmt.setLong(7, id);
+
+            if (stmt.executeUpdate() == 0) return false;
+
+            // Delete old relationships
+            try (Statement s = connection.createStatement()) {
+                s.executeUpdate("DELETE FROM character_stats WHERE character_id = " + id);
+                s.executeUpdate("DELETE FROM character_skill WHERE character_id = " + id);
+                s.executeUpdate("DELETE FROM character_equipment WHERE character_id = " + id);
+                s.executeUpdate("DELETE FROM character_spell WHERE character_id = " + id);
+            }
+
+            saveCharacterStats(id, character);
+            saveCharacterSkills(id, character.getSelectedSkills());
+            saveCharacterEquipment(id, character.getSelectedEquipment());
+            saveCharacterSpells(id, character.getSelectedSpells());
+            return true;
+        } catch (SQLException e) {
+            System.err.println("Error updating character: " + e.getMessage());
+            return false;
+        }
     }
 
     private void saveCharacterStats(long characterId, com.dnd.creator.model.CharacterModel character) {
