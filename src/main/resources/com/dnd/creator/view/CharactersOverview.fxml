@@ -3,27 +3,30 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.FlowPane?>
-<?import javafx.geometry.Pos?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.HBox?>
 
-<VBox alignment="TOP_CENTER" spacing="20.0" 
-      style="-fx-padding: 20; -fx-background-color: #F5F5DC;" 
+<VBox alignment="TOP_CENTER" spacing="20.0"
+      style="-fx-padding: 20; -fx-background-color: radial-gradient(center 50% 38%, radius 90%, #FBF2D8, #E8D8A8);"
       prefHeight="1080.0" prefWidth="1920.0"
       xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
-    <Label style="-fx-font-size: 32; -fx-font-weight: bold; -fx-text-fill: #8B0000; -fx-font-family: 'Serif';" text="Charakter Übersicht" />
+    <HBox alignment="CENTER" spacing="18">
+        <Label text="⚔" style="-fx-font-size: 32px; -fx-text-fill: #6B0000; -fx-effect: dropshadow(gaussian, rgba(212,175,55,0.55), 8, 0, 0, 0);"/>
+        <Label style="-fx-font-size: 34; -fx-font-weight: bold; -fx-text-fill: #6B0000; -fx-font-family: 'Serif'; -fx-effect: dropshadow(gaussian, rgba(212,175,55,0.65), 10, 0, 0, 0);" text="Charakter Übersicht" />
+        <Label text="⚔" style="-fx-font-size: 32px; -fx-text-fill: #6B0000; -fx-effect: dropshadow(gaussian, rgba(212,175,55,0.55), 8, 0, 0, 0); -fx-rotate: 180;"/>
+    </HBox>
     <StackPane VBox.vgrow="ALWAYS">
         <ScrollPane fitToWidth="true" fitToHeight="true" style="-fx-background-color: transparent; -fx-background: transparent;">
             <FlowPane fx:id="cardsPane" alignment="CENTER" hgap="30" style="-fx-padding: 10;" vgap="30" />
         </ScrollPane>
-        <Label fx:id="emptyLabel" style="-fx-font-size: 20; -fx-text-fill: #1A1A1A; -fx-font-style: italic;" text="Keine Charaktere" />
+        <Label fx:id="emptyLabel" style="-fx-font-size: 20; -fx-text-fill: #8B7355; -fx-font-style: italic;" text="Keine Charaktere" />
     </StackPane>
     <HBox alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308">
-        <Button text="Zurück"
+        <Button text="◀ Zurück"
                 onAction="#handleBackToMain"
-                style="-fx-background-color: #FDF5E6; -fx-border-color: #D4AF37; -fx-border-radius: 10; -fx-background-radius: 10; -fx-text-fill: #8B0000; -fx-border-width: 2; -fx-font-size: 16px;"
-                prefWidth="140"
+                style="-fx-background-color: #FFF8E2; -fx-border-color: #C6A664; -fx-border-radius: 10; -fx-background-radius: 10; -fx-text-fill: #6B4A1A; -fx-border-width: 2; -fx-font-size: 16px; -fx-cursor: hand;"
+                prefWidth="160"
                 prefHeight="42" />
     </HBox>
 </VBox>

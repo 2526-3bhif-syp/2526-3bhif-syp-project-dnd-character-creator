@@ -1,31 +1,36 @@
 /* =========================================================================
    D&D Character Creator — Character Creation Flow
-   Color palette: Beige #F5F5DC, Dark Red #8B0000, Ink #1A1A1A, Gold #C6A664
+   Parchment / Illuminated-Manuscript theme.
+   Page #F5EBD0 | Surface #FFF8E2 | Border #8A6A20 | Ink #3A2410
+   Gold #C6A664 / #D4AF37 | Red #8B0000
    ========================================================================= */
 
 /* ---------- Root & Generic ---------- */
 .creation-root {
-    -fx-background-color: #F5F5DC;
+    -fx-background-color: radial-gradient(center 50% 38%, radius 90%, #FBF2D8, #E8D8A8);
 }
 
 .section-title {
-    -fx-font-size: 28px;
+    -fx-font-size: 30px;
     -fx-font-weight: bold;
-    -fx-text-fill: #8B0000;
+    -fx-font-family: "Serif";
+    -fx-text-fill: #6B0000;
+    -fx-effect: dropshadow(gaussian, rgba(212,175,55,0.65), 8, 0, 0, 0);
 }
 
 .section-subtitle {
     -fx-font-size: 14px;
-    -fx-text-fill: #1A1A1A;
+    -fx-text-fill: #6B4A1A;
+    -fx-font-style: italic;
 }
 
 .muted {
-    -fx-text-fill: #666666;
+    -fx-text-fill: #8B7355;
     -fx-font-size: 12px;
 }
 
 .label {
-    -fx-text-fill: #1A1A1A;
+    -fx-text-fill: #3A2410;
 }
 
 /* ---------- Stepper Bar ---------- */
@@ -55,37 +60,38 @@
 }
 
 .stepper-circle-future {
-    -fx-background-color: transparent;
+    -fx-background-color: #FFF8E2;
     -fx-border-color: #C6A664;
-    -fx-text-fill: #C6A664;
+    -fx-text-fill: #8B7355;
 }
 
 .stepper-circle-active {
     -fx-background-color: #8B0000;
-    -fx-border-color: #8B0000;
-    -fx-text-fill: #F5F5DC;
+    -fx-border-color: #D4AF37;
+    -fx-text-fill: #FFD700;
+    -fx-effect: dropshadow(gaussian, rgba(139,0,0,0.55), 12, 0, 0, 0);
 }
 
 .stepper-circle-done {
-    -fx-background-color: #4CAF50;
-    -fx-border-color: #4CAF50;
-    -fx-text-fill: #F5F5DC;
+    -fx-background-color: #2E8B57;
+    -fx-border-color: #1E5E3A;
+    -fx-text-fill: #FFF8E2;
 }
 
 .stepper-label {
     -fx-font-size: 11px;
-    -fx-text-fill: #666666;
+    -fx-text-fill: #8B7355;
 }
 
 .stepper-label-active {
     -fx-font-size: 12px;
     -fx-font-weight: bold;
-    -fx-text-fill: #8B0000;
+    -fx-text-fill: #6B0000;
 }
 
 .stepper-label-done {
     -fx-font-size: 11px;
-    -fx-text-fill: #4CAF50;
+    -fx-text-fill: #2E8B57;
 }
 
 .stepper-arrow-wrap {
@@ -100,57 +106,62 @@
 }
 
 .stepper-arrow-done {
-    -fx-text-fill: #4CAF50;
+    -fx-text-fill: #2E8B57;
 }
 
 /* ---------- Selection Cards (race / class / bundle) ---------- */
 .selection-card {
-    -fx-background-color: #FFFBF0;
-    -fx-border-color: #C6A664;
+    -fx-background-color: linear-gradient(to bottom, #FFFBED, #F5E8C2);
+    -fx-border-color: #C6A664 #8A6A20 #8A6A20 #C6A664;
     -fx-border-width: 2;
     -fx-border-radius: 12;
     -fx-background-radius: 12;
     -fx-padding: 14;
     -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(60,40,10,0.25), 8, 0, 0, 3);
 }
 
 .selection-card:hover {
-    -fx-border-color: #8B0000;
-    -fx-effect: dropshadow(gaussian, rgba(139,0,0,0.35), 12, 0.4, 0, 0);
+    -fx-border-color: #D4AF37;
+    -fx-effect: dropshadow(gaussian, rgba(212,175,55,0.7), 14, 0.4, 0, 0);
 }
 
 .selection-card-selected {
-    -fx-background-color: #FFF1E0;
-    -fx-border-color: #8B0000;
+    -fx-background-color: linear-gradient(to bottom, #FFF6D0, #F2DC8E);
+    -fx-border-color: #FFD700;
     -fx-border-width: 3;
-    -fx-effect: dropshadow(gaussian, rgba(198,166,100,0.7), 16, 0.5, 0, 0);
+    -fx-effect: dropshadow(gaussian, rgba(255,200,0,0.7), 18, 0.5, 0, 0);
 }
 
 .card-icon {
     -fx-font-size: 36px;
-    -fx-text-fill: #8B0000;
+    -fx-text-fill: #6B0000;
 }
 
 .card-title {
     -fx-font-size: 16px;
     -fx-font-weight: bold;
-    -fx-text-fill: #8B0000;
+    -fx-font-family: "Serif";
+    -fx-text-fill: #6B0000;
 }
 
 .card-tagline {
     -fx-font-size: 11px;
-    -fx-text-fill: #1A1A1A;
+    -fx-text-fill: #3A2410;
     -fx-wrap-text: true;
 }
 
 /* Ability bonus chip on race card */
 .ability-chip {
     -fx-background-color: #C6A664;
-    -fx-text-fill: #1A1A1A;
+    -fx-text-fill: #3A2410;
     -fx-font-size: 10px;
     -fx-font-weight: bold;
     -fx-padding: 2 7 2 7;
     -fx-background-radius: 8;
+    -fx-border-color: #8A6A20;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
 }
 
 /* ---------- Role tags (class card) ---------- */
@@ -170,22 +181,22 @@
 
 .difficulty-stars {
     -fx-font-size: 12px;
-    -fx-text-fill: #C6A664;
+    -fx-text-fill: #8A6A20;
 }
 
 .difficulty-legend-label {
     -fx-font-size: 11px;
-    -fx-text-fill: #888888;
+    -fx-text-fill: #8B7355;
     -fx-font-style: italic;
 }
 
 .difficulty-legend-item {
     -fx-font-size: 11px;
-    -fx-text-fill: #C6A664;
+    -fx-text-fill: #6B4A1A;
 }
 
 .difficulty-legend-box {
-    -fx-background-color: #FFFBF0;
+    -fx-background-color: #FFF8E2;
     -fx-border-color: #C6A664;
     -fx-border-width: 1.5;
     -fx-border-radius: 10;
@@ -195,41 +206,43 @@
 .difficulty-legend-heading {
     -fx-font-size: 17px;
     -fx-font-weight: bold;
-    -fx-text-fill: #1A1A1A;
+    -fx-font-family: "Serif";
+    -fx-text-fill: #6B0000;
 }
 
 .difficulty-legend-row {
     -fx-font-size: 16px;
     -fx-font-weight: bold;
-    -fx-text-fill: #1A1A1A;
+    -fx-text-fill: #3A2410;
 }
 
 /* ---------- Filter chips ---------- */
 .filter-chip {
-    -fx-background-color: transparent;
+    -fx-background-color: #FFF8E2;
     -fx-border-color: #C6A664;
     -fx-border-width: 1.5;
     -fx-border-radius: 14;
     -fx-background-radius: 14;
-    -fx-text-fill: #8B0000;
+    -fx-text-fill: #6B4A1A;
     -fx-font-size: 12px;
     -fx-padding: 5 14 5 14;
     -fx-cursor: hand;
 }
 
 .filter-chip:hover {
-    -fx-background-color: #FFF1E0;
+    -fx-background-color: #F5E8C2;
+    -fx-border-color: #D4AF37;
 }
 
 .filter-chip-active {
     -fx-background-color: #8B0000;
-    -fx-text-fill: #F5F5DC;
-    -fx-border-color: #8B0000;
+    -fx-text-fill: #FFD700;
+    -fx-border-color: #D4AF37;
 }
 
 /* ---------- Ability score row (Step 3) ---------- */
 .stat-row {
-    -fx-background-color: #FFFBF0;
+    -fx-background-color: #FFFBED;
     -fx-border-color: #C6A664;
     -fx-border-width: 1.5;
     -fx-border-radius: 10;
@@ -240,7 +253,8 @@
 .stat-row-primary {
     -fx-border-color: #8B0000;
     -fx-border-width: 2;
-    -fx-background-color: #FFF1E0;
+    -fx-background-color: #FFF1DE;
+    -fx-effect: dropshadow(gaussian, rgba(139,0,0,0.25), 10, 0, 0, 0);
 }
 
 .stat-icon {
@@ -250,18 +264,19 @@
 .stat-name {
     -fx-font-size: 14px;
     -fx-font-weight: bold;
-    -fx-text-fill: #8B0000;
+    -fx-font-family: "Serif";
+    -fx-text-fill: #6B0000;
 }
 
 .stat-desc {
     -fx-font-size: 11px;
-    -fx-text-fill: #1A1A1A;
+    -fx-text-fill: #3A2410;
 }
 
 .stat-modifier {
     -fx-font-size: 14px;
     -fx-font-weight: bold;
-    -fx-text-fill: #1A1A1A;
+    -fx-text-fill: #3A2410;
 }
 
 .stat-bar-bg {
@@ -284,7 +299,7 @@
 
 .primary-badge {
     -fx-background-color: #8B0000;
-    -fx-text-fill: #F5F5DC;
+    -fx-text-fill: #FFD700;
     -fx-font-size: 9px;
     -fx-font-weight: bold;
     -fx-padding: 2 7 2 7;
@@ -296,93 +311,111 @@
     -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-pref-width: 70;
-    -fx-background-color: #F5F5DC;
+    -fx-background-color: #FFFBED;
     -fx-border-color: #C6A664;
     -fx-border-width: 2;
     -fx-border-radius: 6;
     -fx-background-radius: 6;
+    -fx-text-fill: #3A2410;
 }
 
 .value-combo .list-cell {
-    -fx-text-fill: #1A1A1A;
+    -fx-text-fill: #3A2410;
     -fx-font-size: 14px;
+    -fx-background-color: #FFFBED;
 }
 
 /* Pool of unassigned values */
 .value-pool-pill {
     -fx-background-color: #8B0000;
-    -fx-text-fill: #F5F5DC;
+    -fx-text-fill: #FFD700;
     -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-padding: 4 10 4 10;
     -fx-background-radius: 12;
+    -fx-border-color: #D4AF37;
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
 }
 
 .value-pool-pill-used {
     -fx-background-color: #C6A664;
-    -fx-text-fill: #666666;
+    -fx-text-fill: #6B4A1A;
+    -fx-border-color: #8A6A20;
 }
 
 /* ---------- Inputs ---------- */
 .input-field {
-    -fx-background-color: #FFFBF0;
+    -fx-background-color: #FFFBED;
     -fx-border-color: #C6A664;
     -fx-border-width: 2;
     -fx-border-radius: 8;
     -fx-background-radius: 8;
-    -fx-text-fill: #1A1A1A;
+    -fx-text-fill: #3A2410;
+    -fx-prompt-text-fill: #8B7355;
     -fx-font-size: 14px;
     -fx-padding: 8 12 8 12;
 }
 
 .input-field:focused {
     -fx-border-color: #8B0000;
+    -fx-effect: dropshadow(gaussian, rgba(212,175,55,0.45), 8, 0, 0, 0);
 }
 
 /* ---------- Navigation buttons ---------- */
 .nav-button-back {
-    -fx-background-color: transparent;
+    -fx-background-color: #FFF8E2;
     -fx-border-color: #C6A664;
     -fx-border-width: 2;
     -fx-border-radius: 10;
     -fx-background-radius: 10;
-    -fx-text-fill: #1A1A1A;
+    -fx-text-fill: #6B4A1A;
     -fx-font-size: 15px;
     -fx-padding: 10 28 10 28;
     -fx-cursor: hand;
 }
 
 .nav-button-back:hover {
-    -fx-background-color: #FFF1E0;
+    -fx-background-color: #F5E8C2;
+    -fx-border-color: #8B0000;
+    -fx-text-fill: #6B0000;
 }
 
 .nav-button-next {
     -fx-background-color: #8B0000;
-    -fx-text-fill: #F5F5DC;
+    -fx-text-fill: #FFD700;
     -fx-background-radius: 10;
+    -fx-border-color: #D4AF37;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 10;
     -fx-font-size: 15px;
     -fx-font-weight: bold;
     -fx-padding: 10 28 10 28;
     -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(139,0,0,0.5), 10, 0, 0, 0);
 }
 
 .nav-button-next:hover {
-    -fx-background-color: #A52A2A;
+    -fx-background-color: #AA2020;
+    -fx-effect: dropshadow(gaussian, rgba(255,50,50,0.55), 14, 0, 0, 0);
 }
 
 .nav-button-next:disabled {
     -fx-background-color: #C6A664;
+    -fx-border-color: #8A6A20;
+    -fx-text-fill: #8B7355;
     -fx-opacity: 0.6;
+    -fx-effect: null;
     -fx-cursor: default;
 }
 
 .action-button {
-    -fx-background-color: #FFFBF0;
+    -fx-background-color: #FFFBED;
     -fx-border-color: #C6A664;
     -fx-border-width: 1.5;
     -fx-border-radius: 8;
     -fx-background-radius: 8;
-    -fx-text-fill: #8B0000;
+    -fx-text-fill: #6B0000;
     -fx-font-size: 12px;
     -fx-font-weight: bold;
     -fx-padding: 6 14 6 14;
@@ -390,27 +423,28 @@
 }
 
 .action-button:hover {
-    -fx-background-color: #FFF1E0;
+    -fx-background-color: #F5E8C2;
     -fx-border-color: #8B0000;
 }
 
 /* ---------- Preview panel (right side) ---------- */
 .preview-panel {
-    -fx-background-color: #FFFBF0;
+    -fx-background-color: #FFFBED;
     -fx-border-color: #C6A664;
     -fx-border-width: 2;
     -fx-border-radius: 12;
     -fx-background-radius: 12;
     -fx-padding: 20;
+    -fx-effect: dropshadow(three-pass-box, rgba(60,40,10,0.18), 8, 0, 0, 2);
 }
 
 .preview-portrait {
     -fx-font-size: 64px;
-    -fx-text-fill: #8B0000;
+    -fx-text-fill: #6B0000;
     -fx-alignment: center;
     -fx-min-height: 110;
     -fx-pref-height: 110;
-    -fx-background-color: #F5F5DC;
+    -fx-background-color: #F5EBD0;
     -fx-background-radius: 12;
     -fx-border-color: #C6A664;
     -fx-border-width: 2;
@@ -420,12 +454,13 @@
 .preview-name {
     -fx-font-size: 20px;
     -fx-font-weight: bold;
-    -fx-text-fill: #8B0000;
+    -fx-font-family: "Serif";
+    -fx-text-fill: #6B0000;
 }
 
 .preview-line {
     -fx-font-size: 13px;
-    -fx-text-fill: #1A1A1A;
+    -fx-text-fill: #3A2410;
 }
 
 .preview-divider {
@@ -438,13 +473,13 @@
 .preview-stat-name {
     -fx-font-size: 11px;
     -fx-font-weight: bold;
-    -fx-text-fill: #8B0000;
+    -fx-text-fill: #6B0000;
     -fx-min-width: 36;
 }
 
 .preview-stat-value {
     -fx-font-size: 12px;
-    -fx-text-fill: #1A1A1A;
+    -fx-text-fill: #3A2410;
     -fx-min-width: 40;
 }
 
@@ -464,7 +499,7 @@
 
 /* ---------- Skill grouping (Step 4) ---------- */
 .skill-group {
-    -fx-background-color: #FFFBF0;
+    -fx-background-color: #FFFBED;
     -fx-border-color: #C6A664;
     -fx-border-width: 1;
     -fx-border-radius: 8;
@@ -475,43 +510,46 @@
 .skill-group-title {
     -fx-font-size: 12px;
     -fx-font-weight: bold;
-    -fx-text-fill: #8B0000;
+    -fx-text-fill: #6B0000;
 }
 
 .skill-counter {
     -fx-font-size: 13px;
     -fx-font-weight: bold;
-    -fx-text-fill: #8B0000;
+    -fx-text-fill: #6B0000;
 }
 
 .skill-counter-done {
     -fx-font-size: 13px;
     -fx-font-weight: bold;
-    -fx-text-fill: #4CAF50;
+    -fx-text-fill: #2E8B57;
 }
 
 /* ---------- Race bonus chip (Step 3) ---------- */
 .race-bonus-chip {
     -fx-background-color: #C6A664;
-    -fx-text-fill: #1A1A1A;
+    -fx-text-fill: #3A2410;
     -fx-font-size: 11px;
     -fx-font-weight: bold;
     -fx-padding: 2 6 2 6;
     -fx-background-radius: 8;
+    -fx-border-color: #8A6A20;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
 }
 
 /* ---------- Final stat label (Step 3) ---------- */
 .stat-final {
     -fx-font-size: 13px;
     -fx-font-weight: bold;
-    -fx-text-fill: #555;
+    -fx-text-fill: #3A2410;
     -fx-alignment: center;
 }
 
 /* ---------- Recommended badge (Step 4) ---------- */
 .recommended-badge {
     -fx-background-color: #8B0000;
-    -fx-text-fill: #F5F5DC;
+    -fx-text-fill: #FFD700;
     -fx-font-size: 11px;
     -fx-font-weight: bold;
     -fx-padding: 2 6 2 6;
@@ -520,7 +558,7 @@
 
 /* ---------- Primary skill highlight (Step 4) ---------- */
 .skill-group-title-primary {
-    -fx-text-fill: #8B0000;
+    -fx-text-fill: #6B0000;
 }
 
 .skill-primary {
@@ -528,13 +566,13 @@
 }
 
 .skill-primary-star {
-    -fx-text-fill: #C6A664;
+    -fx-text-fill: #D4AF37;
     -fx-font-size: 12px;
 }
 
 /* ---------- Stats reminder bar (Step 4) ---------- */
 .stat-reminder-pill {
-    -fx-background-color: #FFFBF0;
+    -fx-background-color: #FFFBED;
     -fx-border-color: #C6A664;
     -fx-border-width: 1;
     -fx-border-radius: 6;
@@ -546,61 +584,77 @@
 .stat-reminder-key {
     -fx-font-size: 9px;
     -fx-font-weight: bold;
-    -fx-text-fill: #8B0000;
+    -fx-text-fill: #6B0000;
 }
 
 .stat-reminder-val {
     -fx-font-size: 14px;
     -fx-font-weight: bold;
-    -fx-text-fill: #1A1A1A;
+    -fx-text-fill: #3A2410;
 }
 
 .stat-reminder-mod {
     -fx-font-size: 10px;
-    -fx-text-fill: #555;
+    -fx-text-fill: #8B7355;
 }
 
 .check-box .label {
-    -fx-text-fill: #1A1A1A;
+    -fx-text-fill: #3A2410;
 }
 
 .check-box {
     -fx-font-size: 12px;
 }
 
-/* Auto-granted skill chip (shown on background cards and in the background section) */
+.check-box > .box {
+    -fx-background-color: #FFFBED;
+    -fx-border-color: #C6A664;
+    -fx-border-radius: 3;
+    -fx-background-radius: 3;
+}
+
+.check-box:selected > .box {
+    -fx-background-color: #8B0000;
+    -fx-border-color: #D4AF37;
+}
+
+.check-box:selected > .box > .mark {
+    -fx-background-color: #FFD700;
+}
+
+/* Auto-granted skill chip */
 .skill-auto-chip {
     -fx-background-color: #2E8B57;
-    -fx-text-fill: #F5F5DC;
+    -fx-text-fill: #FFF8E2;
     -fx-font-size: 10px;
     -fx-font-weight: bold;
     -fx-padding: 2 7 2 7;
     -fx-background-radius: 8;
+    -fx-border-color: #1E5E3A;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
 }
 
-/* Small inline tag next to disabled class-skill checkboxes */
 .skill-from-bg-tag {
     -fx-background-color: #2E8B57;
-    -fx-text-fill: #F5F5DC;
+    -fx-text-fill: #FFF8E2;
     -fx-font-size: 9px;
     -fx-font-weight: bold;
     -fx-padding: 1 5 1 5;
     -fx-background-radius: 6;
 }
 
-/* Chosen class-skill chip in proficiency summary */
 .skill-chosen-chip {
     -fx-background-color: #8B0000;
-    -fx-text-fill: #F5F5DC;
+    -fx-text-fill: #FFD700;
     -fx-font-size: 10px;
     -fx-font-weight: bold;
     -fx-padding: 2 7 2 7;
     -fx-background-radius: 8;
 }
 
-/* Proficiency summary box */
 .proficiency-summary-box {
-    -fx-background-color: #FFFBF0;
+    -fx-background-color: #FFFBED;
     -fx-border-color: #C6A664;
     -fx-border-width: 1.5;
     -fx-border-radius: 8;
@@ -610,45 +664,48 @@
 .proficiency-summary-title {
     -fx-font-size: 11px;
     -fx-font-weight: bold;
-    -fx-text-fill: #1A1A1A;
+    -fx-text-fill: #6B0000;
 }
 
 /* ---------- Equipment bundle card (Step 5) ---------- */
 .bundle-card {
-    -fx-background-color: #FFFBF0;
-    -fx-border-color: #C6A664;
+    -fx-background-color: linear-gradient(to bottom, #FFFBED, #F5E8C2);
+    -fx-border-color: #C6A664 #8A6A20 #8A6A20 #C6A664;
     -fx-border-width: 2;
     -fx-border-radius: 10;
     -fx-background-radius: 10;
     -fx-padding: 16;
     -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(60,40,10,0.22), 8, 0, 0, 3);
 }
 
 .bundle-card:hover {
-    -fx-border-color: #8B0000;
-    -fx-effect: dropshadow(gaussian, rgba(139,0,0,0.3), 10, 0.4, 0, 0);
+    -fx-border-color: #D4AF37;
+    -fx-effect: dropshadow(gaussian, rgba(212,175,55,0.6), 12, 0.4, 0, 0);
 }
 
 .bundle-card-selected {
-    -fx-background-color: #FFF1E0;
-    -fx-border-color: #8B0000;
+    -fx-background-color: linear-gradient(to bottom, #FFF6D0, #F2DC8E);
+    -fx-border-color: #FFD700;
     -fx-border-width: 3;
+    -fx-effect: dropshadow(gaussian, rgba(255,200,0,0.65), 16, 0.5, 0, 0);
 }
 
 .bundle-letter {
     -fx-font-size: 22px;
     -fx-font-weight: bold;
-    -fx-text-fill: #8B0000;
+    -fx-font-family: "Serif";
+    -fx-text-fill: #6B0000;
 }
 
 .bundle-text {
     -fx-font-size: 12px;
-    -fx-text-fill: #1A1A1A;
+    -fx-text-fill: #3A2410;
     -fx-wrap-text: true;
 }
 
 .mandatory-list {
-    -fx-background-color: #FFFBF0;
+    -fx-background-color: #FFFBED;
     -fx-border-color: #C6A664;
     -fx-border-width: 1;
     -fx-border-radius: 8;
@@ -658,13 +715,13 @@
 
 .mandatory-item {
     -fx-font-size: 12px;
-    -fx-text-fill: #1A1A1A;
+    -fx-text-fill: #3A2410;
 }
 
 .choice-block-title {
     -fx-font-size: 13px;
     -fx-font-weight: bold;
-    -fx-text-fill: #8B0000;
+    -fx-text-fill: #6B0000;
 }
 
 /* ---------- ScrollPane theming ---------- */
@@ -677,89 +734,124 @@
     -fx-background-color: transparent;
 }
 
+.scroll-bar:vertical, .scroll-bar:horizontal {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #C6A664;
+    -fx-background-radius: 4;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: #8A6A20;
+}
+
+.scroll-bar .track {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.scroll-bar .increment-arrow,
+.scroll-bar .decrement-arrow {
+    -fx-background-color: #8A6A20;
+}
+
 /* ---------- Alignment buttons (Step 6) ---------- */
 .alignment-btn {
     -fx-pref-width: 180;
     -fx-pref-height: 70;
-    -fx-background-color: #FFFBF0;
+    -fx-background-color: #FFFBED;
     -fx-border-color: #C6A664;
     -fx-border-width: 2;
     -fx-border-radius: 10;
     -fx-background-radius: 10;
     -fx-font-size: 13px;
     -fx-font-weight: bold;
-    -fx-text-fill: #8B0000;
+    -fx-text-fill: #6B0000;
     -fx-cursor: hand;
 }
 
 .alignment-btn:hover {
-    -fx-border-color: #8B0000;
-    -fx-effect: dropshadow(gaussian, rgba(139,0,0,0.3), 10, 0.4, 0, 0);
+    -fx-border-color: #D4AF37;
+    -fx-effect: dropshadow(gaussian, rgba(212,175,55,0.55), 10, 0.4, 0, 0);
 }
 
 .alignment-btn-selected {
     -fx-background-color: #8B0000;
-    -fx-border-color: #8B0000;
-    -fx-text-fill: #F5F5DC;
+    -fx-border-color: #D4AF37;
+    -fx-text-fill: #FFD700;
+    -fx-effect: dropshadow(gaussian, rgba(139,0,0,0.55), 14, 0, 0, 0);
 }
 
 /* ---------- Spell cards (Step 7) ---------- */
 .spell-card {
-    -fx-background-color: #FFFBF0;
-    -fx-border-color: #C6A664;
+    -fx-background-color: linear-gradient(to bottom, #FFFBED, #F5E8C2);
+    -fx-border-color: #C6A664 #8A6A20 #8A6A20 #C6A664;
     -fx-border-width: 2;
     -fx-border-radius: 10;
     -fx-background-radius: 10;
     -fx-padding: 10;
     -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(60,40,10,0.18), 6, 0, 0, 2);
 }
 
 .spell-card:hover {
-    -fx-border-color: #8B0000;
-    -fx-effect: dropshadow(gaussian, rgba(139,0,0,0.3), 8, 0.3, 0, 0);
+    -fx-border-color: #D4AF37;
+    -fx-effect: dropshadow(gaussian, rgba(212,175,55,0.55), 12, 0.3, 0, 0);
 }
 
 .spell-card-selected {
-    -fx-background-color: #8B0000;
-    -fx-border-color: #8B0000;
+    -fx-background-color: linear-gradient(to bottom, #C0392B, #8B0000);
+    -fx-border-color: #FFD700;
+    -fx-border-width: 3;
+    -fx-effect: dropshadow(gaussian, rgba(139,0,0,0.6), 14, 0, 0, 0);
 }
 
 .spell-card-selected .spell-card-name,
 .spell-card-selected .spell-card-school,
 .spell-card-selected .spell-card-meta {
-    -fx-text-fill: #F5F5DC;
+    -fx-text-fill: #FFD700;
 }
 
 .spell-card-name {
     -fx-font-size: 13px;
     -fx-font-weight: bold;
-    -fx-text-fill: #1A1A1A;
+    -fx-font-family: "Serif";
+    -fx-text-fill: #6B0000;
 }
 
 .spell-card-school {
     -fx-font-size: 11px;
     -fx-font-style: italic;
-    -fx-text-fill: #8B0000;
+    -fx-text-fill: #6B4A1A;
 }
 
 .spell-card-meta {
     -fx-font-size: 10px;
-    -fx-text-fill: #666;
+    -fx-text-fill: #8B7355;
 }
 
 .upload-button {
     -fx-background-color: #8B0000;
-    -fx-border-color: #6B0000;
+    -fx-border-color: #D4AF37;
     -fx-border-width: 1.5;
     -fx-border-radius: 8;
     -fx-background-radius: 8;
-    -fx-text-fill: #F5F5DC;
+    -fx-text-fill: #FFD700;
     -fx-font-size: 12px;
     -fx-font-weight: bold;
     -fx-padding: 6 16 6 16;
     -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(139,0,0,0.45), 8, 0, 0, 0);
 }
 
 .upload-button:hover {
-    -fx-background-color: #A50000;
+    -fx-background-color: #AA2020;
+    -fx-effect: dropshadow(gaussian, rgba(255,50,50,0.55), 12, 0, 0, 0);
 }

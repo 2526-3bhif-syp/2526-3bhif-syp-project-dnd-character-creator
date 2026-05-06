@@ -3,12 +3,10 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
-<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" style="-fx-background-color: #F5F5DC;">
-    <!-- Top: Header (Full Width) -->
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" style="-fx-background-color: #FBF2D8;">
     <top>
-        <HBox spacing="20" alignment="CENTER_LEFT" style="-fx-border-color: #C6A664; -fx-border-width: 0 0 2 0; -fx-padding: 20;">
+        <HBox spacing="20" alignment="CENTER_LEFT" style="-fx-background-color: #FFF8E2; -fx-border-color: #C6A664; -fx-border-width: 0 0 2 0; -fx-padding: 20;">
 
-            <!-- 2 Rows of fields, full width -->
             <GridPane hgap="15" vgap="10" HBox.hgrow="ALWAYS" alignment="CENTER_LEFT">
                 <columnConstraints>
                     <ColumnConstraints hgrow="ALWAYS" minWidth="150"/>
@@ -18,72 +16,74 @@
 
                 <!-- Row 1 -->
                 <VBox GridPane.columnIndex="0" GridPane.rowIndex="0">
-                    <Label fx:id="lblClassLevel" text="[Class &amp; Level]" style="-fx-font-size: 16px;"/>
-                    <Label text="CLASS &amp; LEVEL" style="-fx-font-size: 10px; -fx-text-fill: #555555;"/>
+                    <Label fx:id="lblClassLevel" text="[Class &amp; Level]" style="-fx-font-size: 16px; -fx-text-fill: #6B0000;"/>
+                    <Label text="CLASS &amp; LEVEL" style="-fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: #8B7355;"/>
                 </VBox>
                 <VBox GridPane.columnIndex="1" GridPane.rowIndex="0">
-                    <Label fx:id="lblBackground" text="[Background]" style="-fx-font-size: 16px;"/>
-                    <Label text="BACKGROUND" style="-fx-font-size: 10px; -fx-text-fill: #555555;"/>
+                    <Label fx:id="lblBackground" text="[Background]" style="-fx-font-size: 16px; -fx-text-fill: #3A2410;"/>
+                    <Label text="BACKGROUND" style="-fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: #8B7355;"/>
                 </VBox>
                 <VBox GridPane.columnIndex="2" GridPane.rowIndex="0">
-                    <Label fx:id="lblPlayerName" text="[Character Name]" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
-                    <Label text="PLAYER NAME" style="-fx-font-size: 10px; -fx-text-fill: #555555;"/>
+                    <Label fx:id="lblPlayerName" text="[Character Name]" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-font-family: 'Serif'; -fx-text-fill: #6B0000; -fx-effect: dropshadow(gaussian, rgba(212,175,55,0.5), 5, 0, 0, 0);"/>
+                    <Label text="PLAYER NAME" style="-fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: #8B7355;"/>
                 </VBox>
 
                 <!-- Row 2 -->
                 <VBox GridPane.columnIndex="0" GridPane.rowIndex="1">
-                    <Label fx:id="lblRace" text="[Race]" style="-fx-font-size: 16px;"/>
-                    <Label text="RACE" style="-fx-font-size: 10px; -fx-text-fill: #555555;"/>
+                    <Label fx:id="lblRace" text="[Race]" style="-fx-font-size: 16px; -fx-text-fill: #3A2410;"/>
+                    <Label text="RACE" style="-fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: #8B7355;"/>
                 </VBox>
                 <VBox GridPane.columnIndex="1" GridPane.rowIndex="1">
-                    <Label fx:id="lblAlignment" text="[Alignment]" style="-fx-font-size: 16px;"/>
-                    <Label text="ALIGNMENT" style="-fx-font-size: 10px; -fx-text-fill: #555555;"/>
+                    <Label fx:id="lblAlignment" text="[Alignment]" style="-fx-font-size: 16px; -fx-text-fill: #3A2410;"/>
+                    <Label text="ALIGNMENT" style="-fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: #8B7355;"/>
                 </VBox>
                 <VBox GridPane.columnIndex="2" GridPane.rowIndex="1">
-                    <Label fx:id="lblExp" text="1" style="-fx-font-size: 16px;"/>
-                    <Label text="LEVEL" style="-fx-font-size: 10px; -fx-text-fill: #555555;"/>
+                    <Label fx:id="lblExp" text="1" style="-fx-font-size: 16px; -fx-text-fill: #3A2410;"/>
+                    <Label text="LEVEL" style="-fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: #8B7355;"/>
                 </VBox>
             </GridPane>
         </HBox>
     </top>
 
-    <!-- Center: 3 Columns Layout (No ScrollPane) -->
     <center>
         <HBox spacing="15" alignment="TOP_CENTER">
             <padding>
                 <Insets top="10" bottom="10" left="10" right="10"/>
             </padding>
 
-            <!-- Left Column -->
-            <VBox fx:id="leftColumn" spacing="8" HBox.hgrow="SOMETIMES" style="-fx-border-color: #C6A664; -fx-border-width: 1; -fx-padding: 8;">
+            <VBox fx:id="leftColumn" spacing="8" HBox.hgrow="SOMETIMES"
+                  style="-fx-background-color: #FFFBED; -fx-border-color: #C6A664; -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 8;">
             </VBox>
 
-            <!-- Middle Column -->
-            <VBox fx:id="middleColumn" spacing="8" HBox.hgrow="SOMETIMES" style="-fx-border-color: #C6A664; -fx-border-width: 1; -fx-padding: 8;">
+            <VBox fx:id="middleColumn" spacing="8" HBox.hgrow="SOMETIMES"
+                  style="-fx-background-color: #FFFBED; -fx-border-color: #C6A664; -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 8;">
             </VBox>
 
-            <!-- Right Column -->
-            <VBox fx:id="rightColumn" spacing="8" HBox.hgrow="SOMETIMES" style="-fx-border-color: #C6A664; -fx-border-width: 1; -fx-padding: 8;">
+            <VBox fx:id="rightColumn" spacing="8" HBox.hgrow="SOMETIMES"
+                  style="-fx-background-color: #FFFBED; -fx-border-color: #C6A664; -fx-border-width: 1; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 8;">
             </VBox>
         </HBox>
     </center>
 
-    <!-- Bottom: Action Buttons -->
     <bottom>
         <VBox spacing="20">
             <BorderPane.margin>
                 <Insets left="20" right="20" top="10" bottom="20"/>
             </BorderPane.margin>
 
-            <!-- Bottom Info -->
             <HBox alignment="CENTER_LEFT" spacing="10">
-                <Label fx:id="lblPassiveWisdom" text="10" style="-fx-font-size: 18px; -fx-border-color: #1A1A1A; -fx-padding: 5;"/>
-                <Label text="PASSIVE WISDOM (PERCEPTION)" style="-fx-font-size: 12px;"/>
+                <Label fx:id="lblPassiveWisdom" text="10"
+                       style="-fx-font-size: 18px; -fx-text-fill: #6B0000; -fx-background-color: #FFFBED; -fx-border-color: #C6A664; -fx-border-width: 1.5; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 5 10 5 10; -fx-font-weight: bold;"/>
+                <Label text="PASSIVE WISDOM (PERCEPTION)" style="-fx-font-size: 12px; -fx-font-weight: bold; -fx-text-fill: #6B4A1A;"/>
             </HBox>
 
             <HBox alignment="CENTER" spacing="50">
-                <Button fx:id="btnBack" text="Zurück" style="-fx-background-color: #F5F5DC; -fx-border-color: #C6A664; -fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10; -fx-text-fill: #1A1A1A; -fx-font-size: 18px;" prefWidth="150" prefHeight="50"/>
-                <Button fx:id="btnSave" text="Speichern" style="-fx-background-color: #8B0000; -fx-text-fill: #F5F5DC; -fx-border-width: 0; -fx-background-radius: 10; -fx-font-size: 18px; -fx-font-weight: bold;" prefWidth="150" prefHeight="50"/>
+                <Button fx:id="btnBack" text="◀ Zurück"
+                        style="-fx-background-color: #FFF8E2; -fx-border-color: #C6A664; -fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10; -fx-text-fill: #6B4A1A; -fx-font-size: 18px; -fx-cursor: hand;"
+                        prefWidth="170" prefHeight="50"/>
+                <Button fx:id="btnSave" text="✦ Speichern ✦"
+                        style="-fx-background-color: #8B0000; -fx-text-fill: #FFD700; -fx-border-color: #D4AF37; -fx-border-width: 1.5; -fx-border-radius: 10; -fx-background-radius: 10; -fx-font-size: 18px; -fx-font-weight: bold; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(139,0,0,0.55), 12, 0, 0, 0);"
+                        prefWidth="180" prefHeight="50"/>
             </HBox>
         </VBox>
     </bottom>
