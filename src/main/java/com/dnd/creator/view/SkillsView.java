@@ -396,21 +396,22 @@ public class SkillsView {
 
     private void restoreSession() {
         var character = CharacterSession.getInstance().getCurrentCharacter();
+        List<String> originalSavedSkills = character.getSelectedSkills() != null ? new java.util.ArrayList<>(character.getSelectedSkills()) : new java.util.ArrayList<>();
 
         String savedBg = character.getSelectedBackground();
         if (savedBg != null && backgroundCards.containsKey(savedBg)) {
             selectBackground(savedBg); // loads backgroundSkills + refreshes section
         }
 
-        List<String> savedSkills = character.getSelectedSkills();
-        if (savedSkills != null && !savedSkills.isEmpty()) {
+        if (!originalSavedSkills.isEmpty()) {
             for (CheckBox cb : skillCheckboxes) {
                 if (!backgroundSkills.contains(cb.getText())) {
-                    cb.setSelected(savedSkills.contains(cb.getText()));
+                    cb.setSelected(originalSavedSkills.contains(cb.getText()));
                 }
             }
             enforceSkillLimit();
             updateCounter();
+            saveSkills();
         }
     }
 
