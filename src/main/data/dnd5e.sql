@@ -1699,3 +1699,774 @@ CREATE TABLE IF NOT EXISTS character_spell (
 --   VALUES (1,1,'Warhammer','weapon',1,'class'), (2,1,'Chain Mail','armour',1,'class'),
 --          (3,1,'Shield','armour',1,'class'), (4,1,'Explorer''s Pack','pack',1,'class');
 -- =============================================================================
+
+-- =============================================================================
+-- D&D 5e LEVEL UP EXTENSION
+-- Ergänzung zu dnd5e.sql — Einmalig ausführen nach der Basis-DB
+-- Fügt hinzu:
+--   A.  character_level_up        — Verlaufsprotokoll jedes Level-Ups
+--   B.  character_asi             — ASI-Entscheidungen pro Charakter
+--   C.  class_asi_levels          — Welche Level geben ASI pro Klasse
+--   D.  class_spells_known        — Spells/Cantrips Known Progression
+--   E.  subclass_feature          — Subklassen-Features Level 1–20
+--   F.  class_feature (INSERT)    — Klassen-Features Level 3–20
+-- =============================================================================
+
+
+-- =============================================================================
+-- A. CHARACTER LEVEL UP HISTORY
+-- Protokolliert jeden Level-Up eines Charakters.
+-- =============================================================================
+
+CREATE TABLE IF NOT EXISTS character_level_up (
+                                                  id              INTEGER     NOT NULL,
+                                                  character_id    INTEGER     NOT NULL,
+                                                  new_level       INTEGER     NOT NULL CHECK (new_level BETWEEN 2 AND 20),
+    hp_gained       INTEGER     NOT NULL,       -- gewürfelte / gemittelte HP
+    subclass_chosen VARCHAR(127),               -- nur wenn bei diesem Level gewählt
+    created_at      TIMESTAMP   DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    FOREIGN KEY (character_id) REFERENCES "character"(id) ON DELETE CASCADE
+    );
+
+
+-- =============================================================================
+-- B. CHARACTER ASI CHOICES
+-- Speichert welche Ability Score Improvements ein Charakter gewählt hat.
+-- Entweder +2 auf einen Stat (ability_2 = NULL) oder +1/+1 auf zwei Stats.
+-- =============================================================================
+
+CREATE TABLE IF NOT EXISTS character_asi (
+                                             id              INTEGER     NOT NULL,
+                                             character_id    INTEGER     NOT NULL,
+                                             level_gained    INTEGER     NOT NULL CHECK (level_gained BETWEEN 4 AND 20),
+    ability_1       VARCHAR(63) NOT NULL,
+    bonus_1         INTEGER     NOT NULL DEFAULT 1 CHECK (bonus_1 IN (1, 2)),
+    ability_2       VARCHAR(63),                -- NULL = +2 auf ability_1
+    bonus_2         INTEGER     CHECK (bonus_2 IS NULL OR bonus_2 = 1),
+    PRIMARY KEY (id),
+    FOREIGN KEY (character_id) REFERENCES "character"(id) ON DELETE CASCADE,
+    FOREIGN KEY (ability_1)    REFERENCES ability(name),
+    FOREIGN KEY (ability_2)    REFERENCES ability(name)
+    );
+
+
+-- =============================================================================
+-- C. CLASS ASI LEVELS
+-- Welche Charakter-Level geben einer Klasse ein ASI.
+-- Fighter und Rogue erhalten mehr ASIs als andere Klassen.
+-- =============================================================================
+
+CREATE TABLE IF NOT EXISTS class_asi_levels (
+                                                class_name  VARCHAR(63) NOT NULL,
+    level       INTEGER     NOT NULL CHECK (level BETWEEN 4 AND 20),
+    PRIMARY KEY (class_name, level),
+    FOREIGN KEY (class_name) REFERENCES class(name)
+    );
+
+-- Standard: alle Klassen außer Fighter & Rogue — Level 4, 8, 12, 16, 19
+INSERT INTO class_asi_levels (class_name, level) VALUES
+                                                     ('Barbarian', 4), ('Barbarian', 8), ('Barbarian',12), ('Barbarian',16), ('Barbarian',19),
+                                                     ('Bard',      4), ('Bard',      8), ('Bard',     12), ('Bard',     16), ('Bard',     19),
+                                                     ('Cleric',    4), ('Cleric',    8), ('Cleric',   12), ('Cleric',   16), ('Cleric',   19),
+                                                     ('Druid',     4), ('Druid',     8), ('Druid',    12), ('Druid',    16), ('Druid',    19),
+                                                     ('Monk',      4), ('Monk',      8), ('Monk',     12), ('Monk',     16), ('Monk',     19),
+                                                     ('Paladin',   4), ('Paladin',   8), ('Paladin',  12), ('Paladin',  16), ('Paladin',  19),
+                                                     ('Ranger',    4), ('Ranger',    8), ('Ranger',   12), ('Ranger',   16), ('Ranger',   19),
+                                                     ('Sorcerer',  4), ('Sorcerer',  8), ('Sorcerer', 12), ('Sorcerer', 16), ('Sorcerer', 19),
+                                                     ('Warlock',   4), ('Warlock',   8), ('Warlock',  12), ('Warlock',  16), ('Warlock',  19),
+                                                     ('Wizard',    4), ('Wizard',    8), ('Wizard',   12), ('Wizard',   16), ('Wizard',   19);
+
+-- Fighter: 4, 6, 8, 10, 12, 14, 16, 19 (zusätzliche ASIs bei 6, 10, 14)
+INSERT INTO class_asi_levels (class_name, level) VALUES
+                                                     ('Fighter', 4), ('Fighter', 6), ('Fighter', 8), ('Fighter',10),
+                                                     ('Fighter',12), ('Fighter',14), ('Fighter',16), ('Fighter',19);
+
+-- Rogue: 4, 6, 8, 10, 12, 14, 16, 19 (zusätzliche ASIs bei 6, 10, 14)
+INSERT INTO class_asi_levels (class_name, level) VALUES
+                                                     ('Rogue', 4), ('Rogue', 6), ('Rogue', 8), ('Rogue',10),
+                                                     ('Rogue',12), ('Rogue',14), ('Rogue',16), ('Rogue',19);
+
+
+-- =============================================================================
+-- D. CLASS SPELLS KNOWN PROGRESSION
+-- Cantrips Known & Spells Known pro Klasse und Charakter-Level.
+-- NULL bei spells_known = Prepared Caster (wählt täglich aus dem kompletten Pool).
+-- =============================================================================
+
+CREATE TABLE IF NOT EXISTS class_spells_known (
+                                                  class_name      VARCHAR(63) NOT NULL,
+    character_level INTEGER     NOT NULL CHECK (character_level BETWEEN 1 AND 20),
+    cantrips_known  INTEGER,    -- NULL = Klasse hat keine Cantrips
+    spells_known    INTEGER,    -- NULL = Prepared Caster (kein festes Limit)
+    PRIMARY KEY (class_name, character_level),
+    FOREIGN KEY (class_name) REFERENCES class(name)
+    );
+
+-- ── BARD (Known Caster) ──────────────────────────────────────────────────────
+INSERT INTO class_spells_known VALUES
+                                   ('Bard', 1, 2, 4), ('Bard', 2, 2, 5), ('Bard', 3, 2, 6), ('Bard', 4, 3, 7),
+                                   ('Bard', 5, 3, 8), ('Bard', 6, 3, 9), ('Bard', 7, 3,10), ('Bard', 8, 3,11),
+                                   ('Bard', 9, 3,12), ('Bard',10, 4,14), ('Bard',11, 4,15), ('Bard',12, 4,15),
+                                   ('Bard',13, 4,16), ('Bard',14, 4,18), ('Bard',15, 4,19), ('Bard',16, 4,19),
+                                   ('Bard',17, 4,20), ('Bard',18, 4,22), ('Bard',19, 4,22), ('Bard',20, 4,22);
+
+-- ── CLERIC (Prepared Caster — spells_known = NULL) ──────────────────────────
+INSERT INTO class_spells_known VALUES
+                                   ('Cleric', 1, 3,NULL), ('Cleric', 2, 3,NULL), ('Cleric', 3, 3,NULL), ('Cleric', 4, 4,NULL),
+                                   ('Cleric', 5, 4,NULL), ('Cleric', 6, 4,NULL), ('Cleric', 7, 4,NULL), ('Cleric', 8, 4,NULL),
+                                   ('Cleric', 9, 4,NULL), ('Cleric',10, 5,NULL), ('Cleric',11, 5,NULL), ('Cleric',12, 5,NULL),
+                                   ('Cleric',13, 5,NULL), ('Cleric',14, 5,NULL), ('Cleric',15, 5,NULL), ('Cleric',16, 5,NULL),
+                                   ('Cleric',17, 5,NULL), ('Cleric',18, 5,NULL), ('Cleric',19, 5,NULL), ('Cleric',20, 5,NULL);
+
+-- ── DRUID (Prepared Caster — spells_known = NULL) ───────────────────────────
+INSERT INTO class_spells_known VALUES
+                                   ('Druid', 1, 2,NULL), ('Druid', 2, 2,NULL), ('Druid', 3, 2,NULL), ('Druid', 4, 3,NULL),
+                                   ('Druid', 5, 3,NULL), ('Druid', 6, 3,NULL), ('Druid', 7, 3,NULL), ('Druid', 8, 3,NULL),
+                                   ('Druid', 9, 3,NULL), ('Druid',10, 4,NULL), ('Druid',11, 4,NULL), ('Druid',12, 4,NULL),
+                                   ('Druid',13, 4,NULL), ('Druid',14, 4,NULL), ('Druid',15, 4,NULL), ('Druid',16, 4,NULL),
+                                   ('Druid',17, 4,NULL), ('Druid',18, 4,NULL), ('Druid',19, 4,NULL), ('Druid',20, 4,NULL);
+
+-- ── RANGER (Known Caster — keine Cantrips) ──────────────────────────────────
+INSERT INTO class_spells_known VALUES
+                                   ('Ranger', 1,NULL,NULL), ('Ranger', 2,NULL, 2), ('Ranger', 3,NULL, 3), ('Ranger', 4,NULL, 3),
+                                   ('Ranger', 5,NULL, 4),   ('Ranger', 6,NULL, 4), ('Ranger', 7,NULL, 5), ('Ranger', 8,NULL, 5),
+                                   ('Ranger', 9,NULL, 6),   ('Ranger',10,NULL, 6), ('Ranger',11,NULL, 7), ('Ranger',12,NULL, 7),
+                                   ('Ranger',13,NULL, 8),   ('Ranger',14,NULL, 8), ('Ranger',15,NULL, 9), ('Ranger',16,NULL, 9),
+                                   ('Ranger',17,NULL,10),   ('Ranger',18,NULL,10), ('Ranger',19,NULL,11), ('Ranger',20,NULL,11);
+
+-- ── SORCERER (Known Caster) ─────────────────────────────────────────────────
+INSERT INTO class_spells_known VALUES
+                                   ('Sorcerer', 1, 4, 2), ('Sorcerer', 2, 4, 3), ('Sorcerer', 3, 4, 4), ('Sorcerer', 4, 5, 5),
+                                   ('Sorcerer', 5, 5, 6), ('Sorcerer', 6, 5, 7), ('Sorcerer', 7, 5, 8), ('Sorcerer', 8, 5, 9),
+                                   ('Sorcerer', 9, 5,10), ('Sorcerer',10, 6,11), ('Sorcerer',11, 6,12), ('Sorcerer',12, 6,12),
+                                   ('Sorcerer',13, 6,13), ('Sorcerer',14, 6,13), ('Sorcerer',15, 6,14), ('Sorcerer',16, 6,14),
+                                   ('Sorcerer',17, 6,15), ('Sorcerer',18, 6,15), ('Sorcerer',19, 6,15), ('Sorcerer',20, 6,15);
+
+-- ── WARLOCK (Known Caster / Pact Magic) ─────────────────────────────────────
+INSERT INTO class_spells_known VALUES
+                                   ('Warlock', 1, 2, 2), ('Warlock', 2, 2, 3), ('Warlock', 3, 2, 4), ('Warlock', 4, 3, 5),
+                                   ('Warlock', 5, 3, 6), ('Warlock', 6, 3, 7), ('Warlock', 7, 3, 8), ('Warlock', 8, 3, 9),
+                                   ('Warlock', 9, 3,10), ('Warlock',10, 4,10), ('Warlock',11, 4,11), ('Warlock',12, 4,11),
+                                   ('Warlock',13, 4,12), ('Warlock',14, 4,12), ('Warlock',15, 4,13), ('Warlock',16, 4,13),
+                                   ('Warlock',17, 4,14), ('Warlock',18, 4,14), ('Warlock',19, 4,15), ('Warlock',20, 4,15);
+
+-- ── WIZARD (Prepared Caster — Spellbook, spells_known = NULL) ───────────────
+INSERT INTO class_spells_known VALUES
+                                   ('Wizard', 1, 3,NULL), ('Wizard', 2, 3,NULL), ('Wizard', 3, 3,NULL), ('Wizard', 4, 4,NULL),
+                                   ('Wizard', 5, 4,NULL), ('Wizard', 6, 4,NULL), ('Wizard', 7, 4,NULL), ('Wizard', 8, 4,NULL),
+                                   ('Wizard', 9, 4,NULL), ('Wizard',10, 5,NULL), ('Wizard',11, 5,NULL), ('Wizard',12, 5,NULL),
+                                   ('Wizard',13, 5,NULL), ('Wizard',14, 5,NULL), ('Wizard',15, 5,NULL), ('Wizard',16, 5,NULL),
+                                   ('Wizard',17, 5,NULL), ('Wizard',18, 5,NULL), ('Wizard',19, 5,NULL), ('Wizard',20, 5,NULL);
+
+-- Nicht-Zaubernde Klassen (Barbarian, Fighter, Monk, Rogue) — keine Einträge nötig.
+-- Paladin/Ranger ohne Cantrips, Paladin ist Prepared Caster (ab Level 2).
+INSERT INTO class_spells_known VALUES
+                                   ('Paladin', 1,NULL,NULL), ('Paladin', 2,NULL,NULL), ('Paladin', 3,NULL,NULL), ('Paladin', 4,NULL,NULL),
+                                   ('Paladin', 5,NULL,NULL), ('Paladin', 6,NULL,NULL), ('Paladin', 7,NULL,NULL), ('Paladin', 8,NULL,NULL),
+                                   ('Paladin', 9,NULL,NULL), ('Paladin',10,NULL,NULL), ('Paladin',11,NULL,NULL), ('Paladin',12,NULL,NULL),
+                                   ('Paladin',13,NULL,NULL), ('Paladin',14,NULL,NULL), ('Paladin',15,NULL,NULL), ('Paladin',16,NULL,NULL),
+                                   ('Paladin',17,NULL,NULL), ('Paladin',18,NULL,NULL), ('Paladin',19,NULL,NULL), ('Paladin',20,NULL,NULL);
+
+
+-- =============================================================================
+-- E. SUBCLASS FEATURE
+-- Features die eine Subklasse bei bestimmten Leveln gewährt.
+-- Struktur analog zu class_feature.
+-- =============================================================================
+
+CREATE TABLE IF NOT EXISTS subclass_feature (
+                                                subclass_name   VARCHAR(127) NOT NULL,
+    level           INTEGER      NOT NULL CHECK (level BETWEEN 1 AND 20),
+    feature_name    VARCHAR(127) NOT NULL,
+    description     TEXT,
+    PRIMARY KEY (subclass_name, level, feature_name),
+    FOREIGN KEY (subclass_name) REFERENCES subclass(name)
+    );
+
+-- ── BARBARIAN ────────────────────────────────────────────────────────────────
+
+INSERT INTO subclass_feature VALUES
+                                 ('Path of the Berserker', 3,  'Frenzy',
+                                  'When you rage, you can go into a frenzy. For the duration of your rage, you can make a single melee weapon attack as a bonus action on each of your turns after this one. When your rage ends, you suffer one level of exhaustion.'),
+                                 ('Path of the Berserker', 6,  'Mindless Rage',
+                                  'You can''t be charmed or frightened while raging. If you are charmed or frightened when you enter your rage, the effect is suspended for the duration of the rage.'),
+                                 ('Path of the Berserker', 10, 'Intimidating Presence',
+                                  'You can use your action to frighten someone with your menacing presence. One creature that you can see within 30 feet of you must succeed on a Wisdom saving throw (DC = 8 + proficiency bonus + Charisma modifier) or become frightened of you until the end of your next turn.'),
+                                 ('Path of the Berserker', 14, 'Retaliation',
+                                  'When you take damage from a creature that is within 5 feet of you, you can use your reaction to make a melee weapon attack against that creature.');
+
+INSERT INTO subclass_feature VALUES
+                                 ('Path of the Totem Warrior', 3,  'Spirit Seeker',
+                                  'Yours is a path that seeks attunement with the natural world, giving you a kinship with beasts. You gain the ability to cast the beast sense and speak with animals spells, but only as rituals.'),
+                                 ('Path of the Totem Warrior', 3,  'Totem Spirit',
+                                  'Choose a totem spirit (Bear, Eagle, or Wolf). While raging, you gain the benefit of your chosen totem spirit.'),
+                                 ('Path of the Totem Warrior', 6,  'Aspect of the Beast',
+                                  'You gain a magical benefit based on the totem animal of your choice (Bear: carrying capacity doubled; Eagle: can see 1 mile away; Wolf: can track while traveling at fast pace).'),
+                                 ('Path of the Totem Warrior', 10, 'Spirit Walker',
+                                  'You can cast the commune with nature spell, but only as a ritual. When you do so, a spiritual version of one of the animals you chose for Totem Spirit or Aspect of the Beast appears to you to convey the information you seek.'),
+                                 ('Path of the Totem Warrior', 14, 'Totemic Attunement',
+                                  'You gain a magical benefit based on a totem animal of your choice. You can choose the same animal you selected previously or a different one.');
+
+-- ── BARD ─────────────────────────────────────────────────────────────────────
+
+INSERT INTO subclass_feature VALUES
+                                 ('College of Lore', 3,  'Bonus Proficiencies',
+                                  'You gain proficiency with three skills of your choice.'),
+                                 ('College of Lore', 3,  'Cutting Words',
+                                  'When a creature that you can see within 60 feet of you makes an attack roll, ability check, or damage roll, you can use your reaction to expend one of your Bardic Inspiration uses to roll a Bardic Inspiration die. Subtract the number from the creature''s roll.'),
+                                 ('College of Lore', 6,  'Additional Magical Secrets',
+                                  'You learn two spells of your choice from any class. These spells count as bard spells for you.'),
+                                 ('College of Lore', 14, 'Peerless Skill',
+                                  'When you make an ability check, you can expend one use of Bardic Inspiration. Roll a Bardic Inspiration die and add it to the check. You can choose to do so after you roll the ability check but before the DM tells you whether you succeed or fail.');
+
+INSERT INTO subclass_feature VALUES
+                                 ('College of Valor', 3,  'Bonus Proficiencies',
+                                  'You gain proficiency with medium armor, shields, and martial weapons.'),
+                                 ('College of Valor', 3,  'Combat Inspiration',
+                                  'A creature that has a Bardic Inspiration die from you can also use it when it makes a weapon damage roll. When a creature uses a Bardic Inspiration die in this way, it rolls the die and adds the result to the damage roll.'),
+                                 ('College of Valor', 6,  'Extra Attack',
+                                  'You can attack twice, instead of once, whenever you take the Attack action on your turn.'),
+                                 ('College of Valor', 14, 'Battle Magic',
+                                  'You have mastered the art of weaving spellcasting and weapon use into a single harmonious act. When you use your action to cast a bard spell, you can make one weapon attack as a bonus action.');
+
+-- ── CLERIC ───────────────────────────────────────────────────────────────────
+
+INSERT INTO subclass_feature VALUES
+                                 ('Life Domain', 1,  'Bonus Proficiency',
+                                  'When you choose this domain at 1st level, you gain proficiency with heavy armor.'),
+                                 ('Life Domain', 1,  'Disciple of Life',
+                                  'Whenever you use a spell of 1st level or higher to restore hit points to a creature, the creature regains additional hit points equal to 2 + the spell''s level.'),
+                                 ('Life Domain', 2,  'Channel Divinity: Preserve Life',
+                                  'As an action, you present your holy symbol and evoke healing energy that can restore a number of hit points equal to five times your cleric level. Choose any creatures within 30 feet of you, and divide those hit points among them.'),
+                                 ('Life Domain', 6,  'Blessed Healer',
+                                  'The healing spells you cast on others heal you as well. When you cast a healing spell of 1st level or higher that restores hit points to a creature other than you, you regain hit points equal to 2 + the spell''s level.'),
+                                 ('Life Domain', 8,  'Divine Strike',
+                                  'Once on each of your turns when you hit a creature with a weapon attack, you can cause the attack to deal an extra 1d8 radiant damage to the target.'),
+                                 ('Life Domain', 17, 'Supreme Healing',
+                                  'When you would normally roll one or more dice to restore hit points with a spell, you instead use the highest number possible for each die.');
+
+INSERT INTO subclass_feature VALUES
+                                 ('Light Domain', 1,  'Bonus Cantrip',
+                                  'You gain the light cantrip if you don''t already know it.'),
+                                 ('Light Domain', 1,  'Warding Flare',
+                                  'When attacked by a creature within 30 feet of you that you can see, you can use your reaction to impose disadvantage on the attack roll. An attacker that can''t be blinded is immune to this feature.'),
+                                 ('Light Domain', 2,  'Channel Divinity: Radiance of the Dawn',
+                                  'As an action, you present your holy symbol, and any magical darkness within 30 feet of you is dispelled. Each hostile creature within 30 feet must make a Constitution saving throw or take 2d10 + your cleric level radiant damage (half on success).'),
+                                 ('Light Domain', 6,  'Improved Flare',
+                                  'You can also use your Warding Flare when a creature that you can see within 30 feet of you attacks a creature other than you.'),
+                                 ('Light Domain', 8,  'Potent Spellcasting',
+                                  'You add your Wisdom modifier to the damage you deal with any cleric cantrip.'),
+                                 ('Light Domain', 17, 'Corona of Light',
+                                  'You can use your action to activate an aura of sunlight that lasts for 1 minute or until you dismiss it using another action. You emit bright light in a 60-foot radius and dim light 30 feet beyond that. Your enemies in the bright light have disadvantage on saving throws against any spell that deals fire or radiant damage.');
+
+INSERT INTO subclass_feature VALUES
+                                 ('Trickery Domain', 1,  'Blessing of the Trickster',
+                                  'You can use your action to touch a willing creature other than yourself to give it advantage on Dexterity (Stealth) checks. This blessing lasts for 1 hour or until you use this feature again.'),
+                                 ('Trickery Domain', 2,  'Channel Divinity: Invoke Duplicity',
+                                  'As an action, you create a perfect illusion of yourself that lasts for 1 minute or until you lose your concentration. The illusion appears in an unoccupied space within 30 feet of you. You can move the illusion up to 30 feet each turn.'),
+                                 ('Trickery Domain', 6,  'Channel Divinity: Cloak of Shadows',
+                                  'As an action, you become invisible until the end of your next turn. You become visible if you attack or cast a spell.'),
+                                 ('Trickery Domain', 8,  'Divine Strike',
+                                  'Once on each of your turns when you hit a creature with a weapon attack, you can cause the attack to deal an extra 1d8 poison damage to the target.'),
+                                 ('Trickery Domain', 17, 'Improved Duplicity',
+                                  'You can create up to four duplicates of yourself, instead of one, when you use Invoke Duplicity. As a bonus action on your turn, you can move any number of them up to 30 feet, to a maximum range of 120 feet.');
+
+-- ── DRUID ─────────────────────────────────────────────────────────────────────
+
+INSERT INTO subclass_feature VALUES
+                                 ('Circle of the Land', 2,  'Natural Recovery',
+                                  'Starting at 2nd level, you can regain some of your magical energy by sitting in meditation and communing with nature. During a short rest, you choose expended spell slots to recover. The spell slots can have a combined level that is equal to or less than half your druid level (rounded up).'),
+                                 ('Circle of the Land', 2,  'Circle Spells',
+                                  'Your mystical connection to the land infuses you with the ability to cast certain spells. These spells are always prepared and count as druid spells for you, but they don''t count against the number of druid spells you can prepare. The specific spells depend on your chosen land (Arctic, Coast, Desert, Forest, Grassland, Mountain, Swamp, or Underdark).'),
+                                 ('Circle of the Land', 6,  'Land''s Stride',
+                                  'Moving through nonmagical difficult terrain costs you no extra movement. You can also pass through nonmagical plants without being slowed by them and without taking damage from them if they have thorns, spines, or a similar hazard.'),
+                                 ('Circle of the Land', 10, 'Nature''s Ward',
+                                  'You can''t be charmed or frightened by elementals or fey, and you are immune to poison and disease.'),
+                                 ('Circle of the Land', 14, 'Nature''s Sanctuary',
+                                  'Creatures of the natural world sense your connection to nature and become hesitant to attack you. When a beast or plant creature attacks you, that creature must make a Wisdom saving throw against your druid spell save DC. On a failed save, the creature must choose a different target.');
+
+INSERT INTO subclass_feature VALUES
+                                 ('Circle of the Moon', 2,  'Combat Wild Shape',
+                                  'You gain the ability to use Wild Shape as a bonus action, rather than as an action. Additionally, while in beast form, you can use a bonus action to expend one spell slot to regain 1d8 hit points per level of the spell slot expended.'),
+                                 ('Circle of the Moon', 2,  'Circle Forms',
+                                  'You can transform into a beast with a challenge rating as high as 1 (instead of 1/4). Starting at 6th level, you can transform into a beast with a challenge rating as high as your druid level divided by 3, rounded down.'),
+                                 ('Circle of the Moon', 6,  'Primal Strike',
+                                  'Your attacks in beast form count as magical for the purpose of overcoming resistance and immunity to nonmagical attacks and damage.'),
+                                 ('Circle of the Moon', 10, 'Elemental Wild Shape',
+                                  'You can expend two uses of Wild Shape at the same time to transform into an air elemental, an earth elemental, a fire elemental, or a water elemental.'),
+                                 ('Circle of the Moon', 14, 'Thousand Forms',
+                                  'You have learned to use magic to alter your physical form in more subtle ways. You can cast the alter self spell at will.');
+
+-- ── FIGHTER ──────────────────────────────────────────────────────────────────
+
+INSERT INTO subclass_feature VALUES
+                                 ('Champion', 3,  'Improved Critical',
+                                  'Your weapon attacks score a critical hit on a roll of 19 or 20.'),
+                                 ('Champion', 7,  'Remarkable Athlete',
+                                  'You can add half your proficiency bonus (rounded up) to any Strength, Dexterity, or Constitution check you make that doesn''t already use your proficiency bonus. In addition, when you make a running long jump, the distance you can cover increases by a number of feet equal to your Strength modifier.'),
+                                 ('Champion', 10, 'Additional Fighting Style',
+                                  'You can choose a second option from the Fighting Style class feature.'),
+                                 ('Champion', 15, 'Superior Critical',
+                                  'Your weapon attacks score a critical hit on a roll of 18–20.'),
+                                 ('Champion', 18, 'Survivor',
+                                  'You attain the pinnacle of resilience in battle. At the start of each of your turns, you regain hit points equal to 5 + your Constitution modifier if you have no more than half of your hit points left. You don''t gain this benefit if you have 0 hit points.');
+
+INSERT INTO subclass_feature VALUES
+                                 ('Battle Master', 3,  'Combat Superiority',
+                                  'You learn maneuvers that are fueled by special dice called superiority dice (d8). You have four superiority dice and learn three maneuvers of your choice. You regain all expended superiority dice when you finish a short or long rest.'),
+                                 ('Battle Master', 3,  'Student of War',
+                                  'You gain proficiency with one type of artisan''s tools of your choice.'),
+                                 ('Battle Master', 7,  'Know Your Enemy',
+                                  'If you spend at least 1 minute observing or interacting with another creature outside combat, you can learn certain information about its capabilities compared to your own.'),
+                                 ('Battle Master', 10, 'Improved Combat Superiority',
+                                  'Your superiority dice turn into d10s.'),
+                                 ('Battle Master', 15, 'Relentless',
+                                  'When you roll initiative and have no superiority dice remaining, you regain 1 superiority die.'),
+                                 ('Battle Master', 18, 'Improved Combat Superiority',
+                                  'Your superiority dice turn into d12s.');
+
+INSERT INTO subclass_feature VALUES
+                                 ('Eldritch Knight', 3,  'Spellcasting',
+                                  'You augment your martial prowess with the ability to cast spells. You learn three wizard cantrips and know three 1st-level wizard spells. Intelligence is your spellcasting ability.'),
+                                 ('Eldritch Knight', 3,  'Weapon Bond',
+                                  'You learn a ritual that creates a magical bond between yourself and one weapon. You can bond up to two weapons at once.'),
+                                 ('Eldritch Knight', 7,  'War Magic',
+                                  'When you use your action to cast a cantrip, you can make one weapon attack as a bonus action.'),
+                                 ('Eldritch Knight', 10, 'Eldritch Strike',
+                                  'When you hit a creature with a weapon attack, that creature has disadvantage on the next saving throw it makes against a spell you cast before the end of your next turn.'),
+                                 ('Eldritch Knight', 15, 'Arcane Charge',
+                                  'You gain the ability to teleport up to 30 feet to an unoccupied space you can see when you use your Action Surge.'),
+                                 ('Eldritch Knight', 18, 'Improved War Magic',
+                                  'When you use your action to cast a spell, you can make one weapon attack as a bonus action.');
+
+-- ── MONK ─────────────────────────────────────────────────────────────────────
+
+INSERT INTO subclass_feature VALUES
+                                 ('Way of the Open Hand', 3,  'Open Hand Technique',
+                                  'Whenever you hit a creature with one of the attacks granted by your Flurry of Blows, you can impose one of the following effects on that target: knock prone, push up to 15 feet, or prevent reaction until end of next turn.'),
+                                 ('Way of the Open Hand', 6,  'Wholeness of Body',
+                                  'You gain the ability to heal yourself. As an action, you can regain hit points equal to three times your monk level. You must finish a long rest before you can use this feature again.'),
+                                 ('Way of the Open Hand', 11, 'Tranquility',
+                                  'You can enter a special meditation that surrounds you with an aura of peace. At the end of a long rest, you gain the effect of a sanctuary spell that lasts until the start of your next long rest.'),
+                                 ('Way of the Open Hand', 17, 'Quivering Palm',
+                                  'You gain the ability to set up lethal vibrations in someone''s body. When you hit a creature with an unarmed strike, you can spend 3 ki points to start these vibrations. You can then use your action on a later turn to end them, forcing a Constitution saving throw (DC = 8 + proficiency bonus + Wisdom modifier). On a failure, the creature is reduced to 0 hit points.');
+
+INSERT INTO subclass_feature VALUES
+                                 ('Way of Shadow', 3,  'Shadow Arts',
+                                  'You can use your ki to duplicate the effects of certain spells. As an action, you can spend 2 ki points to cast darkness, darkvision, pass without trace, or silence, without providing material components.'),
+                                 ('Way of Shadow', 6,  'Shadow Step',
+                                  'You gain the ability to step from one shadow into another. When you are in dim light or darkness, as a bonus action you can teleport up to 60 feet to an unoccupied space you can see that is also in dim light or darkness.'),
+                                 ('Way of Shadow', 11, 'Cloak of Shadows',
+                                  'You have learned to become one with the shadows. When you are in an area of dim light or darkness, you can use your action to become invisible. You remain invisible until you make an attack, cast a spell, or are in an area of bright light.'),
+                                 ('Way of Shadow', 17, 'Opportunist',
+                                  'You can exploit a creature''s momentary distraction when it is hit by an attack. Whenever a creature within 5 feet of you is hit by an attack made by a creature other than you, you can use your reaction to make a melee attack against that creature.');
+
+-- ── PALADIN ──────────────────────────────────────────────────────────────────
+
+INSERT INTO subclass_feature VALUES
+                                 ('Oath of Devotion', 3,  'Sacred Weapon',
+                                  'As an action, you can imbue one weapon that you are holding with positive energy, using your Channel Divinity. For 1 minute, you add your Charisma modifier to attack rolls made with that weapon. The weapon also emits bright light in a 20-foot radius.'),
+                                 ('Oath of Devotion', 3,  'Turn the Unholy',
+                                  'As an action, you present your holy symbol and speak a prayer censuring fiends and undead, using your Channel Divinity. Each fiend or undead that can see or hear you within 30 feet must make a Wisdom saving throw.'),
+                                 ('Oath of Devotion', 7,  'Aura of Devotion',
+                                  'You and friendly creatures within 10 feet of you can''t be charmed while you are conscious. At 18th level, the range of this aura increases to 30 feet.'),
+                                 ('Oath of Devotion', 15, 'Purity of Spirit',
+                                  'You are always under the effects of a protection from evil and good spell.'),
+                                 ('Oath of Devotion', 20, 'Holy Nimbus',
+                                  'As an action, you can emanate an aura of sunlight. For 1 minute, bright light shines from you in a 30-foot radius, and dim light shines 30 feet beyond that. Enemies that start their turn in the bright light take 10 radiant damage. You can use this feature once per long rest.');
+
+INSERT INTO subclass_feature VALUES
+                                 ('Oath of Vengeance', 3,  'Abjure Enemy',
+                                  'As an action, you present your holy symbol and speak a prayer of denunciation, using your Channel Divinity. Choose one creature within 60 feet that you can see. That creature must make a Wisdom saving throw, unless it is immune to being frightened.'),
+                                 ('Oath of Vengeance', 3,  'Vow of Enmity',
+                                  'As a bonus action, you can utter a vow of enmity against a creature you can see within 10 feet of you, using your Channel Divinity. You gain advantage on attack rolls against the creature for 1 minute or until it drops to 0 hit points.'),
+                                 ('Oath of Vengeance', 7,  'Relentless Avenger',
+                                  'Your supernatural focus helps you close off a foe''s retreat. When you hit a creature with an opportunity attack, you can move up to half your speed immediately after the attack and as part of the same reaction. This movement doesn''t provoke opportunity attacks.'),
+                                 ('Oath of Vengeance', 15, 'Soul of Vengeance',
+                                  'The authority with which you speak your Vow of Enmity gives you greater power over your foe. When a creature under the effect of your Vow of Enmity makes an attack, you can use your reaction to make a melee weapon attack against that creature if it is within range.'),
+                                 ('Oath of Vengeance', 20, 'Avenging Angel',
+                                  'You can assume the form of an angelic avenger. Using your action, you undergo a transformation. For 1 hour, you sprout wings and gain a flying speed of 60 feet. Enemies who see you must succeed on a Wisdom saving throw or become frightened of you for 1 minute.');
+
+INSERT INTO subclass_feature VALUES
+                                 ('Oath of the Ancients', 3,  'Nature''s Wrath',
+                                  'You can use your Channel Divinity to invoke primeval forces to ensnare a foe. As an action, you can cause spectral vines to spring up and reach for a creature within 10 feet of you that you can see.'),
+                                 ('Oath of the Ancients', 3,  'Turn the Faithless',
+                                  'You can use your Channel Divinity to utter ancient words that are painful for fey and fiends to hear. Each fey or fiend within 30 feet that can hear you must make a Wisdom saving throw.'),
+                                 ('Oath of the Ancients', 7,  'Aura of Warding',
+                                  'Ancient magic lies so heavily upon you that it forms an eldritch ward. You and friendly creatures within 10 feet of you have resistance to damage from spells.'),
+                                 ('Oath of the Ancients', 15, 'Undying Sentinel',
+                                  'When you are reduced to 0 hit points and are not killed outright, you can choose to drop to 1 hit point instead. Once you use this ability, you can''t use it again until you finish a long rest.'),
+                                 ('Oath of the Ancients', 20, 'Elder Champion',
+                                  'You can assume the form of an ancient force of nature, taking on an appearance you choose. For 1 minute, your skin takes on a bark-like quality, grass grows from where you step, and you gain several benefits including regeneration and faster channel divinity recharge.');
+
+-- ── RANGER ───────────────────────────────────────────────────────────────────
+
+INSERT INTO subclass_feature VALUES
+                                 ('Hunter', 3,  'Hunter''s Prey',
+                                  'Choose one of the following: Colossus Slayer (extra 1d8 on hurt targets), Giant Killer (reaction attack when Large+ misses), or Horde Breaker (extra attack on adjacent enemy).'),
+                                 ('Hunter', 7,  'Defensive Tactics',
+                                  'Choose one: Escape the Horde (opportunity attacks have disadvantage), Multiattack Defense (+4 AC against same attacker), or Steel Will (advantage vs. frightened).'),
+                                 ('Hunter', 11, 'Multiattack',
+                                  'Choose one: Volley (ranged attack at all creatures in 10-ft radius) or Whirlwind Attack (melee attack against all creatures within reach).'),
+                                 ('Hunter', 15, 'Superior Hunter''s Defense',
+                                  'Choose one: Evasion (Dex save for no damage on success, half on fail) or Stand Against the Tide (redirect missed attack to another creature) or Uncanny Dodge (halve attack damage as reaction).');
+
+INSERT INTO subclass_feature VALUES
+                                 ('Beast Master', 3,  'Ranger''s Companion',
+                                  'You gain a beast companion that accompanies you on your adventures and is trained to fight alongside you. Choose a beast that is no larger than Medium and has a CR of 1/4 or lower. The beast obeys your commands and acts on your initiative.'),
+                                 ('Beast Master', 7,  'Exceptional Training',
+                                  'On any of your turns when your beast companion doesn''t attack, you can use a bonus action to command the beast to take the Dash, Disengage, Dodge, or Help action.'),
+                                 ('Beast Master', 11, 'Bestial Fury',
+                                  'Your beast companion can make two attacks when you command it to use the Attack action.'),
+                                 ('Beast Master', 15, 'Share Spells',
+                                  'When you cast a spell targeting yourself, you can also affect your beast companion with the spell if the beast is within 30 feet of you.');
+
+-- ── ROGUE ─────────────────────────────────────────────────────────────────────
+
+INSERT INTO subclass_feature VALUES
+                                 ('Thief', 3,  'Fast Hands',
+                                  'You can use the bonus action granted by your Cunning Action to make a Dexterity (Sleight of Hand) check, use your thieves'' tools to disarm a trap or open a lock, or take the Use an Object action.'),
+                                 ('Thief', 3,  'Second-Story Work',
+                                  'You gain the ability to climb faster than normal; climbing no longer costs you extra movement. When you make a running jump, the distance you cover increases by a number of feet equal to your Dexterity modifier.'),
+                                 ('Thief', 9,  'Supreme Sneak',
+                                  'You have advantage on a Dexterity (Stealth) check if you move no more than half your speed on the same turn.'),
+                                 ('Thief', 13, 'Use Magic Device',
+                                  'You have learned enough about the workings of magic that you can improvise the use of items even when they are not intended for you. You ignore all class, race, and level requirements on the use of magic items.'),
+                                 ('Thief', 17, 'Thief''s Reflexes',
+                                  'You have become adept at laying ambushes and quickly escaping danger. You can take two turns during the first round of any combat. You take your first turn at your normal initiative and your second turn at your initiative minus 10.');
+
+INSERT INTO subclass_feature VALUES
+                                 ('Assassin', 3,  'Bonus Proficiencies',
+                                  'You gain proficiency with the disguise kit and the poisoner''s kit.'),
+                                 ('Assassin', 3,  'Assassinate',
+                                  'You are at your deadliest when you get the drop on your enemies. You have advantage on attack rolls against any creature that hasn''t taken a turn in the combat yet. In addition, any hit you score against a creature that is surprised is a critical hit.'),
+                                 ('Assassin', 9,  'Infiltration Expertise',
+                                  'You can unfailingly create false identities for yourself. You must spend seven days and 25 gp to establish the history, profession, and affiliations for an identity.'),
+                                 ('Assassin', 13, 'Impostor',
+                                  'You gain the ability to unerringly mimic another person''s speech, writing, and behavior. You must spend at least three hours studying these three components of the person''s behavior.'),
+                                 ('Assassin', 17, 'Death Strike',
+                                  'You become a master of instant death. When you attack and hit a creature that is surprised, it must make a Constitution saving throw (DC = 8 + Dexterity modifier + proficiency bonus). On a failed save, double the damage of your attack against the creature.');
+
+INSERT INTO subclass_feature VALUES
+                                 ('Arcane Trickster', 3,  'Spellcasting',
+                                  'You gain the ability to cast spells. You know three 1st-level spells, of which two must be from the enchantment and illusion schools of the wizard spell list. Intelligence is your spellcasting ability.'),
+                                 ('Arcane Trickster', 3,  'Mage Hand Legerdemain',
+                                  'When you cast mage hand, you can make the spectral hand invisible, and you can perform the following additional tasks with it: stow or retrieve an object, use thieves'' tools to pick locks and disarm traps at range.'),
+                                 ('Arcane Trickster', 9,  'Magical Ambush',
+                                  'If you are hidden from a creature when you cast a spell on it, the creature has disadvantage on any saving throw it makes against the spell this turn.'),
+                                 ('Arcane Trickster', 13, 'Versatile Trickster',
+                                  'You gain the ability to distract targets with your mage hand. As a bonus action on your turn, you can designate a creature within 5 feet of the spectral hand. Doing so gives you advantage on attack rolls against that creature until the end of the turn.'),
+                                 ('Arcane Trickster', 17, 'Spell Thief',
+                                  'You gain the ability to magically steal the knowledge of how to cast a spell from another spellcaster. Immediately after a creature casts a spell that targets you or includes you in its area of effect, you can use your reaction to force the creature to make a saving throw with its spellcasting ability modifier.');
+
+-- ── SORCERER ─────────────────────────────────────────────────────────────────
+
+INSERT INTO subclass_feature VALUES
+                                 ('Draconic Bloodline', 1,  'Dragon Ancestor',
+                                  'You choose one type of dragon as your ancestor. The damage type associated with each dragon is used by features you gain later. You can speak, read, and write Draconic. Whenever you make a Charisma check when interacting with dragons, your proficiency bonus is doubled.'),
+                                 ('Draconic Bloodline', 1,  'Draconic Resilience',
+                                  'As magic flows through your body, it causes physical traits of your dragon ancestors to emerge. Your hit point maximum increases by 1 and increases by 1 again whenever you gain a level in this class. Additionally, parts of your skin are covered by a thin sheen of dragon-like scales: when you aren''t wearing armor, your AC equals 13 + your Dexterity modifier.'),
+                                 ('Draconic Bloodline', 6,  'Elemental Affinity',
+                                  'When you cast a spell that deals damage of the type associated with your draconic ancestry, you can add your Charisma modifier to that damage roll. At the same time, you can spend 1 sorcery point to gain resistance to that damage type for 1 hour.'),
+                                 ('Draconic Bloodline', 14, 'Dragon Wings',
+                                  'You gain the ability to sprout a pair of dragon wings from your back, gaining a flying speed equal to your current speed. You can create these wings as a bonus action on your turn.'),
+                                 ('Draconic Bloodline', 18, 'Draconic Presence',
+                                  'You can channel the dread presence of your dragon ancestor, causing those around you to become awestruck or frightened. As an action, you can spend 5 sorcery points to draw on this power and exude an aura of awe or fear (your choice) to a distance of 60 feet.');
+
+INSERT INTO subclass_feature VALUES
+                                 ('Wild Magic', 1,  'Wild Magic Surge',
+                                  'Your spellcasting can unleash surges of untamed magic. Immediately after you cast a sorcerer spell of 1st level or higher, the DM can have you roll a d20. If you roll a 1, roll on the Wild Magic Surge table to create a random magical effect.'),
+                                 ('Wild Magic', 1,  'Tides of Chaos',
+                                  'You can manipulate the forces of chance and chaos to gain advantage on one attack roll, ability check, or saving throw. Once you do so, you must finish a long rest before you can use this feature again.'),
+                                 ('Wild Magic', 6,  'Bend Luck',
+                                  'You have the ability to twist fate using your wild magic. When another creature you can see makes an attack roll, ability check, or saving throw, you can use your reaction and spend 2 sorcery points to roll 1d4 and apply the number rolled as a bonus or penalty (your choice) to the creature''s roll.'),
+                                 ('Wild Magic', 14, 'Controlled Chaos',
+                                  'You gain a modicum of control over the surges of your wild magic. Whenever you roll on the Wild Magic Surge table, you can roll twice and use either number.'),
+                                 ('Wild Magic', 18, 'Spell Bombardment',
+                                  'The harmful energy of your spells intensifies. When you roll damage for a spell and roll the highest number possible on any of the dice, choose one of those dice, roll it again and add that roll to the damage.');
+
+-- ── WARLOCK ──────────────────────────────────────────────────────────────────
+
+INSERT INTO subclass_feature VALUES
+                                 ('The Fiend', 1,  'Dark One''s Blessing',
+                                  'Starting at 1st level, when you reduce a hostile creature to 0 hit points, you gain temporary hit points equal to your Charisma modifier + your warlock level (minimum of 1).'),
+                                 ('The Fiend', 6,  'Dark One''s Own Luck',
+                                  'Starting at 6th level, you can call on your patron to alter fate in your favor. When you make an ability check or a saving throw, you can use this feature to add a d10 to your roll. You can do so after seeing the initial roll but before any of the roll''s effects occur. Once you use this feature, you can''t use it again until you finish a short or long rest.'),
+                                 ('The Fiend', 10, 'Fiendish Resilience',
+                                  'Starting at 10th level, you can choose one damage type when you finish a short or long rest. You gain resistance to that damage type until you choose a different one.'),
+                                 ('The Fiend', 14, 'Hurl Through Hell',
+                                  'Starting at 14th level, when you hit a creature with an attack, you can use this feature to instantly transport the target through the lower planes. The creature disappears and hurtles through a nightmare landscape. At the end of your next turn, the target returns to the space it previously occupied, or the nearest unoccupied space. Unless the creature is a fiend, it takes 10d10 psychic damage from its horrific experience.');
+
+INSERT INTO subclass_feature VALUES
+                                 ('The Great Old One', 1,  'Awakened Mind',
+                                  'Starting at 1st level, your alien knowledge gives you the ability to touch the minds of other creatures. You can communicate telepathically with any creature you can see within 30 feet of you. You don''t need to share a language with the creature for it to understand your telepathic utterances.'),
+                                 ('The Great Old One', 6,  'Entropic Ward',
+                                  'At 6th level, you learn to magically ward yourself against attack and to turn an enemy''s failed strike into good luck for yourself. When a creature makes an attack roll against you, you can use your reaction to impose disadvantage on that roll. If the attack misses you, your next attack roll against the creature has advantage if you make it before the end of your next turn.'),
+                                 ('The Great Old One', 10, 'Thought Shield',
+                                  'Starting at 10th level, your thoughts can''t be read by telepathy or other means unless you allow it. Also, whenever a creature deals psychic damage to you, that creature takes the same amount of damage that you do.'),
+                                 ('The Great Old One', 14, 'Create Thrall',
+                                  'At 14th level, you gain the ability to infect a humanoid''s mind with the alien magic of your patron. You can use your action to touch an incapacitated humanoid. That creature is then charmed by you until a remove curse spell is cast on it, the charmed condition is removed, or you use this feature again.');
+
+-- ── WIZARD ───────────────────────────────────────────────────────────────────
+
+INSERT INTO subclass_feature VALUES
+                                 ('School of Evocation', 2,  'Evocation Savant',
+                                  'The gold and time you must spend to copy an evocation spell into your spellbook is halved.'),
+                                 ('School of Evocation', 2,  'Sculpt Spells',
+                                  'You can create pockets of relative safety within the effects of your evocation spells. When you cast an evocation spell that affects other creatures that you can see, you can choose a number of them equal to 1 + the spell''s level. The chosen creatures automatically succeed on their saving throws against the spell, and they take no damage if they would normally take half damage on a successful save.'),
+                                 ('School of Evocation', 6,  'Potent Cantrip',
+                                  'Your damaging cantrips affect even creatures that avoid the brunt of the effect. When a creature succeeds on a saving throw against your cantrip, the creature takes half the cantrip''s damage (if any) but suffers no additional effect from the cantrip.'),
+                                 ('School of Evocation', 10, 'Empowered Evocation',
+                                  'Beginning at 10th level, you can add your Intelligence modifier to one damage roll of any wizard evocation spell you cast.'),
+                                 ('School of Evocation', 14, 'Overchannel',
+                                  'Starting at 14th level, you can increase the power of your simpler spells. When you cast a wizard spell of 1st through 5th level that deals damage, you can deal maximum damage with that spell. The first time you do so, you suffer no adverse effect. If you use this feature again before you finish a long rest, you take 2d12 necrotic damage for each level of the spell, immediately after you cast it.');
+
+INSERT INTO subclass_feature VALUES
+                                 ('School of Abjuration', 2,  'Abjuration Savant',
+                                  'The gold and time you must spend to copy an abjuration spell into your spellbook is halved.'),
+                                 ('School of Abjuration', 2,  'Arcane Ward',
+                                  'Starting at 2nd level, you can weave magic around yourself for protection. When you cast an abjuration spell of 1st level or higher, you can simultaneously use a strand of the spell''s magic to create a magical ward on yourself that lasts until you finish a long rest. The ward has hit points equal to twice your wizard level + your Intelligence modifier.'),
+                                 ('School of Abjuration', 6,  'Projected Ward',
+                                  'Beginning at 6th level, when a creature that you can see within 30 feet of you takes damage, you can use your reaction to cause your Arcane Ward to absorb that damage. If this damage reduces the ward to 0 hit points, the warded creature takes any remaining damage.'),
+                                 ('School of Abjuration', 10, 'Improved Abjuration',
+                                  'Beginning at 10th level, when you cast an abjuration spell that requires you to make an ability check as a part of casting that spell, you add your proficiency bonus to that ability check.'),
+                                 ('School of Abjuration', 14, 'Spell Resistance',
+                                  'Starting at 14th level, you have advantage on saving throws against spells. Furthermore, you have resistance against the damage of spells.');
+
+INSERT INTO subclass_feature VALUES
+                                 ('School of Illusion', 2,  'Illusion Savant',
+                                  'The gold and time you must spend to copy an illusion spell into your spellbook is halved.'),
+                                 ('School of Illusion', 2,  'Improved Minor Illusion',
+                                  'When you choose this school at 2nd level, you learn the minor illusion cantrip. If you already know this cantrip, you learn a different wizard cantrip of your choice. When you cast minor illusion, you can create both a sound and an image with a single casting of the spell.'),
+                                 ('School of Illusion', 6,  'Malleable Illusions',
+                                  'Starting at 6th level, when you cast an illusion spell that has a duration of 1 minute or longer, you can use your action to change the nature of that illusion (using the spell''s normal parameters for the illusion), provided that you can see the illusion.'),
+                                 ('School of Illusion', 10, 'Illusory Self',
+                                  'Beginning at 10th level, you can create an illusory duplicate of yourself as an instant, almost instinctual reaction to danger. When a creature makes an attack roll against you, you can use your reaction to interpose the illusory duplicate between the attacker and yourself.'),
+                                 ('School of Illusion', 14, 'Illusory Reality',
+                                  'By 14th level, you have learned the secret of weaving shadow magic into your illusions to give them a semi-reality. When you cast an illusion spell of 1st level or higher, you can choose one inanimate, nonmagical object that is part of the illusion and make that object real.');
+
+
+-- =============================================================================
+-- F. CLASS FEATURE — LEVEL 3–20 ADDITIONS
+-- Ergänzt die bestehende class_feature Tabelle mit Level 3–20.
+-- Beschreibungen sind bewusst kurz gehalten (max ~200 Zeichen) für die UI.
+-- =============================================================================
+
+-- ── BARBARIAN Level 3–20 ────────────────────────────────────────────────────
+INSERT INTO class_feature (class_name, level, feature_name, description) VALUES
+                                                                             ('Barbarian', 3,  'Primal Path',         'Choose a Primal Path that shapes the nature of your rage: Path of the Berserker or Path of the Totem Warrior. Your choice grants features at 3rd, 6th, 10th, and 14th level.'),
+                                                                             ('Barbarian', 4,  'Ability Score Improvement', 'You can increase one ability score by 2, or two ability scores by 1 each. You can''t exceed 20 with this feature.'),
+                                                                             ('Barbarian', 5,  'Extra Attack',        'You can attack twice, instead of once, whenever you take the Attack action on your turn.'),
+                                                                             ('Barbarian', 5,  'Fast Movement',       'Your speed increases by 10 feet while you aren''t wearing heavy armor.'),
+                                                                             ('Barbarian', 7,  'Feral Instinct',      'Your instincts are so honed that you have advantage on initiative rolls. Additionally, if you are surprised at the beginning of combat, you can act normally on your first turn if you enter your rage before doing anything else.'),
+                                                                             ('Barbarian', 8,  'Ability Score Improvement', 'You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Barbarian', 9,  'Brutal Critical',     'You can roll one additional weapon damage die when determining the extra damage for a critical hit with a melee attack.'),
+                                                                             ('Barbarian',11,  'Relentless Rage',     'Your rage can keep you fighting despite grievous wounds. If you drop to 0 hit points while you''re raging, you can make a DC 10 Constitution saving throw to drop to 1 hit point instead.'),
+                                                                             ('Barbarian',12,  'Ability Score Improvement', 'You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Barbarian',13,  'Brutal Critical',     'You can roll two additional weapon damage dice when determining the extra damage for a critical hit with a melee attack.'),
+                                                                             ('Barbarian',15,  'Persistent Rage',     'Your rage is so fierce that it ends early only if you fall unconscious or if you choose to end it.'),
+                                                                             ('Barbarian',16,  'Ability Score Improvement', 'You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Barbarian',17,  'Brutal Critical',     'You can roll three additional weapon damage dice when determining the extra damage for a critical hit with a melee attack.'),
+                                                                             ('Barbarian',18,  'Indomitable Might',   'If your total for a Strength check is less than your Strength score, you can use that score in place of the total.'),
+                                                                             ('Barbarian',19,  'Ability Score Improvement', 'You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Barbarian',20,  'Primal Champion',     'You embody the power of the wilds. Your Strength and Constitution scores each increase by 4. Your maximum for those scores is now 24.');
+
+-- ── BARD Level 3–20 ─────────────────────────────────────────────────────────
+INSERT INTO class_feature (class_name, level, feature_name, description) VALUES
+                                                                             ('Bard', 3,  'Expertise',            'Choose two of your skill proficiencies. Your proficiency bonus is doubled for any ability check you make using either of the chosen proficiencies.'),
+                                                                             ('Bard', 3,  'Bard College',         'You delve into the advanced techniques of a bard college of your choice: College of Lore or College of Valor. Your choice grants features at 3rd, 6th, and 14th level.'),
+                                                                             ('Bard', 4,  'Ability Score Improvement', 'You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Bard', 5,  'Bardic Inspiration (d8)',   'Your Bardic Inspiration die changes to a d8. Font of Inspiration: you now regain your expended uses of Bardic Inspiration on a short or long rest.'),
+                                                                             ('Bard', 6,  'Countercharm',         'You gain the ability to use musical notes or words of power to disrupt mind-influencing effects. As an action, you can start a performance that lasts until the end of your next turn.'),
+                                                                             ('Bard', 8,  'Ability Score Improvement', 'You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Bard', 9,  'Song of Rest (d8)',     'The extra hit points gained from your Song of Rest increases to 1d8.'),
+                                                                             ('Bard',10,  'Bardic Inspiration (d10)',  'Your Bardic Inspiration die changes to a d10. You gain two Magical Secrets: choose two spells from any class. They become bard spells for you.'),
+                                                                             ('Bard',10,  'Expertise',            'Choose two more of your skill proficiencies. Your proficiency bonus is doubled for those checks.'),
+                                                                             ('Bard',12,  'Ability Score Improvement', 'You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Bard',13,  'Song of Rest (d10)',   'The extra hit points from Song of Rest increases to 1d10.'),
+                                                                             ('Bard',14,  'Magical Secrets',      'Choose two spells from any class. They count as bard spells for you and are always prepared.'),
+                                                                             ('Bard',15,  'Bardic Inspiration (d12)', 'Your Bardic Inspiration die changes to a d12.'),
+                                                                             ('Bard',16,  'Ability Score Improvement', 'You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Bard',17,  'Song of Rest (d12)',   'The extra hit points from Song of Rest increases to 1d12.'),
+                                                                             ('Bard',18,  'Magical Secrets',      'Choose two more spells from any class. They count as bard spells for you.'),
+                                                                             ('Bard',19,  'Ability Score Improvement', 'You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Bard',20,  'Superior Inspiration', 'When you roll initiative and have no uses of Bardic Inspiration left, you regain one use.');
+
+-- ── CLERIC Level 3–20 ───────────────────────────────────────────────────────
+INSERT INTO class_feature (class_name, level, feature_name, description) VALUES
+                                                                             ('Cleric', 4,  'Ability Score Improvement', 'You can increase one ability score by 2, or two ability scores by 1 each. Clerics also gain an additional cantrip at this level.'),
+                                                                             ('Cleric', 5,  'Destroy Undead (CR 1/2)', 'When an undead of CR 1/2 or lower fails its saving throw against your Turn Undead, it is instantly destroyed.'),
+                                                                             ('Cleric', 6,  'Channel Divinity (2/rest)', 'You can use Channel Divinity twice between rests. Your Divine Domain grants an additional use.'),
+                                                                             ('Cleric', 8,  'Ability Score Improvement', 'You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Cleric', 8,  'Destroy Undead (CR 1)',     'You can destroy undead of CR 1 or lower with Turn Undead.'),
+                                                                             ('Cleric',10,  'Divine Intervention',       'You can call on your deity to intervene on your behalf. Roll percentile dice. If you roll a number equal to or lower than your cleric level, your deity intervenes. You can''t use this feature again for 7 days after a successful intervention.'),
+                                                                             ('Cleric',11,  'Destroy Undead (CR 2)',     'You can destroy undead of CR 2 or lower with Turn Undead.'),
+                                                                             ('Cleric',12,  'Ability Score Improvement', 'You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Cleric',14,  'Destroy Undead (CR 3)',     'You can destroy undead of CR 3 or lower with Turn Undead.'),
+                                                                             ('Cleric',16,  'Ability Score Improvement', 'You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Cleric',17,  'Destroy Undead (CR 4)',     'You can destroy undead of CR 4 or lower with Turn Undead.'),
+                                                                             ('Cleric',18,  'Channel Divinity (3/rest)', 'You can use Channel Divinity three times between rests.'),
+                                                                             ('Cleric',19,  'Ability Score Improvement', 'You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Cleric',20,  'Divine Intervention Improvement', 'Your call for intervention succeeds automatically — no roll required.');
+
+-- ── DRUID Level 3–20 ────────────────────────────────────────────────────────
+INSERT INTO class_feature (class_name, level, feature_name, description) VALUES
+                                                                             ('Druid', 3,  'Wild Shape Improvement',  'You can use Wild Shape to assume a beast form with a swim speed (no flying). Max CR 1/2.'),
+                                                                             ('Druid', 4,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each. You also gain one additional druid cantrip.'),
+                                                                             ('Druid', 4,  'Wild Shape Improvement',  'You can assume a beast form with a flying speed. Max CR 1.'),
+                                                                             ('Druid', 6,  'Druid Circle Feature',    'Your chosen Druid Circle grants you a feature at 6th level.'),
+                                                                             ('Druid', 8,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Druid', 8,  'Wild Shape Improvement',  'Max CR for Wild Shape increases to 1/3 your druid level (rounded down).'),
+                                                                             ('Druid',10,  'Druid Circle Feature',    'Your chosen Druid Circle grants you a feature at 10th level.'),
+                                                                             ('Druid',12,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Druid',14,  'Druid Circle Feature',    'Your chosen Druid Circle grants you a feature at 14th level.'),
+                                                                             ('Druid',16,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Druid',18,  'Timeless Body',           'The primal magic that you wield causes you to age more slowly. For every 10 years that pass, your body ages only 1 year.'),
+                                                                             ('Druid',18,  'Beast Spells',            'You can cast many of your druid spells in any shape you assume using Wild Shape. You can perform the somatic and verbal components of a druid spell while in a beast shape.'),
+                                                                             ('Druid',19,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Druid',20,  'Archdruid',               'You can use your Wild Shape an unlimited number of times. Additionally, you can ignore the verbal and somatic components of your druid spells, as well as any material components that lack a cost and aren''t consumed by a spell.');
+
+-- ── FIGHTER Level 3–20 ──────────────────────────────────────────────────────
+INSERT INTO class_feature (class_name, level, feature_name, description) VALUES
+                                                                             ('Fighter', 3,  'Martial Archetype',     'Choose an archetype that you strive to emulate: Champion, Battle Master, or Eldritch Knight. Your choice grants features at 3rd, 7th, 10th, 15th, and 18th level.'),
+                                                                             ('Fighter', 4,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Fighter', 5,  'Extra Attack',          'You can attack twice whenever you take the Attack action.'),
+                                                                             ('Fighter', 6,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Fighter', 8,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Fighter', 9,  'Indomitable',           'You can reroll a saving throw that you fail. If you do so, you must use the new roll. You must finish a long rest before you can use this feature again.'),
+                                                                             ('Fighter',11,  'Extra Attack (2)',       'You can attack three times whenever you take the Attack action.'),
+                                                                             ('Fighter',12,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Fighter',13,  'Indomitable (2 uses)',  'You can use Indomitable twice between long rests.'),
+                                                                             ('Fighter',14,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Fighter',16,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Fighter',17,  'Action Surge (2 uses)', 'You can use Action Surge twice between rests. Indomitable can now be used three times between long rests.'),
+                                                                             ('Fighter',19,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Fighter',20,  'Extra Attack (3)',       'You can attack four times whenever you take the Attack action.');
+
+-- ── MONK Level 3–20 ─────────────────────────────────────────────────────────
+INSERT INTO class_feature (class_name, level, feature_name, description) VALUES
+                                                                             ('Monk', 3,  'Monastic Tradition',    'Commit yourself to a monastic tradition: Way of the Open Hand, Way of Shadow, or Way of the Four Elements.'),
+                                                                             ('Monk', 3,  'Deflect Missiles',      'You can use your reaction to deflect or catch the missile when you are hit by a ranged weapon attack. The damage is reduced by 1d10 + Dexterity modifier + monk level.'),
+                                                                             ('Monk', 4,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Monk', 4,  'Slow Fall',             'You can use your reaction when you fall to reduce any falling damage you take by an amount equal to five times your monk level.'),
+                                                                             ('Monk', 5,  'Extra Attack',          'You can attack twice whenever you take the Attack action.'),
+                                                                             ('Monk', 5,  'Stunning Strike',       'When you hit another creature with a melee weapon attack, you can spend 1 ki point to attempt a stunning strike. The target must make a Constitution saving throw. On failure, it is stunned until the end of your next turn.'),
+                                                                             ('Monk', 6,  'Ki-Empowered Strikes',  'Your unarmed strikes count as magical for the purpose of overcoming resistance and immunity to nonmagical attacks and damage.'),
+                                                                             ('Monk', 7,  'Evasion',               'When subjected to an effect that allows a Dexterity saving throw for half damage, you take no damage on success and only half on failure.'),
+                                                                             ('Monk', 7,  'Stillness of Mind',     'You can use your action to end one effect on yourself that is causing you to be charmed or frightened.'),
+                                                                             ('Monk', 8,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Monk',10,  'Purity of Body',        'Your mastery of the ki flowing through you makes you immune to disease and poison.'),
+                                                                             ('Monk',12,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Monk',13,  'Tongue of the Sun and Moon','You learn to touch the ki of other minds so that you understand all spoken languages and all creatures understand what you say.'),
+                                                                             ('Monk',14,  'Diamond Soul',          'Your mastery of ki grants you proficiency in all saving throws. Additionally, whenever you make a saving throw and fail, you can spend 1 ki point to reroll it and take the second result.'),
+                                                                             ('Monk',15,  'Timeless Body',         'Your ki sustains you so that you suffer none of the frailty of old age, and you can''t be aged magically.'),
+                                                                             ('Monk',16,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Monk',18,  'Empty Body',            'You can use your action to spend 4 ki points to become invisible for 1 minute. During that time, you also have resistance to all damage but force damage.'),
+                                                                             ('Monk',19,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Monk',20,  'Perfect Self',          'When you roll for initiative and have no ki points remaining, you regain 4 ki points.');
+
+-- ── PALADIN Level 3–20 ──────────────────────────────────────────────────────
+INSERT INTO class_feature (class_name, level, feature_name, description) VALUES
+                                                                             ('Paladin', 3,  'Sacred Oath',           'Swear the oath that binds you as a paladin: Oath of Devotion, Oath of the Ancients, or Oath of Vengeance. Your oath grants features at 3rd, 7th, 15th, and 20th level.'),
+                                                                             ('Paladin', 3,  'Divine Health',         'By 3rd level, the divine magic flowing through you makes you immune to disease.'),
+                                                                             ('Paladin', 4,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Paladin', 5,  'Extra Attack',          'You can attack twice whenever you take the Attack action.'),
+                                                                             ('Paladin', 6,  'Aura of Protection',    'Whenever you or a friendly creature within 10 feet of you must make a saving throw, the creature gains a bonus to the saving throw equal to your Charisma modifier (with a minimum bonus of +1). At 18th level, range increases to 30 feet.'),
+                                                                             ('Paladin', 8,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Paladin',10,  'Aura of Courage',       'You and friendly creatures within 10 feet of you can''t be frightened while you are conscious. At 18th level, range increases to 30 feet.'),
+                                                                             ('Paladin',11,  'Improved Divine Smite', 'By 11th level, you are so suffused with righteous might that all your melee weapon strikes carry divine power with them. Whenever you hit a creature with a melee weapon, the creature takes an extra 1d8 radiant damage.'),
+                                                                             ('Paladin',12,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Paladin',14,  'Cleansing Touch',       'You can use your action to end one spell on yourself or on one willing creature that you touch. You can use this feature a number of times equal to your Charisma modifier (minimum once).'),
+                                                                             ('Paladin',16,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Paladin',18,  'Aura Improvements',     'The range of your Aura of Protection and Aura of Courage increases to 30 feet.'),
+                                                                             ('Paladin',19,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.');
+
+-- ── RANGER Level 3–20 ───────────────────────────────────────────────────────
+INSERT INTO class_feature (class_name, level, feature_name, description) VALUES
+                                                                             ('Ranger', 3,  'Ranger Archetype',     'Choose an archetype to emulate: Hunter or Beast Master. Your choice grants features at 3rd, 7th, 11th, and 15th level.'),
+                                                                             ('Ranger', 3,  'Primeval Awareness',   'You can use your action and expend one ranger spell slot to focus your awareness on the region around you. For 1 minute per level of the spell slot you expend, you can sense whether certain types of creatures are present.'),
+                                                                             ('Ranger', 4,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Ranger', 5,  'Extra Attack',         'You can attack twice whenever you take the Attack action.'),
+                                                                             ('Ranger', 6,  'Favored Enemy Improvement','You gain one more favored enemy and one more natural environment as a favored terrain.'),
+                                                                             ('Ranger', 8,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Ranger', 8,  'Land''s Stride',       'Moving through nonmagical difficult terrain costs no extra movement. You can also pass through nonmagical plants without being slowed or taking damage from them.'),
+                                                                             ('Ranger',10,  'Hide in Plain Sight',  'You can spend 1 minute creating camouflage for yourself. Once you are camouflaged in this way, you can try to hide by pressing yourself up against a solid surface that is at least as tall and wide as you are, gaining a +10 bonus to Dexterity (Stealth) checks.'),
+                                                                             ('Ranger',12,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Ranger',14,  'Vanish',               'You can use the Hide action as a bonus action. Also, you can''t be tracked by nonmagical means, unless you choose to leave a trail.'),
+                                                                             ('Ranger',16,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Ranger',18,  'Feral Senses',         'You gain preternatural senses that help you fight creatures you can''t see. When you attack a creature you can''t see, your inability to see it doesn''t impose disadvantage on your attack rolls against it.'),
+                                                                             ('Ranger',19,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Ranger',20,  'Foe Slayer',           'You become an unparalleled hunter of your enemies. Once on each of your turns, you can add your Wisdom modifier to the attack roll or the damage roll of an attack you make against your favored enemy.');
+
+-- ── ROGUE Level 3–20 ────────────────────────────────────────────────────────
+INSERT INTO class_feature (class_name, level, feature_name, description) VALUES
+                                                                             ('Rogue', 3,  'Roguish Archetype',    'You choose an archetype that you emulate in the exercise of your rogue abilities: Thief, Assassin, or Arcane Trickster.'),
+                                                                             ('Rogue', 4,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Rogue', 5,  'Uncanny Dodge',        'When an attacker that you can see hits you with an attack, you can use your reaction to halve the attack''s damage against you.'),
+                                                                             ('Rogue', 6,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Rogue', 6,  'Expertise',            'Choose two more of your skill proficiencies, or one more proficiency and your thieves'' tools proficiency. Your proficiency bonus is doubled for those checks.'),
+                                                                             ('Rogue', 7,  'Evasion',              'When subjected to an effect that allows a Dexterity saving throw for half damage, you take no damage on success and only half on failure.'),
+                                                                             ('Rogue', 8,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Rogue',10,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Rogue',11,  'Reliable Talent',      'Whenever you make an ability check that lets you add your proficiency bonus, you can treat a d20 roll of 9 or lower as a 10.'),
+                                                                             ('Rogue',12,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Rogue',14,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Rogue',14,  'Blindsense',           'If you are able to hear, you are aware of the location of any hidden or invisible creature within 10 feet of you.'),
+                                                                             ('Rogue',15,  'Slippery Mind',        'You have acquired greater mental strength. You gain proficiency in Wisdom saving throws.'),
+                                                                             ('Rogue',16,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Rogue',18,  'Elusive',              'No attack roll has advantage against you while you aren''t incapacitated.'),
+                                                                             ('Rogue',19,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Rogue',20,  'Stroke of Luck',       'You have an uncanny knack for succeeding when you need to. If your attack misses a target within range, you can turn the miss into a hit. Alternatively, if you fail an ability check, you can treat the d20 roll as a 20.');
+
+-- ── SORCERER Level 3–20 ─────────────────────────────────────────────────────
+INSERT INTO class_feature (class_name, level, feature_name, description) VALUES
+                                                                             ('Sorcerer', 3,  'Metamagic',             'At 3rd level, you gain the ability to twist your spells to suit your needs. You gain two Metamagic options of your choice: Careful Spell, Distant Spell, Empowered Spell, Extended Spell, Heightened Spell, Quickened Spell, Subtle Spell, or Twinned Spell.'),
+                                                                             ('Sorcerer', 4,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Sorcerer', 8,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Sorcerer',10,  'Metamagic',             'You learn one additional Metamagic option of your choice.'),
+                                                                             ('Sorcerer',12,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Sorcerer',16,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Sorcerer',17,  'Metamagic',             'You learn one additional Metamagic option of your choice.'),
+                                                                             ('Sorcerer',19,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Sorcerer',20,  'Sorcerous Restoration', 'You regain 4 expended sorcery points whenever you finish a short rest.');
+
+-- ── WARLOCK Level 3–20 ──────────────────────────────────────────────────────
+INSERT INTO class_feature (class_name, level, feature_name, description) VALUES
+                                                                             ('Warlock', 3,  'Pact Boon',            'Your otherworldly patron bestows a gift upon you for your loyal service: Pact of the Chain, Pact of the Blade, or Pact of the Tome.'),
+                                                                             ('Warlock', 4,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Warlock', 8,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Warlock',11,  'Mystic Arcanum (6th)',  'Your patron bestows upon you a magical secret called an arcanum. Choose one 6th-level spell from the warlock spell list as your arcanum. You can cast this spell once without expending a spell slot. Once per long rest.'),
+                                                                             ('Warlock',12,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Warlock',13,  'Mystic Arcanum (7th)',  'Choose one 7th-level spell from the warlock spell list as an additional arcanum.'),
+                                                                             ('Warlock',15,  'Mystic Arcanum (8th)',  'Choose one 8th-level spell from the warlock spell list as an additional arcanum.'),
+                                                                             ('Warlock',16,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Warlock',17,  'Mystic Arcanum (9th)',  'Choose one 9th-level spell from the warlock spell list as an additional arcanum.'),
+                                                                             ('Warlock',19,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Warlock',20,  'Eldritch Master',       'When you use your Eldritch Master feature, you can ask your patron to restore all your expended spell slots. You must spend 1 minute entreating your patron. Once you regain spell slots with this feature, you must finish a long rest before you can do so again.');
+
+-- ── WIZARD Level 3–20 ───────────────────────────────────────────────────────
+INSERT INTO class_feature (class_name, level, feature_name, description) VALUES
+                                                                             ('Wizard', 3,  'Arcane Tradition Feature','Your chosen Arcane Tradition grants a feature at 3rd level (e.g. Savant: halved cost to copy spells of your school; plus one additional school-specific feature).'),
+                                                                             ('Wizard', 4,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each. You also gain one additional wizard cantrip.'),
+                                                                             ('Wizard', 8,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Wizard',10,  'Arcane Tradition Feature','Your chosen Arcane Tradition grants a feature at 10th level. You also gain one additional wizard cantrip.'),
+                                                                             ('Wizard',12,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Wizard',14,  'Arcane Tradition Feature','Your chosen Arcane Tradition grants a feature at 14th level.'),
+                                                                             ('Wizard',16,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Wizard',18,  'Spell Mastery',           'You have achieved such mastery over certain spells that you can cast them at will. Choose a 1st-level and a 2nd-level spell from your spellbook. You can cast those spells at their lowest level without expending a spell slot when you have them prepared.'),
+                                                                             ('Wizard',19,  'Ability Score Improvement','You can increase one ability score by 2, or two ability scores by 1 each.'),
+                                                                             ('Wizard',20,  'Signature Spells',        'You gain mastery over two powerful spells and can cast them with little effort. Choose two 3rd-level wizard spells as your signature spells. You always have these spells prepared, and you can cast each once at 3rd level without expending a spell slot per short rest.');
+
+-- =============================================================================
+-- END OF LEVEL UP EXTENSION
+-- =============================================================================
+-- Zusammenfassung der neuen Objekte:
+--   Tables (DDL):  character_level_up, character_asi,
+--                  class_asi_levels, class_spells_known, subclass_feature
+--   Rows (DML):
+--     class_asi_levels      : 62 Zeilen (alle 12 Klassen)
+--     class_spells_known    : 140 Zeilen (alle Klassen inkl. Non-Caster)
+--     class_feature         : 114 neue Zeilen (Level 3–20, alle 12 Klassen)
+--     subclass_feature      : ~130 Zeilen (alle 18 Subklassen im Schema)
+-- =============================================================================
