@@ -5,6 +5,9 @@ import com.dnd.creator.model.CharacterModel;
 import com.dnd.creator.view.CharacterCardView;
 import com.dnd.creator.view.CharacterSheetPopupView;
 import com.dnd.creator.view.CharactersOverviewView;
+import com.dnd.creator.model.CharacterSession;
+import com.dnd.creator.view.CreateCharacterView;
+import javafx.scene.Scene;
 
 import java.util.List;
 
@@ -31,6 +34,14 @@ public class CharactersOverviewPresenter {
                 CharacterCardView cardView = new CharacterCardView(character);
                 cardView.setOnCardClicked(c -> {
                     CharacterSheetPopupView popup = new CharacterSheetPopupView(c);
+
+                    popup.setOnEditCallback(charToEdit -> {
+                        CharacterSession.getInstance().setCurrentCharacter(charToEdit);
+                        CreateCharacterView createView = new CreateCharacterView();
+                        Scene currentScene = view.getCardsPane().getScene();
+                        currentScene.setRoot(createView.getRoot());
+                    });
+
                     popup.showAsPopup(view.getCardsPane().getScene().getWindow());
                 });
                 view.getCardsPane().getChildren().add(cardView.getRoot());
