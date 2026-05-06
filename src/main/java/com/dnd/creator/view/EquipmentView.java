@@ -149,6 +149,8 @@ public class EquipmentView {
         cardsRow.setAlignment(Pos.TOP_LEFT);
 
         List<VBox> cards = new ArrayList<>();
+        String preselectedEntry = null;
+
         for (int i = 0; i < bundles.size(); i++) {
             String letter = String.valueOf((char) ('A' + i));
             String bundleText = bundles.get(i);
@@ -160,10 +162,14 @@ public class EquipmentView {
             cardsRow.getChildren().add(card);
 
             if (previouslySelected != null && previouslySelected.contains(entry)) {
-                applyBundleSelection(orderNum, entry, cards);
+                preselectedEntry = entry;
             }
         }
         bundleCardsByOrder.put(orderNum, cards);
+
+        if (preselectedEntry != null) {
+            applyBundleSelection(orderNum, preselectedEntry, cards);
+        }
 
         block.getChildren().addAll(title, cardsRow);
         return block;
