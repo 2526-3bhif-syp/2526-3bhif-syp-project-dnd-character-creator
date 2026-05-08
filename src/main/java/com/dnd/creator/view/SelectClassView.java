@@ -229,6 +229,10 @@ public class SelectClassView {
     }
 
     private void selectClass(ClassDef def) {
+        var character = CharacterSession.getInstance().getCurrentCharacter();
+        boolean classChanged = character.getCharacterClass() != null
+                && !character.getCharacterClass().equals(def.name);
+
         selectedClass = def.name;
         for (Map.Entry<String, VBox> entry : classCards.entrySet()) {
             VBox c = entry.getValue();
@@ -239,7 +243,6 @@ public class SelectClassView {
         }
 
         Map<String, Object> classData = dbManager.getClassByName(def.name);
-        var character = CharacterSession.getInstance().getCurrentCharacter();
         character.setCharacterClass(def.name);
         if (classData != null) {
             character.setClassIndex((String) classData.get("index"));
@@ -250,8 +253,11 @@ public class SelectClassView {
             List<String> profs = (List<String>) classData.get("proficiencies");
             if (profs != null) character.setClassProficiencies(profs);
         }
-        // Reset equipment selection — different class, different gear
-        character.setSelectedEquipment(new ArrayList<>());
+        if (classChanged) {
+            character.setSelectedEquipment(new ArrayList<>());
+            character.setSelectedCantrips(new ArrayList<>());
+            character.setSelectedSpells(new ArrayList<>());
+        }
 
         preview.refresh();
         updateNextButton();

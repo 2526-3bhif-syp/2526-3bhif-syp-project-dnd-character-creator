@@ -161,7 +161,8 @@ public class EquipmentView {
             HBox.setHgrow(card, Priority.ALWAYS);
             cardsRow.getChildren().add(card);
 
-            if (previouslySelected != null && previouslySelected.contains(entry)) {
+            if (previouslySelected != null
+                    && (previouslySelected.contains(entry) || previouslySelected.contains(bundleText))) {
                 preselectedEntry = entry;
             }
         }

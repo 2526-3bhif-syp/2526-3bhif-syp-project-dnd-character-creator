@@ -635,7 +635,7 @@ public class DbManager {
                     saveCharacterStats(id, character);
                     saveCharacterSkills(id, character.getSelectedSkills());
                     saveCharacterEquipment(id, character.getSelectedEquipment());
-                    saveCharacterSpells(id, character.getSelectedSpells());
+                    saveCharacterSpells(id, getAllSelectedSpells(character));
                     return true;
                 }
             }
@@ -672,7 +672,7 @@ public class DbManager {
             saveCharacterStats(id, character);
             saveCharacterSkills(id, character.getSelectedSkills());
             saveCharacterEquipment(id, character.getSelectedEquipment());
-            saveCharacterSpells(id, character.getSelectedSpells());
+            saveCharacterSpells(id, getAllSelectedSpells(character));
             return true;
         } catch (SQLException e) {
             System.err.println("Error updating character: " + e.getMessage());
@@ -748,6 +748,13 @@ public class DbManager {
         }
     }
 
+    private List<String> getAllSelectedSpells(com.dnd.creator.model.CharacterModel character) {
+        List<String> result = new ArrayList<>();
+        if (character.getSelectedCantrips() != null) result.addAll(character.getSelectedCantrips());
+        if (character.getSelectedSpells() != null) result.addAll(character.getSelectedSpells());
+        return result;
+    }
+
     public List<com.dnd.creator.model.CharacterModel> getAllSavedCharacters() {
         List<com.dnd.creator.model.CharacterModel> characters = new ArrayList<>();
         String query = "SELECT c.id, c.character_name, c.race_name, c.class_name, c.background_name, " +
@@ -792,7 +799,8 @@ public class DbManager {
                 character.setSelectedBackground(rs.getString("background_name"));
                 character.setSelectedSkills(getCharacterSkills(id));
                 character.setSelectedEquipment(getCharacterEquipment(id));
-                character.setSelectedSpells(getCharacterSpells(id));
+                character.setSelectedSpells(getCharacterSpells(id, false));
+                character.setSelectedCantrips(getCharacterSpells(id, true));
                 character.setWeaponAttacks(getCharacterWeaponAttacks(id, character));
                 characters.add(character);
             }
@@ -828,9 +836,9 @@ public class DbManager {
         return result;
     }
 
-    private List<String> getCharacterSpells(long characterId) {
+    private List<String> getCharacterSpells(long characterId, boolean cantrips) {
         List<String> result = new ArrayList<>();
-        String query = "SELECT s.name FROM character_spell cs JOIN spell s ON cs.spell_id = s.id WHERE cs.character_id = ?";
+        String query = "SELECT s.name FROM character_spell cs JOIN spell s ON cs.spell_id = s.id WHERE cs.character_id = ? AND s.spell_level " + (cantrips ? "= 0" : "> 0");
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setLong(1, characterId);
             ResultSet rs = stmt.executeQuery();
