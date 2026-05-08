@@ -749,10 +749,10 @@ public class DbManager {
     }
 
     private List<String> getAllSelectedSpells(com.dnd.creator.model.CharacterModel character) {
-        List<String> result = new ArrayList<>();
+        Set<String> result = new LinkedHashSet<>();
         if (character.getSelectedCantrips() != null) result.addAll(character.getSelectedCantrips());
         if (character.getSelectedSpells() != null) result.addAll(character.getSelectedSpells());
-        return result;
+        return new ArrayList<>(result);
     }
 
     public List<com.dnd.creator.model.CharacterModel> getAllSavedCharacters() {

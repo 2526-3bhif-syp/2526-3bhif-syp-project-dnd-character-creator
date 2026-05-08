@@ -146,6 +146,7 @@ public class SpellSelectionView {
                 card.getStyleClass().add("spell-card-selected");
             }
             updateCounter(counter, selected.size(), max);
+            saveToSession();
         });
 
         return card;
@@ -165,25 +166,34 @@ public class SpellSelectionView {
     private void restoreSaved() {
         CharacterModel ch = CharacterSession.getInstance().getCurrentCharacter();
 
-        if (ch.getSelectedCantrips() != null) {
-            selectedCantrips.addAll(ch.getSelectedCantrips());
-            cantripCards.forEach(card -> {
-                Label lbl = (Label) card.getChildren().get(0);
-                if (selectedCantrips.contains(lbl.getText()))
-                    card.getStyleClass().add("spell-card-selected");
-            });
-            updateCounter(lblCantripCounter, selectedCantrips.size(), maxCantrips);
-        }
+        Set<String> savedCantrips = new LinkedHashSet<>();
+        if (ch.getSelectedCantrips() != null) savedCantrips.addAll(ch.getSelectedCantrips());
+        if (ch.getSelectedSpells() != null) savedCantrips.addAll(ch.getSelectedSpells());
+        restoreCards(cantripCards, selectedCantrips, savedCantrips);
+        updateCounter(lblCantripCounter, selectedCantrips.size(), maxCantrips);
 
-        if (ch.getSelectedSpells() != null) {
-            selectedSpells.addAll(ch.getSelectedSpells());
-            spellCards.forEach(card -> {
-                Label lbl = (Label) card.getChildren().get(0);
-                if (selectedSpells.contains(lbl.getText()))
-                    card.getStyleClass().add("spell-card-selected");
-            });
-            updateCounter(lblSpellCounter, selectedSpells.size(), maxSpells);
+        Set<String> savedSpells = new LinkedHashSet<>();
+        if (ch.getSelectedSpells() != null) savedSpells.addAll(ch.getSelectedSpells());
+        restoreCards(spellCards, selectedSpells, savedSpells);
+        updateCounter(lblSpellCounter, selectedSpells.size(), maxSpells);
+        saveToSession();
+    }
+
+    private void restoreCards(List<VBox> cards, Set<String> selected, Set<String> savedNames) {
+        for (VBox card : cards) {
+            Label lbl = (Label) card.getChildren().get(0);
+            String name = lbl.getText();
+            if (savedNames.contains(name)) {
+                selected.add(name);
+                card.getStyleClass().add("spell-card-selected");
+            }
         }
+    }
+
+    private void saveToSession() {
+        CharacterModel ch = CharacterSession.getInstance().getCurrentCharacter();
+        ch.setSelectedCantrips(new ArrayList<>(selectedCantrips));
+        ch.setSelectedSpells(new ArrayList<>(selectedSpells));
     }
 
     private void setupButtons() {
@@ -203,9 +213,7 @@ public class SpellSelectionView {
                 return;
             }
 
-            CharacterModel ch = CharacterSession.getInstance().getCurrentCharacter();
-            ch.setSelectedCantrips(new ArrayList<>(selectedCantrips));
-            ch.setSelectedSpells(new ArrayList<>(selectedSpells));
+            saveToSession();
 
             Stage stage = (Stage) root.getScene().getWindow();
             stage.setScene(new Scene(new CharacterSummaryView().getRoot(),
