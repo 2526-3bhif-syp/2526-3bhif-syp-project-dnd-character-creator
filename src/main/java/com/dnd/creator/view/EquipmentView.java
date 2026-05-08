@@ -161,8 +161,7 @@ public class EquipmentView {
             HBox.setHgrow(card, Priority.ALWAYS);
             cardsRow.getChildren().add(card);
 
-            if (previouslySelected != null
-                    && (previouslySelected.contains(entry) || previouslySelected.contains(bundleText))) {
+            if (matchesSavedEquipment(previouslySelected, entry, bundleText)) {
                 preselectedEntry = entry;
             }
         }
@@ -174,6 +173,28 @@ public class EquipmentView {
 
         block.getChildren().addAll(title, cardsRow);
         return block;
+    }
+
+    private boolean matchesSavedEquipment(List<String> saved, String entry, String bundleText) {
+        if (saved == null) return false;
+        String normalizedEntry = normalizeEquipment(entry);
+        String normalizedBundle = normalizeEquipment(bundleText);
+        for (String item : saved) {
+            String normalizedItem = normalizeEquipment(item);
+            if (normalizedItem.equals(normalizedEntry) || normalizedItem.equals(normalizedBundle)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private String normalizeEquipment(String item) {
+        if (item == null) return "";
+        return item.trim()
+                .replaceFirst("^[A-C]\\)\\s*", "")
+                .replaceFirst("^\\([a-c]\\)\\s*", "")
+                .replaceAll("\\s+", " ")
+                .toLowerCase();
     }
 
     private VBox buildBundleCard(String letter, String bundleText, int orderNum, String entry) {

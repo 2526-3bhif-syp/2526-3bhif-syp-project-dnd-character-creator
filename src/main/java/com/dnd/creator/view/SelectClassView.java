@@ -212,7 +212,7 @@ public class SelectClassView {
         }
 
         card.getChildren().addAll(topRow, name, roleTag, tagline);
-        card.setOnMouseClicked(e -> selectClass(def));
+        card.setOnMouseClicked(e -> selectClass(def, true));
         return card;
     }
 
@@ -228,10 +228,9 @@ public class SelectClassView {
         };
     }
 
-    private void selectClass(ClassDef def) {
+    private void selectClass(ClassDef def, boolean resetOnChange) {
         var character = CharacterSession.getInstance().getCurrentCharacter();
-        boolean classChanged = character.getCharacterClass() != null
-                && !character.getCharacterClass().equals(def.name);
+        boolean classChanged = selectedClass != null && !selectedClass.equals(def.name);
 
         selectedClass = def.name;
         for (Map.Entry<String, VBox> entry : classCards.entrySet()) {
@@ -253,7 +252,7 @@ public class SelectClassView {
             List<String> profs = (List<String>) classData.get("proficiencies");
             if (profs != null) character.setClassProficiencies(profs);
         }
-        if (classChanged) {
+        if (resetOnChange && classChanged) {
             character.setSelectedEquipment(new ArrayList<>());
             character.setSelectedCantrips(new ArrayList<>());
             character.setSelectedSpells(new ArrayList<>());
@@ -268,7 +267,7 @@ public class SelectClassView {
         if (saved != null && !saved.isBlank()) {
             for (ClassDef def : CLASSES) {
                 if (def.name.equals(saved)) {
-                    selectClass(def);
+                    selectClass(def, false);
                     break;
                 }
             }
