@@ -634,7 +634,7 @@ public class DbManager {
                     long id = keys.getLong(1);
                     saveCharacterStats(id, character);
                     saveCharacterSkills(id, character.getSelectedSkills());
-                    saveCharacterEquipment(id, character.getSelectedEquipment());
+                    saveCharacterEquipment(id, getAllSelectedEquipment(character));
                     saveCharacterSpells(id, getAllSelectedSpells(character));
                     return true;
                 }
@@ -671,7 +671,7 @@ public class DbManager {
 
             saveCharacterStats(id, character);
             saveCharacterSkills(id, character.getSelectedSkills());
-            saveCharacterEquipment(id, character.getSelectedEquipment());
+            saveCharacterEquipment(id, getAllSelectedEquipment(character));
             saveCharacterSpells(id, getAllSelectedSpells(character));
             return true;
         } catch (SQLException e) {
@@ -714,7 +714,8 @@ public class DbManager {
 
     private void saveCharacterEquipment(long characterId, List<String> equipment) {
         if (equipment == null) return;
-        String query = "INSERT INTO character_equipment (character_id, item_name) VALUES (?, ?)";
+        String query = "INSERT INTO character_equipment (id, character_id, item_name) " +
+                "VALUES ((SELECT COALESCE(MAX(id), 0) + 1 FROM character_equipment), ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             for (String item : equipment) {
                 stmt.setLong(1, characterId);
@@ -725,6 +726,26 @@ public class DbManager {
         } catch (SQLException e) {
             System.err.println("Error saving character equipment: " + e.getMessage());
         }
+    }
+
+    private List<String> getAllSelectedEquipment(com.dnd.creator.model.CharacterModel character) {
+        Set<String> result = new LinkedHashSet<>();
+        if (character.getClassIndex() != null) result.addAll(getStartingEquipment(character.getClassIndex()));
+        if (character.getSelectedEquipment() != null) {
+            for (String item : character.getSelectedEquipment()) {
+                String normalized = normalizeSavedEquipment(item);
+                if (!normalized.isBlank()) result.add(normalized);
+            }
+        }
+        return new ArrayList<>(result);
+    }
+
+    private String normalizeSavedEquipment(String item) {
+        if (item == null) return "";
+        return item.trim()
+                .replaceFirst("^[A-C]\\)\\s*", "")
+                .replaceFirst("^\\([a-c]\\)\\s*", "")
+                .replaceAll("\\s+", " ");
     }
 
     private void saveCharacterSpells(long characterId, List<String> spells) {
