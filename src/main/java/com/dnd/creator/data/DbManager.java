@@ -36,8 +36,26 @@ public class DbManager {
             if (!isDatabaseInitialized()) {
                 initializeDatabase();
             }
+            ensureSchema();
         } catch (SQLException e) {
             System.out.println("Connection with Database failed!");
+        }
+    }
+
+    private void ensureSchema() {
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute("CREATE TABLE IF NOT EXISTS character_class_level (" +
+                "character_id INTEGER NOT NULL, " +
+                "class_name VARCHAR(63) NOT NULL, " +
+                "level INTEGER NOT NULL DEFAULT 1, " +
+                "PRIMARY KEY (character_id, class_name))");
+        } catch (SQLException e) {
+            System.err.println("Error creating character_class_level: " + e.getMessage());
+        }
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute("ALTER TABLE character_stats ADD COLUMN max_hp INTEGER DEFAULT 0");
+        } catch (SQLException ignored) {
+            // Column already exists on subsequent runs — expected
         }
     }
 
@@ -254,6 +272,18 @@ public class DbManager {
             System.err.println("Error loading class: " + e.getMessage());
         }
         return null;
+    }
+
+    public int getClassHitDie(String className) {
+        String query = "SELECT hit_die FROM class WHERE name = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, className);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) return rs.getInt("hit_die");
+        } catch (SQLException e) {
+            System.err.println("Error loading hit die: " + e.getMessage());
+        }
+        return 8;
     }
 
     public Map<String, Object> getClassByIndex(String className) {
@@ -609,6 +639,16 @@ public class DbManager {
                     saveCharacterSkills(id, character.getSelectedSkills());
                     saveCharacterEquipment(id, character.getSelectedEquipment());
                     saveCharacterSpells(id, character.getSelectedSpells());
+                    saveCharacterClassLevel(id, character.getCharacterClass(), 1);
+                    if (character.getMaxHp() == 0) {
+                        com.dnd.creator.model.Race race = character.getRace();
+                        int conBonus = race != null ? race.getAbilityBonuses().getOrDefault("CON", 0) : 0;
+                        int conMod = (character.getConstitution() + conBonus - 10) / 2;
+                        int hp = Math.max(1, character.getClassHitDie() + conMod);
+                        character.setMaxHp(hp);
+                    }
+                    saveCharacterMaxHp(id, character.getMaxHp());
+                    character.setDbId(id);
                     return true;
                 }
             }
@@ -690,7 +730,7 @@ public class DbManager {
         List<com.dnd.creator.model.CharacterModel> characters = new ArrayList<>();
         String query = "SELECT c.id, c.character_name, c.race_name, c.class_name, c.background_name, " +
                 "c.character_picture, a.name_x, a.name_y, " +
-                "cs.strength, cs.dexterity, cs.constitution, cs.intelligence, cs.wisdom, cs.charisma " +
+                "cs.strength, cs.dexterity, cs.constitution, cs.intelligence, cs.wisdom, cs.charisma, cs.max_hp " +
                 "FROM \"character\" c " +
                 "LEFT JOIN character_stats cs ON c.id = cs.character_id " +
                 "LEFT JOIN alignment a ON c.alignment_id = a.id " +
@@ -732,6 +772,12 @@ public class DbManager {
                 character.setSelectedEquipment(getCharacterEquipment(id));
                 character.setSelectedSpells(getCharacterSpells(id));
                 character.setWeaponAttacks(getCharacterWeaponAttacks(id, character));
+                character.setMaxHp(rs.getInt("max_hp"));
+                Map<String, Integer> classLevels = getCharacterClassLevels(id);
+                if (classLevels.isEmpty() && className != null) {
+                    classLevels.put(className, 1);
+                }
+                character.setClassLevels(classLevels);
                 characters.add(character);
             }
         } catch (SQLException e) {
@@ -779,6 +825,89 @@ public class DbManager {
         return result;
     }
 
+
+    private void saveCharacterClassLevel(long characterId, String className, int level) {
+        String query = "INSERT OR REPLACE INTO character_class_level (character_id, class_name, level) VALUES (?, ?, ?)";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setLong(1, characterId);
+            stmt.setString(2, className);
+            stmt.setInt(3, level);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Error saving class level: " + e.getMessage());
+        }
+    }
+
+    private void saveCharacterMaxHp(long characterId, int maxHp) {
+        String query = "UPDATE character_stats SET max_hp = ? WHERE character_id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, maxHp);
+            stmt.setLong(2, characterId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Error saving max HP: " + e.getMessage());
+        }
+    }
+
+    private Map<String, Integer> getCharacterClassLevels(long characterId) {
+        Map<String, Integer> result = new LinkedHashMap<>();
+        String query = "SELECT class_name, level FROM character_class_level WHERE character_id = ? ORDER BY rowid";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setLong(1, characterId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                result.put(rs.getString("class_name"), rs.getInt("level"));
+            }
+        } catch (SQLException e) {
+            System.err.println("Error loading class levels: " + e.getMessage());
+        }
+        return result;
+    }
+
+    public boolean levelUpCharacter(long characterId, String className, int newClassLevel, int newMaxHp) {
+        try {
+            connection.setAutoCommit(false);
+
+            String upsert = "INSERT INTO character_class_level (character_id, class_name, level) VALUES (?, ?, ?) " +
+                "ON CONFLICT(character_id, class_name) DO UPDATE SET level = excluded.level";
+            try (PreparedStatement stmt = connection.prepareStatement(upsert)) {
+                stmt.setLong(1, characterId);
+                stmt.setString(2, className);
+                stmt.setInt(3, newClassLevel);
+                stmt.executeUpdate();
+            }
+
+            int totalLevel;
+            try (PreparedStatement stmt = connection.prepareStatement(
+                    "SELECT SUM(level) FROM character_class_level WHERE character_id = ?")) {
+                stmt.setLong(1, characterId);
+                ResultSet rs = stmt.executeQuery();
+                totalLevel = rs.next() ? rs.getInt(1) : 1;
+            }
+
+            try (PreparedStatement stmt = connection.prepareStatement(
+                    "UPDATE \"character\" SET level = ? WHERE id = ?")) {
+                stmt.setInt(1, totalLevel);
+                stmt.setLong(2, characterId);
+                stmt.executeUpdate();
+            }
+
+            try (PreparedStatement stmt = connection.prepareStatement(
+                    "UPDATE character_stats SET max_hp = ? WHERE character_id = ?")) {
+                stmt.setInt(1, newMaxHp);
+                stmt.setLong(2, characterId);
+                stmt.executeUpdate();
+            }
+
+            connection.commit();
+            connection.setAutoCommit(true);
+            return true;
+        } catch (SQLException e) {
+            System.err.println("Error leveling up character: " + e.getMessage());
+            try { connection.rollback(); connection.setAutoCommit(true); } catch (SQLException ignored) {}
+            return false;
+        }
+    }
 
     private List<String[]> getCharacterWeaponAttacks(long characterId, com.dnd.creator.model.CharacterModel character) {
         List<String[]> result = new ArrayList<>();

@@ -79,13 +79,16 @@
             </padding>
             <Button fx:id="btnDelete" text="Delete"
                     style="-fx-background-color: transparent; -fx-border-color: #8B0000; -fx-border-width: 2; -fx-border-radius: 8; -fx-background-radius: 8; -fx-text-fill: #8B0000; -fx-font-size: 14px; -fx-font-weight: bold;"
-                    prefWidth="130" prefHeight="44"/>
+                    prefWidth="110" prefHeight="44"/>
             <Button fx:id="btnEdit" text="Edit"
                     style="-fx-background-color: transparent; -fx-border-color: #C6A664; -fx-border-width: 2; -fx-border-radius: 8; -fx-background-radius: 8; -fx-text-fill: #1A1A1A; -fx-font-size: 14px;"
-                    prefWidth="130" prefHeight="44"/>
+                    prefWidth="110" prefHeight="44"/>
+            <Button fx:id="btnLevelUp" text="Level Up ▲"
+                    style="-fx-background-color: #4CAF50; -fx-text-fill: #F5F5DC; -fx-border-width: 0; -fx-background-radius: 8; -fx-font-size: 14px; -fx-font-weight: bold;"
+                    prefWidth="140" prefHeight="44"/>
             <Button fx:id="btnClose" text="Close"
                     style="-fx-background-color: #1A1A1A; -fx-text-fill: #F5F5DC; -fx-border-width: 0; -fx-background-radius: 8; -fx-font-size: 14px; -fx-font-weight: bold;"
-                    prefWidth="130" prefHeight="44"/>
+                    prefWidth="110" prefHeight="44"/>
         </HBox>
     </bottom>
 </BorderPane>

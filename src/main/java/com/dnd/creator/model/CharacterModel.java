@@ -16,6 +16,8 @@ public class CharacterModel {
     private String classIndex;
     private int classHitDie;
     private String spellcastingAbility;
+    private Map<String, Integer> classLevels = new LinkedHashMap<>();
+    private int maxHp;
     private List<String> classProficiencies = new ArrayList<>();
     private List<String> selectedSpells = new ArrayList<>();
     private List<String> selectedCantrips = new ArrayList<>();
@@ -225,5 +227,30 @@ public class CharacterModel {
     /** Each entry is {name, atkBonus, damageAndType} — e.g. {"Longsword", "+4", "1d8 Slashing"} */
     public List<String[]> getWeaponAttacks() { return weaponAttacks; }
     public void setWeaponAttacks(List<String[]> weaponAttacks) { this.weaponAttacks = weaponAttacks; }
+
+    public Map<String, Integer> getClassLevels() { return classLevels; }
+    public void setClassLevels(Map<String, Integer> classLevels) { this.classLevels = classLevels; }
+
+    public int getMaxHp() { return maxHp; }
+    public void setMaxHp(int maxHp) { this.maxHp = maxHp; }
+
+    /** Sum of all class levels; falls back to 1 if no class level data present. */
+    public int getTotalLevel() {
+        if (classLevels.isEmpty()) return 1;
+        return classLevels.values().stream().mapToInt(Integer::intValue).sum();
+    }
+
+    /** Returns e.g. "Fighter 3 / Rogue 1", or "Fighter 1" for single-class characters. */
+    public String getClassLevelDisplay() {
+        if (classLevels.isEmpty()) {
+            return (characterClass != null ? characterClass : "Unknown") + " 1";
+        }
+        StringBuilder sb = new StringBuilder();
+        classLevels.forEach((cls, lvl) -> {
+            if (sb.length() > 0) sb.append(" / ");
+            sb.append(cls).append(" ").append(lvl);
+        });
+        return sb.toString();
+    }
 }
 
