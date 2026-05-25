@@ -64,6 +64,9 @@ out/
 dist/
 docs/slides/revealjs
 
+# Claude local settings
+.claude/settings.local.json
+
 #ai helper files
 /ai-files
 #databank
