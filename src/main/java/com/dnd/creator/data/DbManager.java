@@ -612,16 +612,22 @@ public class DbManager {
         String portraitPath = copyPortraitToStorage(character.getImagePath());
 
         String insertChar = "INSERT INTO \"character\" " +
-                "(character_name, race_name, class_name, background_name, alignment_id, level, character_picture) " +
-                "VALUES (?, ?, ?, ?, ?, 1, ?)";
+                "(character_name, race_name, class_name, subclass_name, background_name, alignment_id, level, character_picture) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
         try (PreparedStatement stmt = connection.prepareStatement(insertChar, Statement.RETURN_GENERATED_KEYS)) {
+
             stmt.setString(1, character.getName());
             stmt.setString(2, character.getRace().getName());
             stmt.setString(3, character.getCharacterClass());
-            stmt.setString(4, character.getSelectedBackground());
-            if (alignmentId != null) stmt.setInt(5, alignmentId);
-            else stmt.setNull(5, java.sql.Types.INTEGER);
-            stmt.setString(6, portraitPath);
+            if (character.getSubclassName() != null) stmt.setString(4, character.getSubclassName());
+            else stmt.setNull(4, java.sql.Types.VARCHAR);
+            stmt.setString(5, character.getSelectedBackground());
+            if (alignmentId != null) stmt.setInt(6, alignmentId);
+            else stmt.setNull(6, java.sql.Types.INTEGER);
+            stmt.setInt(7, character.getLevel());
+            stmt.setString(8, character.getImagePath());
+
 
             if (stmt.executeUpdate() == 0) return false;
 
@@ -711,13 +717,14 @@ public class DbManager {
 
     public List<com.dnd.creator.model.CharacterModel> getAllSavedCharacters() {
         List<com.dnd.creator.model.CharacterModel> characters = new ArrayList<>();
-        String query = "SELECT c.id, c.character_name, c.race_name, c.class_name, c.background_name, " +
-                "c.character_picture, a.name_x, a.name_y, " +
-                "cs.strength, cs.dexterity, cs.constitution, cs.intelligence, cs.wisdom, cs.charisma " +
+        String query = "SELECT c.id, c.character_name, c.race_name, c.class_name, c.subclass_name, " +
+                "c.background_name, c.character_picture, c.level, a.name_x, a.name_y, " +
+                "cs.strength, cs.dexterity, cs.constitution, cs.intelligence, cs.wisdom, cs.charisma, cs.max_hp " +
                 "FROM \"character\" c " +
                 "LEFT JOIN character_stats cs ON c.id = cs.character_id " +
                 "LEFT JOIN alignment a ON c.alignment_id = a.id " +
                 "ORDER BY c.id DESC";
+
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
             while (rs.next()) {
@@ -750,6 +757,9 @@ public class DbManager {
                 if (nameX != null && nameY != null) character.setAlignment(nameX + " " + nameY);
 
                 character.setDbId(id);
+                character.setLevel(rs.getInt("level") > 0 ? rs.getInt("level") : 1);
+                character.setSubclassName(rs.getString("subclass_name"));
+                character.setMaxHp(rs.getInt("max_hp"));
                 character.setSelectedBackground(rs.getString("background_name"));
                 character.setSelectedSkills(getCharacterSkills(id));
                 character.setSelectedEquipment(getCharacterEquipment(id));
@@ -833,4 +843,258 @@ public class DbManager {
         }
         return result;
     }
+
+    public List<String[]> getClassFeaturesAtLevel(String className, int level) {
+        List<String[]> result = new ArrayList<>();
+        String query = "SELECT feature_name, description FROM class_feature " +
+                "WHERE class_name = ? AND level = ? ORDER BY feature_name";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, className);
+            stmt.setInt(2, level);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next())
+                result.add(new String[]{rs.getString("feature_name"), rs.getString("description")});
+        } catch (SQLException e) {
+            System.err.println("Error loading class features: " + e.getMessage());
+        }
+        return result;
+    }
+
+    public List<String[]> getSubclassFeaturesAtLevel(String subclassName, int level) {
+        List<String[]> result = new ArrayList<>();
+        String query = "SELECT feature_name, description FROM subclass_feature " +
+                "WHERE subclass_name = ? AND level = ? ORDER BY feature_name";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, subclassName);
+            stmt.setInt(2, level);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next())
+                result.add(new String[]{rs.getString("feature_name"), rs.getString("description")});
+        } catch (SQLException e) {
+            System.err.println("Error loading subclass features: " + e.getMessage());
+        }
+        return result;
+    }
+
+    public List<String[]> getSubclassesForClass(String className) {
+        List<String[]> result = new ArrayList<>();
+        String query = "SELECT name, description FROM subclass WHERE class_name = ? ORDER BY name";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, className);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next())
+                result.add(new String[]{rs.getString("name"), rs.getString("description")});
+        } catch (SQLException e) {
+            System.err.println("Error loading subclasses: " + e.getMessage());
+        }
+        return result;
+    }
+
+    public boolean isAsiLevel(String className, int level) {
+        String query = "SELECT 1 FROM class_asi_levels WHERE class_name = ? AND level = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, className);
+            stmt.setInt(2, level);
+            return stmt.executeQuery().next();
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
+    public Map<Integer, Integer> getAllSpellSlotsAtLevel(String className, int characterLevel) {
+        Map<Integer, Integer> slots = new LinkedHashMap<>();
+        String query = "SELECT slot_level, slots FROM class_spell_slots " +
+                "WHERE class_name = ? AND character_level = ? ORDER BY slot_level";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, className);
+            stmt.setInt(2, characterLevel);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) slots.put(rs.getInt("slot_level"), rs.getInt("slots"));
+        } catch (SQLException e) {
+            System.err.println("Error loading spell slots: " + e.getMessage());
+        }
+        return slots;
+    }
+
+    public Integer getSpellsKnownAtLevel(String className, int level) {
+        String query = "SELECT spells_known FROM class_spells_known WHERE class_name = ? AND character_level = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, className);
+            stmt.setInt(2, level);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                int v = rs.getInt("spells_known");
+                return rs.wasNull() ? null : v;
+            }
+        } catch (SQLException e) {
+            System.err.println("Error loading spells_known: " + e.getMessage());
+        }
+        return null;
+    }
+
+    public Integer getCantripsKnownAtLevel(String className, int level) {
+        String query = "SELECT cantrips_known FROM class_spells_known WHERE class_name = ? AND character_level = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, className);
+            stmt.setInt(2, level);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                int v = rs.getInt("cantrips_known");
+                return rs.wasNull() ? null : v;
+            }
+        } catch (SQLException e) {
+            System.err.println("Error loading cantrips_known: " + e.getMessage());
+        }
+        return null;
+    }
+
+    public List<Map<String,String>> getSpellsForClassAndLevel(String className, int spellLevel) {
+        List<Map<String,String>> result = new ArrayList<>();
+        String query = "SELECT s.name, s.spell_school, s.casting_time, s.range_area, s.duration, s.description " +
+                "FROM spell s JOIN class_spell cs ON s.id = cs.spell_id " +
+                "WHERE cs.class_name = ? AND s.spell_level = ? ORDER BY s.name";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, className);
+            stmt.setInt(2, spellLevel);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Map<String,String> sp = new HashMap<>();
+                sp.put("name", rs.getString("name"));
+                sp.put("school", rs.getString("spell_school"));
+                sp.put("casting_time", rs.getString("casting_time"));
+                sp.put("range", rs.getString("range_area"));
+                sp.put("duration", rs.getString("duration"));
+                sp.put("description", rs.getString("description"));
+                result.add(sp);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error loading spells: " + e.getMessage());
+        }
+        return result;
+    }
+
+    public int getCharacterMaxHp(long characterId) {
+        String query = "SELECT max_hp FROM character_stats WHERE character_id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setLong(1, characterId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) return rs.getInt("max_hp");
+        } catch (SQLException e) {
+            System.err.println("Error loading max_hp: " + e.getMessage());
+        }
+        return 0;
+    }
+
+    public void saveLevelUp(long characterId, int newLevel, int newMaxHp,
+                            String subclassChosen,
+                            String asi1, int bonus1,
+                            String asi2, Integer bonus2,
+                            String feat,
+                            List<String> newSpells,
+                            List<String> newCantrips,
+                            List<String> replacedSpells) {
+        // 1. Update level
+        try (PreparedStatement stmt = connection.prepareStatement(
+                "UPDATE \"character\" SET level = ? WHERE id = ?")) {
+            stmt.setInt(1, newLevel);
+            stmt.setLong(2, characterId);
+            stmt.executeUpdate();
+        } catch (SQLException e) { System.err.println("LevelUp - level: " + e.getMessage()); }
+
+        // 2. Update max_hp
+        try (PreparedStatement stmt = connection.prepareStatement(
+                "UPDATE character_stats SET max_hp = ? WHERE character_id = ?")) {
+            stmt.setInt(1, newMaxHp);
+            stmt.setLong(2, characterId);
+            stmt.executeUpdate();
+        } catch (SQLException e) { System.err.println("LevelUp - max_hp: " + e.getMessage()); }
+
+        // 3. Subclass (if chosen)
+        if (subclassChosen != null && !subclassChosen.isBlank()) {
+            try (PreparedStatement stmt = connection.prepareStatement(
+                    "UPDATE \"character\" SET subclass_name = ? WHERE id = ?")) {
+                stmt.setString(1, subclassChosen);
+                stmt.setLong(2, characterId);
+                stmt.executeUpdate();
+            } catch (SQLException e) { System.err.println("LevelUp - subclass: " + e.getMessage()); }
+        }
+
+        // 4. ASI (only if no feat chosen)
+        if (asi1 != null && !asi1.isBlank() && (feat == null || feat.isBlank())) {
+            try (PreparedStatement stmt = connection.prepareStatement(
+                    "INSERT INTO character_asi (character_id, level_gained, ability_1, bonus_1, ability_2, bonus_2) " +
+                            "VALUES (?, ?, ?, ?, ?, ?)")) {
+                stmt.setLong(1, characterId);
+                stmt.setInt(2, newLevel);
+                stmt.setString(3, asi1);
+                stmt.setInt(4, bonus1);
+                if (asi2 != null) { stmt.setString(5, asi2); stmt.setInt(6, bonus2); }
+                else { stmt.setNull(5, java.sql.Types.VARCHAR); stmt.setNull(6, java.sql.Types.INTEGER); }
+                stmt.executeUpdate();
+            } catch (SQLException e) { System.err.println("LevelUp - ASI: " + e.getMessage()); }
+            applyAsiToStats(characterId, asi1, bonus1);
+            if (asi2 != null) applyAsiToStats(characterId, asi2, bonus2);
+        }
+
+        // 5. Replaced spells — delete from character_spell
+        if (replacedSpells != null) {
+            for (String spellName : replacedSpells) {
+                try (PreparedStatement stmt = connection.prepareStatement(
+                        "DELETE FROM character_spell WHERE character_id = ? AND spell_id = " +
+                                "(SELECT id FROM spell WHERE name = ?)")) {
+                    stmt.setLong(1, characterId);
+                    stmt.setString(2, spellName);
+                    stmt.executeUpdate();
+                } catch (SQLException e) { System.err.println("LevelUp - removeSpell: " + e.getMessage()); }
+            }
+        }
+
+        // 6. New spells + cantrips
+        List<String> allNew = new ArrayList<>();
+        if (newSpells != null) allNew.addAll(newSpells);
+        if (newCantrips != null) allNew.addAll(newCantrips);
+        for (String spellName : allNew) {
+            try (PreparedStatement stmt = connection.prepareStatement(
+                    "INSERT OR IGNORE INTO character_spell (character_id, spell_id) " +
+                            "VALUES (?, (SELECT id FROM spell WHERE name = ?))")) {
+                stmt.setLong(1, characterId);
+                stmt.setString(2, spellName);
+                stmt.executeUpdate();
+            } catch (SQLException e) { System.err.println("LevelUp - addSpell: " + e.getMessage()); }
+        }
+
+        // 7. Log level up
+        try (PreparedStatement stmt = connection.prepareStatement(
+                "INSERT INTO character_level_up (character_id, new_level, hp_gained, subclass_chosen) " +
+                        "VALUES (?, ?, ?, ?)")) {
+            stmt.setLong(1, characterId);
+            stmt.setInt(2, newLevel);
+            stmt.setInt(3, 0);
+            if (subclassChosen != null) stmt.setString(4, subclassChosen);
+            else stmt.setNull(4, java.sql.Types.VARCHAR);
+            stmt.executeUpdate();
+        } catch (SQLException e) { System.err.println("LevelUp - log: " + e.getMessage()); }
+    }
+
+    private void applyAsiToStats(long characterId, String ability, int bonus) {
+        String col = switch (ability) {
+            case "Strength"     -> "strength";
+            case "Dexterity"    -> "dexterity";
+            case "Constitution" -> "constitution";
+            case "Intelligence" -> "intelligence";
+            case "Wisdom"       -> "wisdom";
+            case "Charisma"     -> "charisma";
+            default -> null;
+        };
+        if (col == null) return;
+        try (PreparedStatement stmt = connection.prepareStatement(
+                "UPDATE character_stats SET " + col + " = MIN(" + col + " + ?, 20) WHERE character_id = ?")) {
+            stmt.setInt(1, bonus);
+            stmt.setLong(2, characterId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Error applying ASI to stats: " + e.getMessage());
+        }
+    }
+
 }

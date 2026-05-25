@@ -1,5 +1,6 @@
 package com.dnd.creator.view;
 
+import com.dnd.creator.data.DbManager;
 import com.dnd.creator.model.CharacterModel;
 import com.dnd.creator.model.Race;
 import javafx.fxml.FXML;
@@ -23,6 +24,7 @@ import javafx.stage.Window;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 public class CharacterSheetPopupView {
 
@@ -34,12 +36,14 @@ public class CharacterSheetPopupView {
     @FXML private Button btnDelete;
     @FXML private Button btnEdit;
     @FXML private Button btnClose;
+    @FXML private Button btnLevelUp;
     @FXML private VBox leftColumn;
     @FXML private VBox middleColumn;
     @FXML private VBox rightColumn;
 
     private Parent root;
     private final CharacterModel character;
+    private Window ownerWindow;
 
     public CharacterSheetPopupView(CharacterModel character) {
         this.character = character;
@@ -55,11 +59,12 @@ public class CharacterSheetPopupView {
     }
 
     public void showAsPopup(Window owner) {
+        this.ownerWindow = owner;
         Stage stage = new Stage();
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.initOwner(owner);
         stage.setTitle(character.getName() + " — Character Sheet");
-        Scene scene = new Scene(root, 900, 720);
+        Scene scene = new Scene(root, 900, 760);
         scene.getStylesheets().add(getClass().getResource("/com/dnd/creator/view/character-sheet.css").toExternalForm());
         stage.setScene(scene);
         stage.setMinWidth(800);
@@ -70,7 +75,11 @@ public class CharacterSheetPopupView {
     private void populate() {
         lblCharacterName.setText(character.getName() != null ? character.getName() : "Unknown");
         String cls = character.getCharacterClass() != null ? character.getCharacterClass() : "Unknown";
-        lblClassLevel.setText(cls + " | Level 1");
+        String classWithSub = cls;
+        if (character.getSubclassName() != null && !character.getSubclassName().isBlank()) {
+            classWithSub = cls + " (" + character.getSubclassName() + ")";
+        }
+        lblClassLevel.setText(classWithSub + " | Level " + character.getLevel());
         lblBackground.setText(character.getSelectedBackground() != null ? character.getSelectedBackground() : "—");
         lblRace.setText(character.getRace() != null ? character.getRace().getName() : "Unknown");
         loadPortrait();
@@ -99,9 +108,10 @@ public class CharacterSheetPopupView {
         abilityGrid.add(abilityBlock("WIS", wis), 1, 1);
         abilityGrid.add(abilityBlock("CHA", cha), 2, 1);
 
+        int profBonus = character.getProficiencyBonus();
         HBox profBox = new HBox(8);
         profBox.setAlignment(Pos.CENTER_LEFT);
-        Label profVal = new Label("+2");
+        Label profVal = new Label("+" + profBonus);
         profVal.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-border-color: #C6A664; -fx-border-radius: 5; -fx-background-color: white; -fx-background-radius: 5; -fx-padding: 4 8;");
         Label profLabel = new Label("PROFICIENCY BONUS");
         profLabel.setStyle("-fx-font-size: 10px; -fx-font-weight: bold;");
@@ -116,27 +126,27 @@ public class CharacterSheetPopupView {
         savesBox.getChildren().add(saveRow("Charisma", mod(cha)));
 
         VBox skillsBox = titledSection("SKILLS");
-        addSkillRow(skillsBox, "Acrobatics", "Dex", dex);
-        addSkillRow(skillsBox, "Animal Handling", "Wis", wis);
-        addSkillRow(skillsBox, "Arcana", "Int", intel);
-        addSkillRow(skillsBox, "Athletics", "Str", str);
-        addSkillRow(skillsBox, "Deception", "Cha", cha);
-        addSkillRow(skillsBox, "History", "Int", intel);
-        addSkillRow(skillsBox, "Insight", "Wis", wis);
-        addSkillRow(skillsBox, "Intimidation", "Cha", cha);
-        addSkillRow(skillsBox, "Investigation", "Int", intel);
-        addSkillRow(skillsBox, "Medicine", "Wis", wis);
-        addSkillRow(skillsBox, "Nature", "Int", intel);
-        addSkillRow(skillsBox, "Perception", "Wis", wis);
-        addSkillRow(skillsBox, "Performance", "Cha", cha);
-        addSkillRow(skillsBox, "Persuasion", "Cha", cha);
-        addSkillRow(skillsBox, "Religion", "Int", intel);
-        addSkillRow(skillsBox, "Sleight of Hand", "Dex", dex);
-        addSkillRow(skillsBox, "Stealth", "Dex", dex);
-        addSkillRow(skillsBox, "Survival", "Wis", wis);
+        addSkillRow(skillsBox, "Acrobatics", "Dex", dex, profBonus);
+        addSkillRow(skillsBox, "Animal Handling", "Wis", wis, profBonus);
+        addSkillRow(skillsBox, "Arcana", "Int", intel, profBonus);
+        addSkillRow(skillsBox, "Athletics", "Str", str, profBonus);
+        addSkillRow(skillsBox, "Deception", "Cha", cha, profBonus);
+        addSkillRow(skillsBox, "History", "Int", intel, profBonus);
+        addSkillRow(skillsBox, "Insight", "Wis", wis, profBonus);
+        addSkillRow(skillsBox, "Intimidation", "Cha", cha, profBonus);
+        addSkillRow(skillsBox, "Investigation", "Int", intel, profBonus);
+        addSkillRow(skillsBox, "Medicine", "Wis", wis, profBonus);
+        addSkillRow(skillsBox, "Nature", "Int", intel, profBonus);
+        addSkillRow(skillsBox, "Perception", "Wis", wis, profBonus);
+        addSkillRow(skillsBox, "Performance", "Cha", cha, profBonus);
+        addSkillRow(skillsBox, "Persuasion", "Cha", cha, profBonus);
+        addSkillRow(skillsBox, "Religion", "Int", intel, profBonus);
+        addSkillRow(skillsBox, "Sleight of Hand", "Dex", dex, profBonus);
+        addSkillRow(skillsBox, "Stealth", "Dex", dex, profBonus);
+        addSkillRow(skillsBox, "Survival", "Wis", wis, profBonus);
 
         boolean percProf = isProficient("Perception");
-        int passWis = 10 + mod(wis) + (percProf ? 2 : 0);
+        int passWis = 10 + mod(wis) + (percProf ? profBonus : 0);
         HBox passiveBox = new HBox(8);
         passiveBox.setAlignment(Pos.CENTER_LEFT);
         Label passVal = new Label(String.valueOf(passWis));
@@ -155,15 +165,23 @@ public class CharacterSheetPopupView {
         int str = character.getStrength() + bonus(race, "STR");
         int ac = 10 + mod(dex);
         int speed = race != null ? race.getSpeed() : 30;
-        int hitDie = character.getClassHitDie() == 0 ? 6 : character.getClassHitDie();
-        int maxHp = hitDie + mod(con);
+
+        // Use stored max_hp if available, else compute estimate
+        int maxHp;
+        if (character.getMaxHp() > 0) {
+            maxHp = character.getMaxHp();
+        } else {
+            int hitDie = character.getClassHitDie() == 0 ? 8 : character.getClassHitDie();
+            maxHp = hitDie + mod(con) + (character.getLevel() - 1) * ((hitDie / 2 + 1) + mod(con));
+        }
+        int hitDie = character.getClassHitDie() == 0 ? 8 : character.getClassHitDie();
 
         HBox topRow = new HBox(10);
         topRow.setAlignment(Pos.CENTER);
         topRow.getChildren().addAll(
-            shieldBox("ARMOR\nCLASS", String.valueOf(ac)),
-            statBox("INITIATIVE", modStr(mod(dex))),
-            statBox("SPEED", speed + " ft")
+                shieldBox("ARMOR\nCLASS", String.valueOf(ac)),
+                statBox("INITIATIVE", modStr(mod(dex))),
+                statBox("SPEED", speed + " ft")
         );
 
         VBox hpBox = new VBox(4);
@@ -177,14 +195,13 @@ public class CharacterSheetPopupView {
         hpBox.getChildren().addAll(hpMax, hpVal, hpLabel);
 
         HBox diceRow = new HBox(10);
-
         VBox hitDiceBox = new VBox(4);
         hitDiceBox.setStyle(sectionStyle());
         hitDiceBox.setPadding(new Insets(6));
         HBox.setHgrow(hitDiceBox, Priority.ALWAYS);
-        Label hdTotal = new Label("Total: 1d" + hitDie);
+        Label hdTotal = new Label("Total: " + character.getLevel() + "d" + hitDie);
         hdTotal.setStyle("-fx-font-size: 10px; -fx-text-fill: #555;");
-        Label hdVal = new Label("1d" + hitDie);
+        Label hdVal = new Label(character.getLevel() + "d" + hitDie);
         hdVal.setStyle("-fx-font-size: 18px;");
         Label hdLabel = new Label("HIT DICE");
         hdLabel.setStyle("-fx-font-size: 10px; -fx-font-weight: bold;");
@@ -207,21 +224,18 @@ public class CharacterSheetPopupView {
         Label dsLabel = new Label("DEATH SAVES");
         dsLabel.setStyle("-fx-font-size: 10px; -fx-font-weight: bold;");
         deathBox.getChildren().addAll(succRow, failRow, dsLabel);
-
         diceRow.getChildren().addAll(hitDiceBox, deathBox);
 
         VBox attacksBox = new VBox(5);
         attacksBox.setStyle(sectionStyle());
         attacksBox.setPadding(new Insets(6));
         VBox.setVgrow(attacksBox, Priority.ALWAYS);
-
         GridPane atkGrid = new GridPane();
         atkGrid.setHgap(12);
         atkGrid.setVgap(3);
         atkGrid.add(headerLabel("NAME"), 0, 0);
         atkGrid.add(headerLabel("ATK BONUS"), 1, 0);
         atkGrid.add(headerLabel("DAMAGE / TYPE"), 2, 0);
-
         int row = 1;
         for (String[] weapon : character.getWeaponAttacks()) {
             atkGrid.add(new Label(weapon[0]), 0, row);
@@ -230,19 +244,46 @@ public class CharacterSheetPopupView {
             row++;
         }
         if (row == 1) {
-            // No weapons — show unarmed as fallback
             int strMod = mod(str);
             atkGrid.add(new Label("Unarmed Strike"), 0, 1);
             atkGrid.add(new Label(modStr(strMod)), 1, 1);
             atkGrid.add(new Label("1 Bludgeoning"), 2, 1);
         }
-
         Label atkLabel = new Label("ATTACKS & SPELLCASTING");
         atkLabel.setStyle("-fx-font-size: 10px; -fx-font-weight: bold;");
         atkLabel.setPadding(new Insets(4, 0, 0, 0));
         attacksBox.getChildren().addAll(atkGrid, atkLabel);
 
         middleColumn.getChildren().addAll(topRow, hpBox, diceRow, attacksBox);
+
+        // Spell slots — only for spellcasters
+        addSpellSlotsBox();
+    }
+
+    private void addSpellSlotsBox() {
+        String cls = character.getCharacterClass();
+        if (cls == null) return;
+        DbManager db = new DbManager();
+        db.connect();
+        Map<Integer, Integer> slots = db.getAllSpellSlotsAtLevel(cls, character.getLevel());
+        if (slots.isEmpty()) return;
+
+        VBox section = titledSection("SPELL SLOTS");
+        HBox row = new HBox(6);
+        row.setAlignment(Pos.CENTER_LEFT);
+        slots.forEach((lvl, count) -> {
+            VBox slotBox = new VBox(2);
+            slotBox.setAlignment(Pos.CENTER);
+            slotBox.setStyle("-fx-background-color: white; -fx-border-color: #8B0000; -fx-border-width: 1; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 4 8; -fx-min-width: 42;");
+            Label l1 = new Label("Lv " + lvl);
+            l1.setStyle("-fx-font-size: 9px; -fx-text-fill: #555;");
+            Label l2 = new Label(count + "x");
+            l2.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B0000;");
+            slotBox.getChildren().addAll(l1, l2);
+            row.getChildren().add(slotBox);
+        });
+        section.getChildren().add(row);
+        middleColumn.getChildren().add(section);
     }
 
     private void populateRight() {
@@ -278,6 +319,19 @@ public class CharacterSheetPopupView {
             }
         }
 
+        // Feats
+        List<String> feats = character.getFeats();
+        if (feats != null && !feats.isEmpty()) {
+            VBox featsBox = titledSection("FEATS");
+            for (String f : feats) {
+                Label lbl = new Label("✦ " + f);
+                lbl.setStyle("-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #6B0000;");
+                lbl.setWrapText(true);
+                featsBox.getChildren().add(lbl);
+            }
+            rightColumn.getChildren().add(featsBox);
+        }
+
         rightColumn.getChildren().addAll(equipBox, spellsBox);
     }
 
@@ -294,7 +348,53 @@ public class CharacterSheetPopupView {
 
     private void setupButtons() {
         btnClose.setOnAction(e -> ((Stage) btnClose.getScene().getWindow()).close());
-        // Delete and Edit are stubs — implemented in stories #6 and #5
+
+        // Level Up button
+        int currentLevel = character.getLevel();
+        if (currentLevel >= 20) {
+            btnLevelUp.setDisable(true);
+            btnLevelUp.setText("MAX LEVEL");
+            btnLevelUp.setStyle(btnLevelUp.getStyle() + "; -fx-opacity: 0.5;");
+        } else {
+            btnLevelUp.setOnAction(e -> {
+                try {
+                    Stage sheetStage = (Stage) btnLevelUp.getScene().getWindow();
+                    System.out.println("Level Up clicked for: " + character.getName()
+                            + " (Level " + character.getLevel() + ", Class: " + character.getCharacterClass() + ")");
+
+                    LevelUpView levelUp = new LevelUpView(character, sheetStage, () -> {
+                        sheetStage.close();
+                        reopenSheet(ownerWindow);
+                    });
+                    levelUp.show();
+                } catch (Throwable ex) {
+                    ex.printStackTrace();
+                    javafx.scene.control.Alert alert = new javafx.scene.control.Alert(
+                            javafx.scene.control.Alert.AlertType.ERROR);
+                    alert.setHeaderText("Level Up konnte nicht geöffnet werden");
+                    alert.setContentText(ex.getClass().getSimpleName() + ": " + ex.getMessage());
+                    alert.showAndWait();
+                }
+            });
+        }
+
+        // Delete and Edit are stubs
+    }
+
+    private void reopenSheet(Window owner) {
+        try {
+            DbManager db = new DbManager();
+            db.connect();
+            db.getAllSavedCharacters().stream()
+                    .filter(c -> c.getDbId() == character.getDbId())
+                    .findFirst()
+                    .ifPresent(refreshed -> {
+                        CharacterSheetPopupView fresh = new CharacterSheetPopupView(refreshed);
+                        fresh.showAsPopup(owner);
+                    });
+        } catch (Exception e) {
+            System.err.println("Could not refresh sheet: " + e.getMessage());
+        }
     }
 
     // ---- Helpers ----
@@ -302,19 +402,11 @@ public class CharacterSheetPopupView {
     private int bonus(Race race, String ability) {
         return race != null ? race.getAbilityBonuses().getOrDefault(ability, 0) : 0;
     }
-
-    private int mod(int score) {
-        return (score - 10) / 2;
-    }
-
-    private String modStr(int mod) {
-        return (mod >= 0 ? "+" : "") + mod;
-    }
-
+    private int mod(int score) { return (score - 10) / 2; }
+    private String modStr(int m) { return (m >= 0 ? "+" : "") + m; }
     private boolean isProficient(String skillName) {
         return character.getSelectedSkills() != null && character.getSelectedSkills().contains(skillName);
     }
-
     private String sectionStyle() {
         return "-fx-border-color: #1A1A1A; -fx-padding: 5; -fx-background-color: white; -fx-background-radius: 5; -fx-border-radius: 5;";
     }
@@ -354,9 +446,9 @@ public class CharacterSheetPopupView {
         return row;
     }
 
-    private void addSkillRow(VBox parent, String skillName, String ability, int abilityScore) {
+    private void addSkillRow(VBox parent, String skillName, String ability, int abilityScore, int profBonus) {
         boolean prof = isProficient(skillName);
-        int skillMod = mod(abilityScore) + (prof ? 2 : 0);
+        int skillMod = mod(abilityScore) + (prof ? profBonus : 0);
         HBox row = new HBox(5);
         row.setAlignment(Pos.CENTER_LEFT);
         CheckBox cb = new CheckBox();
