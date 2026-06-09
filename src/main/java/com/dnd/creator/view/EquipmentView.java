@@ -88,14 +88,25 @@ public class EquipmentView {
         // Choices
         List<Map<String, Object>> options = dbManager.getEquipmentOptions(classIndex);
         Map<Integer, String> uniqueDescriptions = new LinkedHashMap<>();
+        Map<Integer, List<String>> allBundlesByOrder = new LinkedHashMap<>();
+
         for (Map<String, Object> option : options) {
             int orderNum = (Integer) option.get("order_num");
             uniqueDescriptions.putIfAbsent(orderNum, (String) option.get("description"));
         }
+
+        // Build all bundles for each order to validate saved selections
+        for (Map.Entry<Integer, String> entry : uniqueDescriptions.entrySet()) {
+            int orderNum = entry.getKey();
+            String description = entry.getValue();
+            List<String> bundles = parseBundles(description);
+            allBundlesByOrder.put(orderNum, bundles);
+        }
+
         totalChoiceBlocks = uniqueDescriptions.size();
 
-        // Restore prior selections (matched by saved entry strings)
-        List<String> previouslySelected = character.getSelectedEquipment();
+        // Restore prior selections only if they're still valid for this class
+        List<String> previouslySelected = validatePreviousSelections(character.getSelectedEquipment(), allBundlesByOrder);
 
         int blockIndex = 0;
         for (Map.Entry<Integer, String> entry : uniqueDescriptions.entrySet()) {
@@ -137,6 +148,40 @@ public class EquipmentView {
             if (!cleaned.isEmpty()) result.add(cleaned);
         }
         return result;
+    }
+
+    private List<String> validatePreviousSelections(List<String> previouslySelected, Map<Integer, List<String>> allBundlesByOrder) {
+        if (previouslySelected == null || previouslySelected.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        // Check if each previously selected item is still valid for current class
+        List<String> validSelections = new ArrayList<>();
+        for (String selected : previouslySelected) {
+            if (selected == null || selected.isBlank()) continue;
+
+            String normalizedSelected = normalizeEquipment(selected);
+            boolean isValid = false;
+
+            // Check against all available bundles for this class
+            for (List<String> bundles : allBundlesByOrder.values()) {
+                for (String bundle : bundles) {
+                    String normalizedBundle = normalizeEquipment(bundle);
+                    if (normalizedBundle.contains(normalizedSelected) || normalizedSelected.contains(normalizedBundle)) {
+                        isValid = true;
+                        break;
+                    }
+                }
+                if (isValid) break;
+            }
+
+            // Only add to valid selections if it's still available
+            if (isValid) {
+                validSelections.add(selected);
+            }
+        }
+
+        return validSelections;
     }
 
     private VBox buildChoiceBlock(int blockNumber, int orderNum, List<String> bundles, List<String> previouslySelected) {
@@ -181,7 +226,8 @@ public class EquipmentView {
         String normalizedBundle = normalizeEquipment(bundleText);
         for (String item : saved) {
             String normalizedItem = normalizeEquipment(item);
-            if (normalizedItem.equals(normalizedEntry) || normalizedItem.equals(normalizedBundle)) {
+            if (normalizedItem.contains(normalizedEntry) || normalizedItem.contains(normalizedBundle) ||
+                normalizedEntry.contains(normalizedItem) || normalizedBundle.contains(normalizedItem)) {
                 return true;
             }
         }
@@ -191,8 +237,8 @@ public class EquipmentView {
     private String normalizeEquipment(String item) {
         if (item == null) return "";
         return item.trim()
-                .replaceFirst("^[A-C]\\)\\s*", "")
-                .replaceFirst("^\\([a-c]\\)\\s*", "")
+                .replaceFirst("^[A-Z]\\)\\s*", "")
+                .replaceFirst("^\\([a-z]\\)\\s*", "")
                 .replaceAll("\\s+", " ")
                 .toLowerCase();
     }

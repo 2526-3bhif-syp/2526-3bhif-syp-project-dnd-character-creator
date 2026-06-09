@@ -743,8 +743,8 @@ public class DbManager {
     private String normalizeSavedEquipment(String item) {
         if (item == null) return "";
         return item.trim()
-                .replaceFirst("^[A-C]\\)\\s*", "")
-                .replaceFirst("^\\([a-c]\\)\\s*", "")
+                .replaceFirst("^[A-Z]\\)\\s*", "")
+                .replaceFirst("^\\([a-z]\\)\\s*", "")
                 .replaceAll("\\s+", " ");
     }
 
