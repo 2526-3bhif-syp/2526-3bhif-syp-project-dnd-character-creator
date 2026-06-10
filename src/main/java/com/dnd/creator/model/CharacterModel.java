@@ -24,6 +24,10 @@ public class CharacterModel {
     private String selectedBackground;
     private List<String[]> weaponAttacks = new ArrayList<>();
     private String alignment;
+    private String personalityTraits = "";
+    private String ideals = "";
+    private String bonds = "";
+    private String flaws = "";
 
     // ─── Level-Up Felder ────────────────────────────────────────────────
     private int level = 1;
@@ -135,4 +139,16 @@ public class CharacterModel {
     public int getProficiencyBonus() {
         return 2 + (level - 1) / 4;
     }
+
+    public String getPersonalityTraits() { return personalityTraits; }
+    public void setPersonalityTraits(String personalityTraits) { this.personalityTraits = personalityTraits; }
+
+    public String getIdeals() { return ideals; }
+    public void setIdeals(String ideals) { this.ideals = ideals; }
+
+    public String getBonds() { return bonds; }
+    public void setBonds(String bonds) { this.bonds = bonds; }
+
+    public String getFlaws() { return flaws; }
+    public void setFlaws(String flaws) { this.flaws = flaws; }
 }
