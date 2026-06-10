@@ -46,6 +46,11 @@ public class CharacterSheetPopupView {
     private java.util.function.Consumer<CharacterModel> onEditCallback;
     private Window ownerWindow;
 
+    private final TextArea txtPersonality = new TextArea();
+    private final TextArea txtIdeals = new TextArea();
+    private final TextArea txtBonds = new TextArea();
+    private final TextArea txtFlaws = new TextArea();
+
     public CharacterSheetPopupView(CharacterModel character) {
         this.character = character;
         try {
@@ -88,6 +93,10 @@ public class CharacterSheetPopupView {
         lblBackground.setText(character.getSelectedBackground() != null ? character.getSelectedBackground() : "—");
         lblRace.setText(character.getRace() != null ? character.getRace().getName() : "Unknown");
         loadPortrait();
+
+        leftColumn.getChildren().clear();
+        middleColumn.getChildren().clear();
+        rightColumn.getChildren().clear();
 
         populateLeft();
         populateMiddle();
@@ -171,7 +180,15 @@ public class CharacterSheetPopupView {
         int ac = 10 + mod(dex);
         int speed = race != null ? race.getSpeed() : 30;
 
-        // Use stored max_hp if available, else compute estimate
+        HBox topStatsBox = new HBox(10);
+        topStatsBox.setAlignment(Pos.CENTER);
+        topStatsBox.getChildren().addAll(
+                shieldBox("ARMOR\nCLASS", String.valueOf(ac)),
+                statBox("INITIATIVE", modStr(mod(dex))),
+                statBox("SPEED", speed + " ft")
+        );
+
+        // HPC Row (HP & Temp HP side by side)
         int maxHp;
         if (character.getMaxHp() > 0) {
             maxHp = character.getMaxHp();
@@ -179,62 +196,76 @@ public class CharacterSheetPopupView {
             int hitDie = character.getClassHitDie() == 0 ? 8 : character.getClassHitDie();
             maxHp = hitDie + mod(con) + (character.getLevel() - 1) * ((hitDie / 2 + 1) + mod(con));
         }
-        int hitDie = character.getClassHitDie() == 0 ? 8 : character.getClassHitDie();
 
-        HBox topRow = new HBox(10);
-        topRow.setAlignment(Pos.CENTER);
-        topRow.getChildren().addAll(
-                shieldBox("ARMOR\nCLASS", String.valueOf(ac)),
-                statBox("INITIATIVE", modStr(mod(dex))),
-                statBox("SPEED", speed + " ft")
-        );
+        HBox hpHBox = new HBox(10);
 
-        VBox hpBox = new VBox(4);
+        VBox hpBox = new VBox(5);
         hpBox.setStyle(sectionStyle());
-        Label hpMax = new Label("HP Maximum: " + maxHp);
-        hpMax.setStyle("-fx-font-size: 10px; -fx-text-fill: #555;");
-        Label hpVal = new Label(String.valueOf(maxHp));
-        hpVal.setStyle("-fx-font-size: 26px; -fx-font-weight: bold;");
-        Label hpLabel = new Label("CURRENT HIT POINTS");
-        hpLabel.setStyle("-fx-font-size: 10px; -fx-font-weight: bold;");
-        hpBox.getChildren().addAll(hpMax, hpVal, hpLabel);
+        HBox.setHgrow(hpBox, Priority.ALWAYS);
 
-        HBox diceRow = new HBox(10);
-        VBox hitDiceBox = new VBox(4);
+        HBox hpLabels = new HBox(10);
+        Label lblHpMax = new Label("Hit Point Maximum: " + maxHp);
+        lblHpMax.setStyle("-fx-font-size: 10px; -fx-text-fill: #555;");
+        hpLabels.getChildren().add(lblHpMax);
+
+        Label lblHpValue = new Label(String.valueOf(maxHp));
+        lblHpValue.setStyle("-fx-font-size: 18px; -fx-padding: 5; -fx-alignment: center;");
+
+        Label lblHpCurrent = new Label("CURRENT HIT POINTS");
+        lblHpCurrent.setStyle("-fx-font-size: 10px; -fx-font-weight: bold;");
+
+        hpBox.getChildren().addAll(hpLabels, lblHpValue, lblHpCurrent);
+
+        VBox tempHpBox = new VBox(5);
+        tempHpBox.setStyle(sectionStyle());
+        HBox.setHgrow(tempHpBox, Priority.ALWAYS);
+        Label lblTempHpValue = new Label("");
+        lblTempHpValue.setStyle("-fx-font-size: 18px; -fx-padding: 5; -fx-alignment: center;");
+        Label lblTempHp = new Label("TEMP HIT POINTS");
+        lblTempHp.setStyle("-fx-font-size: 10px; -fx-font-weight: bold;");
+        tempHpBox.getChildren().addAll(lblTempHpValue, lblTempHp);
+
+        hpHBox.getChildren().addAll(hpBox, tempHpBox);
+
+        // Hit Dice & Death Saves Row
+        int hitDie = character.getClassHitDie() == 0 ? 8 : character.getClassHitDie();
+        HBox diceSavesBox = new HBox(10);
+
+        VBox hitDiceBox = new VBox(5);
         hitDiceBox.setStyle(sectionStyle());
-        hitDiceBox.setPadding(new Insets(6));
         HBox.setHgrow(hitDiceBox, Priority.ALWAYS);
-        Label hdTotal = new Label("Total: " + character.getLevel() + "d" + hitDie);
-        hdTotal.setStyle("-fx-font-size: 10px; -fx-text-fill: #555;");
-        Label hdVal = new Label(character.getLevel() + "d" + hitDie);
-        hdVal.setStyle("-fx-font-size: 18px;");
-        Label hdLabel = new Label("HIT DICE");
-        hdLabel.setStyle("-fx-font-size: 10px; -fx-font-weight: bold;");
-        hitDiceBox.getChildren().addAll(hdTotal, hdVal, hdLabel);
+        Label lblHdTotal = new Label("Total: " + character.getLevel() + "d" + hitDie);
+        lblHdTotal.setStyle("-fx-font-size: 10px; -fx-text-fill: #555;");
+        Label lblHdValue = new Label(character.getLevel() + "d" + hitDie);
+        lblHdValue.setStyle("-fx-font-size: 14px; -fx-alignment: center;");
+        Label lblHdText = new Label("HIT DICE");
+        lblHdText.setStyle("-fx-font-size: 10px; -fx-font-weight: bold;");
+        hitDiceBox.getChildren().addAll(lblHdTotal, lblHdValue, lblHdText);
 
         VBox deathBox = new VBox(5);
         deathBox.setStyle(sectionStyle());
-        deathBox.setPadding(new Insets(6));
         HBox.setHgrow(deathBox, Priority.ALWAYS);
-        HBox succRow = new HBox(4);
-        succRow.setAlignment(Pos.CENTER_LEFT);
-        Label succLbl = new Label("SUCCESSES");
-        succLbl.setStyle("-fx-font-size: 9px;");
-        succRow.getChildren().addAll(succLbl, disabledCheckBox(), disabledCheckBox(), disabledCheckBox());
-        HBox failRow = new HBox(4);
-        failRow.setAlignment(Pos.CENTER_LEFT);
-        Label failLbl = new Label("FAILURES   ");
-        failLbl.setStyle("-fx-font-size: 9px;");
-        failRow.getChildren().addAll(failLbl, disabledCheckBox(), disabledCheckBox(), disabledCheckBox());
-        Label dsLabel = new Label("DEATH SAVES");
-        dsLabel.setStyle("-fx-font-size: 10px; -fx-font-weight: bold;");
-        deathBox.getChildren().addAll(succRow, failRow, dsLabel);
-        diceRow.getChildren().addAll(hitDiceBox, deathBox);
 
+        HBox successes = new HBox(5);
+        successes.getChildren().addAll(new Label("SUCCESSES"), disabledCheckBox(), disabledCheckBox(), disabledCheckBox());
+        successes.setStyle("-fx-font-size: 9px;");
+
+        HBox failures = new HBox(5);
+        failures.getChildren().addAll(new Label("FAILURES  "), disabledCheckBox(), disabledCheckBox(), disabledCheckBox());
+        failures.setStyle("-fx-font-size: 9px;");
+
+        Label lblDeathText = new Label("DEATH SAVES");
+        lblDeathText.setStyle("-fx-font-size: 10px; -fx-font-weight: bold;");
+        deathBox.getChildren().addAll(successes, failures, lblDeathText);
+
+        diceSavesBox.getChildren().addAll(hitDiceBox, deathBox);
+
+        // Attacks Box
         VBox attacksBox = new VBox(5);
         attacksBox.setStyle(sectionStyle());
         attacksBox.setPadding(new Insets(6));
         VBox.setVgrow(attacksBox, Priority.ALWAYS);
+
         GridPane atkGrid = new GridPane();
         atkGrid.setHgap(12);
         atkGrid.setVgap(3);
@@ -259,36 +290,69 @@ public class CharacterSheetPopupView {
         atkLabel.setPadding(new Insets(4, 0, 0, 0));
         attacksBox.getChildren().addAll(atkGrid, atkLabel);
 
-        middleColumn.getChildren().addAll(topRow, hpBox, diceRow, attacksBox);
+        middleColumn.getChildren().addAll(topStatsBox, hpHBox, diceSavesBox, attacksBox);
 
-        // Spell slots — only for spellcasters
-        addSpellSlotsBox();
+        // Spell slots & spells — only for spellcasters
+        addSpellSlotsAndSpellsBox();
     }
 
-    private void addSpellSlotsBox() {
+    private void addSpellSlotsAndSpellsBox() {
         String cls = character.getCharacterClass();
         if (cls == null) return;
         DbManager db = new DbManager();
         db.connect();
         Map<Integer, Integer> slots = db.getAllSpellSlotsAtLevel(cls, character.getLevel());
-        if (slots.isEmpty()) return;
+        if (slots.isEmpty() && (character.getSelectedCantrips() == null || character.getSelectedCantrips().isEmpty()) && (character.getSelectedSpells() == null || character.getSelectedSpells().isEmpty())) return;
 
-        VBox section = titledSection("SPELL SLOTS");
-        HBox row = new HBox(6);
-        row.setAlignment(Pos.CENTER_LEFT);
-        slots.forEach((lvl, count) -> {
-            VBox slotBox = new VBox(2);
-            slotBox.setAlignment(Pos.CENTER);
-            slotBox.setStyle("-fx-background-color: white; -fx-border-color: #8B0000; -fx-border-width: 1; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 4 8; -fx-min-width: 42;");
-            Label l1 = new Label("Lv " + lvl);
-            l1.setStyle("-fx-font-size: 9px; -fx-text-fill: #555;");
-            Label l2 = new Label(count + "x");
-            l2.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B0000;");
-            slotBox.getChildren().addAll(l1, l2);
-            row.getChildren().add(slotBox);
-        });
-        section.getChildren().add(row);
-        middleColumn.getChildren().add(section);
+        VBox spellBox = titledSection("ZAUBER & SLOTS");
+
+        // Slots
+        if (!slots.isEmpty()) {
+            HBox slotsRow = new HBox(6);
+            slotsRow.setAlignment(Pos.CENTER_LEFT);
+            slots.forEach((lvl, count) -> {
+                VBox slotBox = new VBox(2);
+                slotBox.setAlignment(Pos.CENTER);
+                slotBox.setStyle("-fx-background-color: white; -fx-border-color: #8B0000; -fx-border-width: 1; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 4 8; -fx-min-width: 42;");
+                Label l1 = new Label("Lv " + lvl);
+                l1.setStyle("-fx-font-size: 9px; -fx-text-fill: #555;");
+                Label l2 = new Label(count + "x");
+                l2.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #8B0000;");
+                slotBox.getChildren().addAll(l1, l2);
+                slotsRow.getChildren().add(slotBox);
+            });
+            spellBox.getChildren().add(slotsRow);
+        }
+
+        // Cantrips
+        if (character.getSelectedCantrips() != null && !character.getSelectedCantrips().isEmpty()) {
+            VBox cantripSection = new VBox(2);
+            Label cantripLbl = new Label("Cantrips:");
+            cantripLbl.setStyle("-fx-font-size: 11px; -fx-font-weight: bold;");
+            cantripSection.getChildren().add(cantripLbl);
+            for (String c : character.getSelectedCantrips()) {
+                Label lbl = new Label("• " + c);
+                lbl.setStyle("-fx-font-size: 11px;");
+                cantripSection.getChildren().add(lbl);
+            }
+            spellBox.getChildren().add(cantripSection);
+        }
+
+        // Prepared Spells
+        if (character.getSelectedSpells() != null && !character.getSelectedSpells().isEmpty()) {
+            VBox preparedSection = new VBox(2);
+            Label prepLbl = new Label("Zauber:");
+            prepLbl.setStyle("-fx-font-size: 11px; -fx-font-weight: bold;");
+            preparedSection.getChildren().add(prepLbl);
+            for (String s : character.getSelectedSpells()) {
+                Label lbl = new Label("• " + s);
+                lbl.setStyle("-fx-font-size: 11px;");
+                preparedSection.getChildren().add(lbl);
+            }
+            spellBox.getChildren().add(preparedSection);
+        }
+
+        middleColumn.getChildren().add(spellBox);
     }
 
     private void populateRight() {
@@ -308,21 +372,35 @@ public class CharacterSheetPopupView {
             }
         }
 
-        VBox spellsBox = titledSection("SPELLS");
-        VBox.setVgrow(spellsBox, Priority.SOMETIMES);
-        List<String> spells = character.getSelectedSpells();
-        if (spells == null || spells.isEmpty()) {
+        // --- LANGUAGES ---
+        VBox langBox = titledSection("LANGUAGES");
+        if (character.getRace() != null && !character.getRace().getLanguages().isEmpty()) {
+            for (String lang : character.getRace().getLanguages()) {
+                String display = lang.substring(0, 1).toUpperCase() + lang.substring(1);
+                Label lbl = new Label("• " + display);
+                lbl.setStyle("-fx-font-size: 11px;");
+                langBox.getChildren().add(lbl);
+            }
+        } else {
             Label none = new Label("—");
             none.setStyle("-fx-font-size: 11px; -fx-text-fill: #888;");
-            spellsBox.getChildren().add(none);
-        } else {
-            for (String spell : spells) {
-                Label lbl = new Label("• " + spell);
-                lbl.setStyle("-fx-font-size: 11px;");
-                lbl.setWrapText(true);
-                spellsBox.getChildren().add(lbl);
-            }
+            langBox.getChildren().add(none);
         }
+
+        // --- PERSONALITY TRAITS / IDEALS / BONDS / FLAWS ---
+        txtPersonality.setText(character.getPersonalityTraits() != null ? character.getPersonalityTraits() : "");
+        txtIdeals.setText(character.getIdeals() != null ? character.getIdeals() : "");
+        txtBonds.setText(character.getBonds() != null ? character.getBonds() : "");
+        txtFlaws.setText(character.getFlaws() != null ? character.getFlaws() : "");
+
+        rightColumn.getChildren().addAll(
+                equipBox,
+                langBox,
+                createTextBox("PERSONALITY TRAITS", txtPersonality, true),
+                createTextBox("IDEALS", txtIdeals, true),
+                createTextBox("BONDS", txtBonds, true),
+                createTextBox("FLAWS", txtFlaws, true)
+        );
 
         // Feats
         List<String> feats = character.getFeats();
@@ -336,8 +414,28 @@ public class CharacterSheetPopupView {
             }
             rightColumn.getChildren().add(featsBox);
         }
+    }
 
-        rightColumn.getChildren().addAll(equipBox, spellsBox);
+    private VBox createTextBox(String title, TextArea textArea, boolean grow) {
+        VBox box = new VBox(2);
+        box.setStyle("-fx-border-color: #1A1A1A; -fx-padding: 2; -fx-background-color: white; -fx-background-radius: 5; -fx-border-radius: 5;");
+        if(grow) {
+            VBox.setVgrow(box, Priority.ALWAYS);
+        }
+
+        textArea.setWrapText(true);
+        textArea.setStyle("-fx-background-color: transparent; -fx-border-color: transparent; -fx-control-inner-background: white; -fx-font-size: 10px;");
+        if(grow) {
+            VBox.setVgrow(textArea, Priority.ALWAYS);
+        } else {
+            textArea.setPrefRowCount(2);
+        }
+
+        Label lblTitle = new Label(title);
+        lblTitle.setStyle("-fx-font-size: 9px; -fx-font-weight: bold; -fx-alignment: center; -fx-pref-width: 200;");
+
+        box.getChildren().addAll(textArea, lblTitle);
+        return box;
     }
 
     private void loadPortrait() {
