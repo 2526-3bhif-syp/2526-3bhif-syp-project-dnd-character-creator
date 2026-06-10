@@ -57,6 +57,21 @@ public class CharacterSheetPopupView {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/dnd/creator/view/CharacterSheetPopup.fxml"));
             loader.setController(this);
             root = loader.load();
+
+            // Attach listeners to save textareas when focus is lost
+            txtPersonality.focusedProperty().addListener((obs, oldVal, newVal) -> {
+                if (!newVal) saveBackgroundFields();
+            });
+            txtIdeals.focusedProperty().addListener((obs, oldVal, newVal) -> {
+                if (!newVal) saveBackgroundFields();
+            });
+            txtBonds.focusedProperty().addListener((obs, oldVal, newVal) -> {
+                if (!newVal) saveBackgroundFields();
+            });
+            txtFlaws.focusedProperty().addListener((obs, oldVal, newVal) -> {
+                if (!newVal) saveBackgroundFields();
+            });
+
             populate();
             setupButtons();
         } catch (IOException e) {
@@ -75,6 +90,9 @@ public class CharacterSheetPopupView {
         stage.setScene(scene);
         stage.setMinWidth(800);
         stage.setMinHeight(600);
+
+        stage.setOnCloseRequest(e -> saveBackgroundFields());
+
         stage.show();
     }
 
@@ -450,9 +468,13 @@ public class CharacterSheetPopupView {
     }
 
     private void setupButtons() {
-        btnClose.setOnAction(e -> ((Stage) btnClose.getScene().getWindow()).close());
+        btnClose.setOnAction(e -> {
+            saveBackgroundFields();
+            ((Stage) btnClose.getScene().getWindow()).close();
+        });
 
         btnEdit.setOnAction(e -> {
+            saveBackgroundFields();
             if (onEditCallback != null) {
                 onEditCallback.accept(character);
             }
@@ -604,5 +626,20 @@ public class CharacterSheetPopupView {
         CheckBox cb = new CheckBox();
         cb.setDisable(true);
         return cb;
+    }
+
+    private void saveBackgroundFields() {
+        character.setPersonalityTraits(txtPersonality.getText());
+        character.setIdeals(txtIdeals.getText());
+        character.setBonds(txtBonds.getText());
+        character.setFlaws(txtFlaws.getText());
+
+        DbManager db = new DbManager();
+        db.connect();
+        db.updateCharacterBackgroundFields(character.getDbId(),
+                character.getPersonalityTraits(),
+                character.getIdeals(),
+                character.getBonds(),
+                character.getFlaws());
     }
 }
