@@ -36,6 +36,7 @@ public class DbManager {
             if (!isDatabaseInitialized()) {
                 initializeDatabase();
             }
+            checkAndAddBackgroundColumns();
         } catch (SQLException e) {
             System.out.println("Connection with Database failed!");
         }
@@ -47,6 +48,24 @@ public class DbManager {
             return rs.next() && rs.getInt(1) > 0;
         } catch (SQLException e) {
             return false;
+        }
+    }
+
+    private void checkAndAddBackgroundColumns() {
+        String[] columns = {"personality_traits", "ideals", "bonds", "flaws"};
+        try (Statement stmt = connection.createStatement()) {
+            for (String col : columns) {
+                try {
+                    // Test if column exists by trying to select it
+                    stmt.executeQuery("SELECT " + col + " FROM \"character\" LIMIT 1").close();
+                } catch (SQLException e) {
+                    // Column doesn't exist, add it
+                    System.out.println("Adding column " + col + " to character table...");
+                    stmt.executeUpdate("ALTER TABLE \"character\" ADD COLUMN " + col + " TEXT");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error verifying background columns: " + e.getMessage());
         }
     }
 
@@ -616,8 +635,8 @@ public class DbManager {
         }
 
         String insertChar = "INSERT INTO \"character\" " +
-                "(character_name, race_name, class_name, subclass_name, background_name, alignment_id, level, character_picture) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                "(character_name, race_name, class_name, subclass_name, background_name, alignment_id, level, character_picture, personality_traits, ideals, bonds, flaws) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement stmt = connection.prepareStatement(insertChar, Statement.RETURN_GENERATED_KEYS)) {
 
@@ -631,6 +650,10 @@ public class DbManager {
             else stmt.setNull(6, java.sql.Types.INTEGER);
             stmt.setInt(7, character.getLevel());
             stmt.setString(8, character.getImagePath());
+            stmt.setString(9, character.getPersonalityTraits());
+            stmt.setString(10, character.getIdeals());
+            stmt.setString(11, character.getBonds());
+            stmt.setString(12, character.getFlaws());
 
 
             if (stmt.executeUpdate() == 0) return false;
@@ -654,7 +677,7 @@ public class DbManager {
     private boolean updateCharacter(com.dnd.creator.model.CharacterModel character, String portraitPath, Integer alignmentId) {
         long id = character.getDbId();
         String updateQuery = "UPDATE \"character\" SET character_name = ?, race_name = ?, class_name = ?, " +
-                "background_name = ?, alignment_id = ?, character_picture = ? WHERE id = ?";
+                "background_name = ?, alignment_id = ?, character_picture = ?, personality_traits = ?, ideals = ?, bonds = ?, flaws = ? WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(updateQuery)) {
             stmt.setString(1, character.getName());
             stmt.setString(2, character.getRace().getName());
@@ -663,7 +686,11 @@ public class DbManager {
             if (alignmentId != null) stmt.setInt(5, alignmentId);
             else stmt.setNull(5, java.sql.Types.INTEGER);
             stmt.setString(6, portraitPath);
-            stmt.setLong(7, id);
+            stmt.setString(7, character.getPersonalityTraits());
+            stmt.setString(8, character.getIdeals());
+            stmt.setString(9, character.getBonds());
+            stmt.setString(10, character.getFlaws());
+            stmt.setLong(11, id);
 
             if (stmt.executeUpdate() == 0) return false;
 
@@ -785,7 +812,7 @@ public class DbManager {
     public List<com.dnd.creator.model.CharacterModel> getAllSavedCharacters() {
         List<com.dnd.creator.model.CharacterModel> characters = new ArrayList<>();
         String query = "SELECT c.id, c.character_name, c.race_name, c.class_name, c.subclass_name, " +
-                "c.background_name, c.character_picture, c.level, a.name_x, a.name_y, " +
+                "c.background_name, c.character_picture, c.level, c.personality_traits, c.ideals, c.bonds, c.flaws, a.name_x, a.name_y, " +
                 "cs.strength, cs.dexterity, cs.constitution, cs.intelligence, cs.wisdom, cs.charisma, cs.max_hp " +
                 "FROM \"character\" c " +
                 "LEFT JOIN character_stats cs ON c.id = cs.character_id " +
@@ -828,6 +855,10 @@ public class DbManager {
                 character.setSubclassName(rs.getString("subclass_name"));
                 character.setMaxHp(rs.getInt("max_hp"));
                 character.setSelectedBackground(rs.getString("background_name"));
+                character.setPersonalityTraits(rs.getString("personality_traits"));
+                character.setIdeals(rs.getString("ideals"));
+                character.setBonds(rs.getString("bonds"));
+                character.setFlaws(rs.getString("flaws"));
                 character.setSelectedSkills(getCharacterSkills(id));
                 character.setSelectedEquipment(getCharacterEquipment(id));
                 character.setSelectedSpells(getCharacterSpells(id, false));
@@ -1165,4 +1196,18 @@ public class DbManager {
         }
     }
 
+    public boolean updateCharacterBackgroundFields(long id, String personality, String ideals, String bonds, String flaws) {
+        String sql = "UPDATE \"character\" SET personality_traits = ?, ideals = ?, bonds = ?, flaws = ? WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, personality);
+            stmt.setString(2, ideals);
+            stmt.setString(3, bonds);
+            stmt.setString(4, flaws);
+            stmt.setLong(5, id);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Error updating character background fields: " + e.getMessage());
+            return false;
+        }
+    }
 }
