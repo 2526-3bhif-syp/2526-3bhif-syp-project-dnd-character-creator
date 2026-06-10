@@ -66,6 +66,11 @@ public class CharacterSummaryView {
 
     private DbManager dbManager = new DbManager();
 
+    private final TextArea txtPersonality = new TextArea();
+    private final TextArea txtIdeals = new TextArea();
+    private final TextArea txtBonds = new TextArea();
+    private final TextArea txtFlaws = new TextArea();
+
     public CharacterSummaryView() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/dnd/creator/view/CharacterSummaryView.fxml"));
@@ -121,6 +126,11 @@ public class CharacterSummaryView {
         boolean proficientInPerception = character.getSelectedSkills() != null && character.getSelectedSkills().contains("Perception");
         int passiveWisdom = 10 + wisMod + (proficientInPerception ? 2 : 0);
         lblPassiveWisdom.setText(String.valueOf(passiveWisdom));
+
+        txtPersonality.setText(character.getPersonalityTraits() != null ? character.getPersonalityTraits() : "");
+        txtIdeals.setText(character.getIdeals() != null ? character.getIdeals() : "");
+        txtBonds.setText(character.getBonds() != null ? character.getBonds() : "");
+        txtFlaws.setText(character.getFlaws() != null ? character.getFlaws() : "");
 
         // We will build columns step by step, for now just clear them
         leftColumn.getChildren().clear();
@@ -181,21 +191,20 @@ public class CharacterSummaryView {
         rightColumn.getChildren().addAll(
                 equipBox,
                 langBox,
-                createTextBox("PERSONALITY TRAITS", true),
-                createTextBox("IDEALS", true),
-                createTextBox("BONDS", true),
-                createTextBox("FLAWS", true)
+                createTextBox("PERSONALITY TRAITS", txtPersonality, true),
+                createTextBox("IDEALS", txtIdeals, true),
+                createTextBox("BONDS", txtBonds, true),
+                createTextBox("FLAWS", txtFlaws, true)
         );
     }
 
-    private VBox createTextBox(String title, boolean grow) {
+    private VBox createTextBox(String title, TextArea textArea, boolean grow) {
         VBox box = new VBox(2);
         box.setStyle("-fx-border-color: #1A1A1A; -fx-padding: 2; -fx-background-color: white; -fx-background-radius: 5; -fx-border-radius: 5;");
         if(grow) {
             VBox.setVgrow(box, Priority.ALWAYS);
         }
 
-        TextArea textArea = new TextArea();
         textArea.setWrapText(true);
         textArea.setStyle("-fx-background-color: transparent; -fx-border-color: transparent; -fx-control-inner-background: white; -fx-font-size: 10px;");
         if(grow) {
@@ -592,6 +601,10 @@ public class CharacterSummaryView {
 
     private void saveCharacter() {
         var character = CharacterSession.getInstance().getCurrentCharacter();
+        character.setPersonalityTraits(txtPersonality.getText());
+        character.setIdeals(txtIdeals.getText());
+        character.setBonds(txtBonds.getText());
+        character.setFlaws(txtFlaws.getText());
         
         if (dbManager.saveCharacter(character)) {
             showSuccess("Charakter erfolgreich gespeichert!");
