@@ -25,11 +25,11 @@ public class CharactersOverviewPresenter {
     }
 
     private void updateView() {
+        view.getCardsPane().getChildren().clear();
         if (characters == null || characters.isEmpty()) {
             view.setEmptyMessageVisible(true);
         } else {
             view.setEmptyMessageVisible(false);
-            view.getCardsPane().getChildren().clear();
             for (CharacterModel character : characters) {
                 CharacterCardView cardView = new CharacterCardView(character);
                 cardView.setOnCardClicked(c -> {
