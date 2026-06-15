@@ -42,6 +42,11 @@ public class CharactersOverviewPresenter {
                         currentScene.setRoot(createView.getRoot());
                     });
 
+                    popup.setOnDeleteCallback(deleted -> {
+                        characters = dbManager.getAllSavedCharacters();
+                        updateView();
+                    });
+
                     popup.showAsPopup(view.getCardsPane().getScene().getWindow());
                 });
                 view.getCardsPane().getChildren().add(cardView.getRoot());

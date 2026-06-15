@@ -45,6 +45,7 @@ public class CharacterSheetPopupView {
     private Parent root;
     private final CharacterModel character;
     private java.util.function.Consumer<CharacterModel> onEditCallback;
+    private java.util.function.Consumer<CharacterModel> onDeleteCallback;
     private Window ownerWindow;
 
     private final TextArea txtPersonality = new TextArea();
@@ -99,6 +100,10 @@ public class CharacterSheetPopupView {
 
     public void setOnEditCallback(java.util.function.Consumer<CharacterModel> callback) {
         this.onEditCallback = callback;
+    }
+
+    public void setOnDeleteCallback(java.util.function.Consumer<CharacterModel> callback) {
+        this.onDeleteCallback = callback;
     }
 
     private void populate() {
@@ -511,7 +516,33 @@ public class CharacterSheetPopupView {
             });
         }
 
-        // Delete is stub
+        // Delete button
+        btnDelete.setOnAction(e -> {
+            javafx.scene.control.Alert confirm = new javafx.scene.control.Alert(
+                    javafx.scene.control.Alert.AlertType.CONFIRMATION);
+            confirm.setTitle("Charakter löschen");
+            confirm.setHeaderText("\"" + character.getName() + "\" löschen?");
+            confirm.setContentText("Der Charakter wird dauerhaft entfernt. Dies kann nicht rückgängig gemacht werden.");
+
+            confirm.showAndWait().ifPresent(result -> {
+                if (result != javafx.scene.control.ButtonType.OK) return;
+
+                DbManager db = new DbManager();
+                db.connect();
+                if (db.deleteCharacter(character.getDbId())) {
+                    if (onDeleteCallback != null) {
+                        onDeleteCallback.accept(character);
+                    }
+                    ((Stage) btnDelete.getScene().getWindow()).close();
+                } else {
+                    javafx.scene.control.Alert error = new javafx.scene.control.Alert(
+                            javafx.scene.control.Alert.AlertType.ERROR);
+                    error.setHeaderText("Charakter konnte nicht gelöscht werden");
+                    error.setContentText("Beim Löschen ist ein Fehler aufgetreten. Bitte versuche es erneut.");
+                    error.showAndWait();
+                }
+            });
+        });
     }
 
     private void reopenSheet(Window owner) {
