@@ -1,0 +1,61 @@
+# openspec/config.yaml
+schema: spec-driven
+
+context: |
+  PROJECT
+  D&D Character Creator — a beginner-friendly desktop tool for building and
+  managing Dungeons & Dragons characters. Goal: let a player with zero prior
+  knowledge create a complete character through a guided flow and understand
+  its attributes, abilities and spells along the way.
+  Authoritative requirements: ai-files/pflichtenheft.adoc — read it before proposing.
+
+  TECH STACK
+  Language: Java
+  UI: JavaFX
+  Database: SQLite via sqlite-jdbc (local, self-initializing; holds D&D rules data
+            reproduced from the official "D&D Player's Handbook"). NOTE: the
+            Pflichtenheft names Oracle, but the implementation uses local SQLite,
+            consistent with the single-user, local-desktop scope.
+  Platform: desktop application
+
+  SCOPE / SCALE — do NOT over-engineer
+  Single user only, max 1 concurrent user, ~1–2 character creations/day,
+  10–20 min sessions, small storage per character.
+  => Do NOT introduce authentication, user accounts, multi-user, concurrency,
+     networking or scaling concerns unless a requirement explicitly asks for it.
+
+  CORE CAPABILITIES (Pflichtenheft 1.4.1)
+  - Charakter erstellen (guided character creation)
+  - Charakterübersicht anzeigen (list all saved characters)
+  - Charakter bearbeiten (edit a character)
+  - Charakter löschen (delete a character)
+  - Charakter exportieren (export, e.g. to PDF)
+  - Regeln und Features lesen (read rule/feature explanations in-app)
+  Final output: a character sheet showing all attributes, abilities and spells.
+
+  DOMAIN GLOSSARY
+  Charakter = player character; Volk = race (Mensch/Elf/Zwerg);
+  Klasse = class (Kämpfer/Magier/Schurke); Attribute = ability scores
+  (e.g. Stärke, Intelligenz); Hintergrund = background.
+
+  UX PRINCIPLE (NFA)
+  Beginner-friendly above all: explain jargon (attributes, modifiers, saving
+  throws) in plain language, keep navigation simple, guide the user.
+
+  DESIGN SYSTEM (NFA — D&D colour scheme)
+  Background: beige | Headings/accents: dark red | Text: ink black |
+  Icons/borders: gold/brass.
+
+rules:
+  proposal:
+    - State which Pflichtenheft use case (1.4.1) the change serves
+    - Describe the impact for a first-time user with no prior knowledge
+  specs:
+    - Use Given/When/Then scenarios
+    - Reference the relevant Pflichtenheft section number
+    - Stay within single-user scope; no auth/concurrency unless required
+  design:
+    - Assume Java + JavaFX for UI and a local SQLite database (sqlite-jdbc)
+    - Note affected views and the data-access approach (DbManager)
+  tasks:
+    - Keep tasks small and implementation-ready
