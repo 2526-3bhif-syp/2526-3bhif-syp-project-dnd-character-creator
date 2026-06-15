@@ -60,14 +60,19 @@ flow for the character (see `character-leveling`).
 - **WHEN** the user clicks Level Up on the sheet
 - **THEN** the level-up flow opens for that character
 
-### Requirement: Delete action present but not yet functional
+### Requirement: Delete a character from the sheet
 
-The sheet SHALL expose a delete control. NOTE (baseline gap): deletion is
-currently a stub and does NOT remove the character from storage; full deletion is
-out of scope for this baseline and tracked separately (Pflichtenheft use case
-"Charakter löschen").
+The system SHALL provide a Delete action on the character sheet that permanently
+removes the character after the user explicitly confirms. (Pflichtenheft 1.4.1
+"Charakter löschen".) For a first-time user this prevents accidental loss by
+requiring confirmation before anything is removed.
 
-#### Scenario: Delete control is a stub
+#### Scenario: Confirming a deletion
 
-- **WHEN** the user activates the delete control
-- **THEN** no character is removed from the database (behavior is a placeholder)
+- **WHEN** the user clicks Delete on a character's sheet and confirms the prompt
+- **THEN** the character and all its related data are permanently removed and the sheet closes
+
+#### Scenario: Cancelling a deletion
+
+- **WHEN** the user clicks Delete but cancels the confirmation prompt
+- **THEN** nothing is deleted and the sheet remains open

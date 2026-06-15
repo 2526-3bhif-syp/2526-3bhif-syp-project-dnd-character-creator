@@ -20,7 +20,7 @@
 
 ## 4. Verification
 
-- [ ] 4.1 Build and run; delete a character from its sheet, confirm, and verify its card disappears from the Deck
-- [ ] 4.2 Cancel a delete and verify nothing is removed and the sheet stays open
-- [ ] 4.3 Delete the last remaining character and verify the empty-state message appears
-- [ ] 4.4 Query the DB to confirm no orphaned rows remain in `character_stats`, `character_skill`, `character_equipment`, `character_spell` for the deleted id
+- [x] 4.1 Build and run; delete a character from its sheet, confirm, and verify its card disappears from the Deck
+- [x] 4.2 Cancel a delete and verify nothing is removed and the sheet stays open
+- [x] 4.3 Delete the last remaining character and verify the empty-state message appears
+- [x] 4.4 Query the DB to confirm no orphaned rows remain in `character_stats`, `character_skill`, `character_equipment`, `character_spell` for the deleted id
