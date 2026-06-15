@@ -5,3 +5,27 @@
 .check-box .label {
     -fx-text-fill: #1A1A1A;
 }
+
+/* Delete button — light by default, fills red on hover */
+.sheet-btn-delete {
+    -fx-background-color: #FFF8E2;
+    -fx-border-color: #8B0000;
+    -fx-border-width: 2;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-text-fill: #8B0000;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(139,0,0,0.3), 8, 0, 0, 0);
+}
+
+.sheet-btn-delete:hover {
+    -fx-background-color: #8B0000;
+    -fx-text-fill: #FFF8E2;
+    -fx-effect: dropshadow(gaussian, rgba(139,0,0,0.6), 14, 0, 0, 0);
+}
+
+.sheet-btn-delete:pressed {
+    -fx-background-color: #6B0000;
+}
