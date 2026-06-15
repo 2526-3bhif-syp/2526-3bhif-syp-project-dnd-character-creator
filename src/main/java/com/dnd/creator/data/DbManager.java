@@ -1196,6 +1196,36 @@ public class DbManager {
         }
     }
 
+    public boolean deleteCharacter(long id) {
+        // SQLite FK enforcement is off on this connection, so ON DELETE CASCADE
+        // does not fire — delete child rows explicitly, then the character row,
+        // all within one transaction (mirrors updateCharacter).
+        try {
+            connection.setAutoCommit(false);
+            try (Statement s = connection.createStatement()) {
+                s.executeUpdate("DELETE FROM character_stats WHERE character_id = " + id);
+                s.executeUpdate("DELETE FROM character_skill WHERE character_id = " + id);
+                s.executeUpdate("DELETE FROM character_equipment WHERE character_id = " + id);
+                s.executeUpdate("DELETE FROM character_spell WHERE character_id = " + id);
+            }
+
+            int affected;
+            try (PreparedStatement stmt = connection.prepareStatement("DELETE FROM \"character\" WHERE id = ?")) {
+                stmt.setLong(1, id);
+                affected = stmt.executeUpdate();
+            }
+
+            connection.commit();
+            return affected > 0;
+        } catch (SQLException e) {
+            System.err.println("Error deleting character: " + e.getMessage());
+            try { connection.rollback(); } catch (SQLException ignored) {}
+            return false;
+        } finally {
+            try { connection.setAutoCommit(true); } catch (SQLException ignored) {}
+        }
+    }
+
     public boolean updateCharacterBackgroundFields(long id, String personality, String ideals, String bonds, String flaws) {
         String sql = "UPDATE \"character\" SET personality_traits = ?, ideals = ?, bonds = ?, flaws = ? WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
