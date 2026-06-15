@@ -69,3 +69,6 @@ docs/slides/revealjs
 #databank
 *.db
 /src/main/data/portraits
+
+# Local AI assistant settings (machine-specific, not shared)
+.claude/settings.local.json
