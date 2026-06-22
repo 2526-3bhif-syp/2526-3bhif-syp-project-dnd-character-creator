@@ -939,15 +939,20 @@
     -fx-background-color: transparent;
     -fx-text-fill: #3A2410;
     -fx-padding: 7 10 7 10;
+    -fx-cursor: default;
+}
+
+/* Only real (filled) rows are interactive — empty filler rows stay inert */
+.rules-tree .tree-cell:filled {
     -fx-cursor: hand;
 }
 
-.rules-tree .tree-cell:hover {
+.rules-tree .tree-cell:filled:hover {
     -fx-background-color: #F5E8C2;
     -fx-text-fill: #6B0000;
 }
 
-.rules-tree .tree-cell:selected {
+.rules-tree .tree-cell:filled:selected {
     -fx-background-color: linear-gradient(to bottom, #8B0000, #6B0000);
     -fx-text-fill: #FFE08A;
 }
@@ -1040,23 +1045,33 @@
 }
 
 .rules-body {
-    -fx-font-size: 14px;
+    -fx-font-size: 14.5px;
     -fx-text-fill: #3A2410;
-    -fx-line-spacing: 4;
+    -fx-line-spacing: 5;
 }
 
 .rules-card {
-    -fx-background-color: linear-gradient(to bottom, rgba(255,252,243,0.99), rgba(245,229,188,0.97));
-    -fx-background-radius: 16;
-    -fx-border-color: rgba(198,166,100,0.95) rgba(138,106,32,0.92) rgba(138,106,32,0.92) rgba(198,166,100,0.95);
+    -fx-background-color:
+        linear-gradient(to bottom, #9B1A1A, #6B0000),
+        linear-gradient(to bottom, rgba(255,252,243,0.99), rgba(245,229,188,0.97));
+    -fx-background-insets: 0, 0 0 0 7;
+    -fx-background-radius: 16, 0 16 16 0;
+    -fx-border-color: rgba(198,166,100,0.95) rgba(138,106,32,0.92) rgba(138,106,32,0.92) transparent;
     -fx-border-width: 1.5;
     -fx-border-radius: 16;
-    -fx-padding: 16 18 16 18;
-    -fx-effect: dropshadow(gaussian, rgba(60,40,10,0.22), 14, 0.22, 0, 4);
+    -fx-padding: 16 20 16 22;
+    -fx-effect: dropshadow(gaussian, rgba(60,40,10,0.22), 16, 0.20, 0, 5);
+}
+
+/* Hairline divider beneath a card's header row */
+.rules-card-header {
+    -fx-border-color: transparent transparent rgba(198,166,100,0.6) transparent;
+    -fx-border-width: 0 0 1.5 0;
+    -fx-padding: 0 0 8 0;
 }
 
 .rules-chip-row {
-    -fx-padding: 2 0 0 0;
+    -fx-padding: 4 0 2 0;
 }
 
 .rules-chip {
@@ -1073,17 +1088,25 @@
 }
 
 .rules-feature-card {
-    -fx-background-color: linear-gradient(to bottom, rgba(255,255,255,0.42), rgba(255,248,233,0.74));
-    -fx-background-radius: 12;
-    -fx-border-color: rgba(198,166,100,0.72) rgba(138,106,32,0.4) rgba(138,106,32,0.4) rgba(198,166,100,0.72);
+    -fx-background-color:
+        linear-gradient(to bottom, #E6C25A, #A37E22),
+        linear-gradient(to bottom, rgba(255,255,255,0.55), rgba(255,247,227,0.85));
+    -fx-background-insets: 0, 0 0 0 5;
+    -fx-background-radius: 12, 0 12 12 0;
+    -fx-border-color: rgba(198,166,100,0.72) rgba(138,106,32,0.4) rgba(138,106,32,0.4) transparent;
     -fx-border-radius: 12;
     -fx-border-width: 1;
-    -fx-padding: 12 14 12 14;
+    -fx-padding: 12 16 12 16;
     -fx-effect: dropshadow(gaussian, rgba(60,40,10,0.12), 8, 0.16, 0, 2);
 }
 
+.rules-feature-card:hover {
+    -fx-translate-y: -1;
+    -fx-effect: dropshadow(gaussian, rgba(60,40,10,0.22), 12, 0.22, 0, 4);
+}
+
 .rules-feature-title {
-    -fx-font-size: 15px;
+    -fx-font-size: 15.5px;
     -fx-font-weight: bold;
     -fx-font-family: "Serif";
     -fx-text-fill: #6B0000;

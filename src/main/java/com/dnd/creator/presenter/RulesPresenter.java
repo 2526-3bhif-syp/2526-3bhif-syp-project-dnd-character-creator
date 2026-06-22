@@ -22,6 +22,10 @@ public class RulesPresenter {
     private final RulesView view;
     private final DbManager dbManager;
 
+    // Grundvölker, die nur als Sammelbegriff dienen und eigene Untervölker besitzen
+    private static final java.util.Set<String> BASE_RACES_WITHOUT_SUBRACE =
+        java.util.Set.of("Dwarf", "Elf", "Gnome", "Halfling");
+
     // Statische Kernregeln
     private static final Map<String, String[]> CORE_RULES = new LinkedHashMap<>();
     static {
@@ -118,9 +122,12 @@ public class RulesPresenter {
         }
         rootItem.getChildren().add(classesItem);
 
-        // Völker aus der Datenbank
+        // Völker aus der Datenbank (Grundvölker ohne Untervolk werden ausgeblendet)
         TreeItem<String> racesItem = new TreeItem<>("Völker");
         for (String race : dbManager.getAllRaces()) {
+            if (BASE_RACES_WITHOUT_SUBRACE.contains(race)) {
+                continue;
+            }
             racesItem.getChildren().add(new TreeItem<>(raceDisplayName(race)));
         }
         rootItem.getChildren().add(racesItem);
@@ -242,10 +249,10 @@ public class RulesPresenter {
         summary.getChildren().add(createCardHeader("📊", "Attributsübersicht"));
         summary.getChildren().add(createChipRow(List.of("Attribut", "Modifikator", "Übungsbonus")));
         if (!measures.isBlank()) {
-            addLabeledBlock(summary, "Bedeutung", localizeDatabaseText(measures));
+            addLabeledBlock(summary, "Bedeutung", measures);
         }
         if (!importantFor.isBlank()) {
-            addLabeledBlock(summary, "Wichtig für", localizeDatabaseText(importantFor));
+            addLabeledBlock(summary, "Wichtig für", importantFor);
         }
         container.getChildren().add(summary);
 
@@ -271,7 +278,7 @@ public class RulesPresenter {
         VBox summary = createCard();
         summary.getChildren().add(createCardHeader("🎯", "Fertigkeit"));
         summary.getChildren().add(createChipRow(List.of("Attribut: " + abilityDisplayName(ability), "Proben: d20 + Modifikator + ggf. Übungsbonus")));
-        summary.getChildren().add(createBodyLabel(description.isBlank() ? "Keine Beschreibung verfügbar." : localizeSkillDescription(name, description)));
+        summary.getChildren().add(createBodyLabel(description.isBlank() ? "Keine Beschreibung verfügbar." : description));
         container.getChildren().add(summary);
     }
 
@@ -309,7 +316,7 @@ public class RulesPresenter {
                     Label featTitle = new Label("Stufe " + feature.get("level") + " — " + feature.get("feature_name"));
                     featTitle.getStyleClass().add("rules-feature-title");
                     String desc = (String) feature.get("description");
-                    Label featDesc = createBodyLabel(desc != null && !desc.isBlank() ? localizeDatabaseText(desc) : "Keine Beschreibung.");
+                    Label featDesc = createBodyLabel(desc != null && !desc.isBlank() ? desc : "Keine Beschreibung.");
                     featureBox.getChildren().addAll(featTitle, featDesc);
                     featuresCard.getChildren().add(featureBox);
                 }
@@ -358,7 +365,7 @@ public class RulesPresenter {
                     Label traitTitle = new Label(trait.get("trait_name"));
                     traitTitle.getStyleClass().add("rules-feature-title");
                     String desc = trait.get("description");
-                    Label traitDesc = createBodyLabel(desc != null && !desc.isBlank() ? localizeDatabaseText(desc) : "Keine Beschreibung.");
+                    Label traitDesc = createBodyLabel(desc != null && !desc.isBlank() ? desc : "Keine Beschreibung.");
                     traitBox.getChildren().addAll(traitTitle, traitDesc);
                     traitsCard.getChildren().add(traitBox);
                 }
@@ -419,6 +426,7 @@ public class RulesPresenter {
     private HBox createCardHeader(String icon, String title) {
         HBox header = new HBox(10);
         header.setAlignment(Pos.CENTER_LEFT);
+        header.getStyleClass().add("rules-card-header");
         Label iconLabel = new Label(icon);
         iconLabel.setStyle("-fx-font-size: 20px;");
         Label titleLabel = new Label(title);
@@ -495,7 +503,7 @@ public class RulesPresenter {
 
     private String extractImportantFor(String description) {
         if (description == null || description.isBlank()) return "";
-        String marker = "Important for:";
+        String marker = "Wichtig für:";
         int index = description.indexOf(marker);
         if (index < 0) return "";
         return description.substring(index + marker.length()).trim().replaceAll("\\.$", "");
@@ -503,10 +511,10 @@ public class RulesPresenter {
 
     private String extractMeasures(String description) {
         if (description == null || description.isBlank()) return "";
-        String marker = "Measures:";
+        String marker = "Bedeutet:";
         int start = description.indexOf(marker);
         if (start < 0) return description.trim();
-        int end = description.indexOf("Important for:");
+        int end = description.indexOf("Wichtig für:");
         String text = end > start ? description.substring(start + marker.length(), end) : description.substring(start + marker.length());
         return text.trim().replaceAll("\\.$", "");
     }
@@ -526,30 +534,6 @@ public class RulesPresenter {
             case "CHA" -> "Charisma";
             case "Charisma" -> "Charisma";
             default -> englishName;
-        };
-    }
-
-    private String localizeSkillDescription(String skillName, String rawDescription) {
-        return switch (skillName) {
-            case "Acrobatics" -> "Deine Fähigkeit, in schwierigen Situationen auf den Beinen zu bleiben und akrobatische Kunststücke auszuführen.";
-            case "Animal Handling" -> "Deine Fähigkeit, domestizierte Tiere zu beruhigen, Reittiere zu kontrollieren und die Absichten eines Tieres zu erahnen.";
-            case "Arcana" -> "Deine Fähigkeit, Wissen über Zauber, magische Gegenstände, arkane Symbole und magische Traditionen abzurufen.";
-            case "Athletics" -> "Deine Fähigkeit, zu klettern, zu springen, zu schwimmen und andere körperliche Leistungen zu vollbringen.";
-            case "Deception" -> "Deine Fähigkeit, die Wahrheit überzeugend zu verbergen, ob durch Täuschung oder offenes Lügen.";
-            case "History" -> "Deine Fähigkeit, Wissen über historische Ereignisse, legendäre Personen, alte Königreiche und Kriege abzurufen.";
-            case "Insight" -> "Deine Fähigkeit, die wahren Absichten einer Kreatur zu erkennen, zum Beispiel wenn du eine Lüge aufdeckst.";
-            case "Intimidation" -> "Deine Fähigkeit, andere durch Drohungen, feindseliges Verhalten und körperliche Gewalt zu beeinflussen.";
-            case "Investigation" -> "Deine Fähigkeit, nach Hinweisen zu suchen und aus ihnen logische Schlüsse zu ziehen.";
-            case "Medicine" -> "Deine Fähigkeit, einen sterbenden Gefährten zu stabilisieren oder eine Krankheit zu diagnostizieren.";
-            case "Nature" -> "Deine Fähigkeit, Wissen über Tiere, Pflanzen, Jahreszeiten, Wetter und natürliche Kreisläufe abzurufen.";
-            case "Perception" -> "Deine Fähigkeit, deine Umgebung aufmerksam wahrzunehmen und versteckte Dinge zu bemerken.";
-            case "Performance" -> "Deine Fähigkeit, andere mit Musik, Schauspiel, Tanz oder anderen Darbietungen zu unterhalten.";
-            case "Persuasion" -> "Deine Fähigkeit, andere mit Diplomatie, Charme und überzeugenden Worten zu bewegen.";
-            case "Religion" -> "Deine Fähigkeit, Wissen über Götter, Rituale, heilige Symbole und religiöse Traditionen abzurufen.";
-            case "Sleight of Hand" -> "Deine Fingerfertigkeit für Taschenspielertricks, das Verstecken von Gegenständen und geschickte Handarbeit.";
-            case "Stealth" -> "Deine Fähigkeit, dich leise zu bewegen und unbemerkt zu bleiben.";
-            case "Survival" -> "Deine Fähigkeit, in der Wildnis zu überleben, Spuren zu lesen und dich in der Natur zurechtzufinden.";
-            default -> rawDescription;
         };
     }
 
@@ -588,18 +572,6 @@ public class RulesPresenter {
         text = text.replace("Martial Melee", "Kriegsnahkampfwaffen");
         text = text.replace("Martial Ranged", "Kriegsfernkampfwaffen");
         return text;
-    }
-
-    private String abilityDisplayName(String englishName) {
-        return switch (englishName) {
-            case "Strength" -> "Stärke";
-            case "Dexterity" -> "Geschicklichkeit";
-            case "Constitution" -> "Konstitution";
-            case "Intelligence" -> "Intelligenz";
-            case "Wisdom" -> "Weisheit";
-            case "Charisma" -> "Charisma";
-            default -> englishName;
-        };
     }
 
     private String skillDisplayName(String englishName) {
@@ -651,11 +623,12 @@ public class RulesPresenter {
             case "Mountain Dwarf" -> "Bergzwerg";
             case "High Elf" -> "Hochelf";
             case "Wood Elf" -> "Waldelf";
-            case "Dark Elf" -> "Dunkelelf";
+            case "Drow" -> "Dunkelelf";
             case "Lightfoot Halfling" -> "Leichtfuß-Halbling";
             case "Stout Halfling" -> "Robust-Halbling";
             case "Dragonborn" -> "Drachengeborener";
-            case "Gnome" -> "Gnom";
+            case "Forest Gnome" -> "Waldgnom";
+            case "Rock Gnome" -> "Felsgnom";
             case "Half-Elf" -> "Halbelf";
             case "Half-Orc" -> "Halbork";
             case "Tiefling" -> "Tiefling";
@@ -745,11 +718,12 @@ public class RulesPresenter {
                 case "Bergzwerg" -> "Mountain Dwarf";
                 case "Hochelf" -> "High Elf";
                 case "Waldelf" -> "Wood Elf";
-                case "Dunkelelf" -> "Dark Elf";
+                case "Dunkelelf" -> "Drow";
                 case "Leichtfuß-Halbling" -> "Lightfoot Halfling";
                 case "Robust-Halbling" -> "Stout Halfling";
                 case "Drachengeborener" -> "Dragonborn";
-                case "Gnom" -> "Gnome";
+                case "Waldgnom" -> "Forest Gnome";
+                case "Felsgnom" -> "Rock Gnome";
                 case "Halbelf" -> "Half-Elf";
                 case "Halbork" -> "Half-Orc";
                 case "Tiefling" -> "Tiefling";

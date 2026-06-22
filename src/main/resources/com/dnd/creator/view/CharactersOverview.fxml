@@ -22,10 +22,10 @@
         </ScrollPane>
         <Label fx:id="emptyLabel" style="-fx-font-size: 20; -fx-text-fill: #8B7355; -fx-font-style: italic;" text="Keine Charaktere" />
     </StackPane>
-    <HBox alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308">
+    <HBox alignment="CENTER" maxWidth="1.7976931348623157E308">
         <Button text="◀ Zurück"
                 onAction="#handleBackToMain"
-                style="-fx-background-color: #FFF8E2; -fx-border-color: #C6A664; -fx-border-radius: 10; -fx-background-radius: 10; -fx-text-fill: #6B4A1A; -fx-border-width: 2; -fx-font-size: 16px; -fx-cursor: hand;"
+                styleClass="nav-button-back"
                 prefWidth="160"
                 prefHeight="42" />
     </HBox>

@@ -22,6 +22,7 @@ public class CharactersOverviewView {
         loader.setController(this);
         try {
             root = loader.load();
+            CreationStyles.attach(root);
         } catch (IOException e) {
             throw new RuntimeException("Failed to load CharactersOverview.fxml", e);
         }
