@@ -895,6 +895,14 @@
     -fx-effect: dropshadow(gaussian, rgba(60,40,10,0.18), 12, 0.18, 0, 3);
 }
 
+.rules-sidebar-header {
+    -fx-background-insets: 0;
+}
+
+.rules-reader-header {
+    -fx-background-insets: 0;
+}
+
 .rules-sidebar-title,
 .rules-reader-title {
     -fx-font-size: 19px;
@@ -921,6 +929,10 @@
     -fx-font-size: 15px;
     -fx-text-fill: #3A2410;
     -fx-effect: dropshadow(gaussian, rgba(60,40,10,0.16), 10, 0.18, 0, 2);
+}
+
+.rules-tree .tree-cell:filled .tree-disclosure-node .arrow {
+    -fx-background-color: #8A6A20;
 }
 
 .rules-tree .tree-cell {
@@ -985,10 +997,31 @@
     -fx-background-color: linear-gradient(to bottom, #FFFDF5, #F7EBC6);
 }
 
+.rules-scroll-pane .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 14;
+}
+
+.rules-scroll-pane .scroll-bar:vertical .track {
+    -fx-background-color: rgba(255,251,237,0.55);
+    -fx-background-radius: 999;
+}
+
+.rules-scroll-pane .scroll-bar:vertical .thumb {
+    -fx-background-color: linear-gradient(to bottom, #D4AF37, #8A6A20);
+    -fx-background-radius: 999;
+}
+
+.rules-scroll-pane .scroll-bar:vertical .increment-button,
+.rules-scroll-pane .scroll-bar:vertical .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
 .rules-content-pane {
     -fx-background-color: linear-gradient(to bottom, rgba(255,253,245,0.98), rgba(247,235,198,0.98));
     -fx-background-radius: 14;
-    -fx-padding: 4;
+    -fx-padding: 8;
 }
 
 .rules-title {
@@ -1042,7 +1075,7 @@
 .rules-feature-card {
     -fx-background-color: linear-gradient(to bottom, rgba(255,255,255,0.42), rgba(255,248,233,0.74));
     -fx-background-radius: 12;
-    -fx-border-color: rgba(198,166,100,0.72);
+    -fx-border-color: rgba(198,166,100,0.72) rgba(138,106,32,0.4) rgba(138,106,32,0.4) rgba(198,166,100,0.72);
     -fx-border-radius: 12;
     -fx-border-width: 1;
     -fx-padding: 12 14 12 14;
