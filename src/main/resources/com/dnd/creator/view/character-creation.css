@@ -856,3 +856,73 @@
     -fx-background-color: #AA2020;
     -fx-effect: dropshadow(gaussian, rgba(255,50,50,0.55), 12, 0, 0, 0);
 }
+
+/* ---------- Rules & Codex Screen ---------- */
+.rules-tree {
+    -fx-background-color: #FFFBED;
+    -fx-border-color: #C6A664;
+    -fx-border-width: 2;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-padding: 10;
+    -fx-font-family: "Serif";
+    -fx-font-size: 15px;
+    -fx-text-fill: #3A2410;
+}
+
+.rules-tree .tree-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #3A2410;
+    -fx-padding: 6;
+    -fx-cursor: hand;
+}
+
+.rules-tree .tree-cell:hover {
+    -fx-background-color: #F5E8C2;
+    -fx-text-fill: #6B0000;
+}
+
+.rules-tree .tree-cell:selected {
+    -fx-background-color: #8B0000;
+    -fx-text-fill: #FFD700;
+}
+
+.rules-scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+    -fx-border-color: #C6A664;
+    -fx-border-width: 2;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+}
+
+.rules-content-pane {
+    -fx-background-color: #FFFBED;
+    -fx-background-radius: 12;
+}
+
+.rules-title {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Serif";
+    -fx-text-fill: #6B0000;
+    -fx-effect: dropshadow(gaussian, rgba(212,175,55,0.4), 6, 0, 0, 0);
+}
+
+.rules-subtitle {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #8A6A20;
+    -fx-font-family: "Serif";
+}
+
+.rules-body {
+    -fx-font-size: 14px;
+    -fx-text-fill: #3A2410;
+    -fx-line-spacing: 4;
+}
+
+.rules-bold-label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #6B0000;
+}
