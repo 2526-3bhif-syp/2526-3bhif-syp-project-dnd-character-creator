@@ -22,12 +22,12 @@ public class RulesPresenter {
     private final RulesView view;
     private final DbManager dbManager;
 
-    // Statische Kernregeln für das Spiel
+    // Statische Kernregeln
     private static final Map<String, String[]> CORE_RULES = new LinkedHashMap<>();
     static {
         CORE_RULES.put("Würfeln mit dem d20", new String[]{
             "🎲 Das Herzstück des Spiels",
-            "Wenn der Ausgang einer Aktion unsicher ist, wirfst du in der Regel einen d20 und addierst passende Boni oder Mali. Der Spielleiter sagt dir, welche Probe nötig ist und welche Schwelle du erreichen musst.",
+            "Wenn der Ausgang einer Aktion unsicher ist, würfelst du in der Regel einen d20 und addierst passende Boni oder Mali. Der Spielleiter sagt dir, welche Probe nötig ist und welche Schwelle du erreichen musst.",
             "Typische Würfe:\n" +
             "• Angriff: d20 + Angriffsbonus gegen die Rüstungsklasse (RK)\n" +
             "• Attributsprobe: d20 + Attributsmodifikator + ggf. Übungsbonus gegen den Schwierigkeitsgrad (SG)\n" +
@@ -100,28 +100,28 @@ public class RulesPresenter {
         // Attribute aus der Datenbank
         TreeItem<String> abilitiesItem = new TreeItem<>("Attribute");
         for (String ability : dbManager.getAllAbilities()) {
-            abilitiesItem.getChildren().add(new TreeItem<>(ability));
+            abilitiesItem.getChildren().add(new TreeItem<>(abilityDisplayName(ability)));
         }
         rootItem.getChildren().add(abilitiesItem);
 
         // Fertigkeiten aus der Datenbank
         TreeItem<String> skillsItem = new TreeItem<>("Fertigkeiten");
         for (String skill : dbManager.getAllSkills()) {
-            skillsItem.getChildren().add(new TreeItem<>(skill));
+            skillsItem.getChildren().add(new TreeItem<>(skillDisplayName(skill)));
         }
         rootItem.getChildren().add(skillsItem);
 
         // Klassen aus der Datenbank
         TreeItem<String> classesItem = new TreeItem<>("Klassen");
         for (String clazz : dbManager.getAllClasses()) {
-            classesItem.getChildren().add(new TreeItem<>(clazz));
+            classesItem.getChildren().add(new TreeItem<>(classDisplayName(clazz)));
         }
         rootItem.getChildren().add(classesItem);
 
         // Völker aus der Datenbank
         TreeItem<String> racesItem = new TreeItem<>("Völker");
         for (String race : dbManager.getAllRaces()) {
-            racesItem.getChildren().add(new TreeItem<>(race));
+            racesItem.getChildren().add(new TreeItem<>(raceDisplayName(race)));
         }
         rootItem.getChildren().add(racesItem);
 
@@ -155,7 +155,7 @@ public class RulesPresenter {
         view.getRulesTree().getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
             if (newSel != null && newSel.isLeaf() && newSel.getParent() != null) {
                 String category = newSel.getParent().getValue();
-                String name = newSel.getValue();
+                String name = toEnglishName(category, newSel.getValue());
                 showContent(category, name);
             }
         });
@@ -235,17 +235,17 @@ public class RulesPresenter {
         String importantFor = extractImportantFor(description);
         String measures = extractMeasures(description);
 
-        addTitle(container, name, abilityIcon(name));
+        addTitle(container, abilityDisplayName(name), abilityIcon(name));
         container.getChildren().add(makeSeparator());
 
         VBox summary = createCard();
         summary.getChildren().add(createCardHeader("📊", "Attributsübersicht"));
         summary.getChildren().add(createChipRow(List.of("Attribut", "Modifikator", "Übungsbonus")));
         if (!measures.isBlank()) {
-            addLabeledBlock(summary, "Bedeutung", measures);
+            addLabeledBlock(summary, "Bedeutung", localizeDatabaseText(measures));
         }
         if (!importantFor.isBlank()) {
-            addLabeledBlock(summary, "Wichtig für", importantFor);
+            addLabeledBlock(summary, "Wichtig für", localizeDatabaseText(importantFor));
         }
         container.getChildren().add(summary);
 
@@ -265,13 +265,13 @@ public class RulesPresenter {
             .map(s -> s.get("ability"))
             .findFirst().orElse("—");
 
-        addTitle(container, name, "🎯");
+        addTitle(container, skillDisplayName(name), "🎯");
         container.getChildren().add(makeSeparator());
 
         VBox summary = createCard();
         summary.getChildren().add(createCardHeader("🎯", "Fertigkeit"));
-        summary.getChildren().add(createChipRow(List.of("Attribut: " + ability, "Proben: d20 + Modifikator + ggf. Übungsbonus")));
-        summary.getChildren().add(createBodyLabel(description.isBlank() ? "Keine Beschreibung verfügbar." : description));
+        summary.getChildren().add(createChipRow(List.of("Attribut: " + abilityDisplayName(ability), "Proben: d20 + Modifikator + ggf. Übungsbonus")));
+        summary.getChildren().add(createBodyLabel(description.isBlank() ? "Keine Beschreibung verfügbar." : localizeSkillDescription(name, description)));
         container.getChildren().add(summary);
     }
 
@@ -279,7 +279,7 @@ public class RulesPresenter {
         VBox container = view.getContentPane();
         Map<String, Object> classInfo = dbManager.getClassByName(name);
 
-        addTitle(container, name, classIcon(name));
+        addTitle(container, classDisplayName(name), classIcon(name));
         container.getChildren().add(makeSeparator());
 
         if (classInfo != null) {
@@ -289,13 +289,13 @@ public class RulesPresenter {
 
             List<String> savingThrows = castStringList(classInfo.get("saving_throws"));
             if (!savingThrows.isEmpty()) {
-                addLabeledBlock(summary, "Rettungswürfe", String.join(", ", savingThrows));
+                addLabeledBlock(summary, "Rettungswürfe", String.join(", ", savingThrows.stream().map(this::abilityDisplayName).toList()));
             }
 
             @SuppressWarnings("unchecked")
             List<String> profs = (List<String>) classInfo.get("proficiencies");
             if (profs != null && !profs.isEmpty()) {
-                addLabeledBlock(summary, "Übungen", String.join(", ", profs));
+                addLabeledBlock(summary, "Übungen", localizeDatabaseText(String.join(", ", profs)));
             }
             container.getChildren().add(summary);
 
@@ -309,7 +309,7 @@ public class RulesPresenter {
                     Label featTitle = new Label("Stufe " + feature.get("level") + " — " + feature.get("feature_name"));
                     featTitle.getStyleClass().add("rules-feature-title");
                     String desc = (String) feature.get("description");
-                    Label featDesc = createBodyLabel(desc != null && !desc.isBlank() ? desc : "Keine Beschreibung.");
+                    Label featDesc = createBodyLabel(desc != null && !desc.isBlank() ? localizeDatabaseText(desc) : "Keine Beschreibung.");
                     featureBox.getChildren().addAll(featTitle, featDesc);
                     featuresCard.getChildren().add(featureBox);
                 }
@@ -324,27 +324,27 @@ public class RulesPresenter {
         VBox container = view.getContentPane();
         Race race = dbManager.getRaceByName(name);
 
-        addTitle(container, name, "🧝");
+        addTitle(container, raceDisplayName(name), "🧝");
         container.getChildren().add(makeSeparator());
 
         if (race != null) {
             VBox summary = createCard();
             summary.getChildren().add(createCardHeader("🧬", "Volksprofil"));
             summary.getChildren().add(createChipRow(List.of(
-                "Größe: " + (race.getSize() != null ? race.getSize() : "—"),
+                "Größe: " + raceSizeDisplayName(race.getSize()),
                 "Bewegung: " + race.getSpeed() + " Fuß"
             )));
 
             if (!race.getAbilityBonuses().isEmpty()) {
                 FlowPane abilityChips = createChipRow(race.getAbilityBonuses().entrySet().stream()
-                    .map(entry -> entry.getKey() + " +" + entry.getValue())
+                    .map(entry -> abilityDisplayName(entry.getKey()) + " +" + entry.getValue())
                     .toList());
                 summary.getChildren().add(addLabeledHeader("Attributsboni", "💪"));
                 summary.getChildren().add(abilityChips);
             }
 
             if (!race.getLanguages().isEmpty()) {
-                addLabeledBlock(summary, "Sprachen", String.join(", ", race.getLanguages()));
+                addLabeledBlock(summary, "Sprachen", String.join(", ", race.getLanguages().stream().map(this::languageDisplayName).toList()));
             }
             container.getChildren().add(summary);
 
@@ -358,7 +358,7 @@ public class RulesPresenter {
                     Label traitTitle = new Label(trait.get("trait_name"));
                     traitTitle.getStyleClass().add("rules-feature-title");
                     String desc = trait.get("description");
-                    Label traitDesc = createBodyLabel(desc != null && !desc.isBlank() ? desc : "Keine Beschreibung.");
+                    Label traitDesc = createBodyLabel(desc != null && !desc.isBlank() ? localizeDatabaseText(desc) : "Keine Beschreibung.");
                     traitBox.getChildren().addAll(traitTitle, traitDesc);
                     traitsCard.getChildren().add(traitBox);
                 }
@@ -471,10 +471,10 @@ public class RulesPresenter {
         Object spell = classInfo.get("spellcasting_ability");
         chips.add("Trefferwürfel: d" + (hitDie != null ? hitDie : "?"));
         if (primary != null) {
-            chips.add("Primär: " + primary);
+            chips.add("Primär: " + abilityDisplayName(String.valueOf(primary)));
         }
         if (spell != null) {
-            chips.add("Zauberattribut: " + spell);
+            chips.add("Zauberattribut: " + abilityDisplayName(String.valueOf(spell)));
         }
         return chips;
     }
@@ -509,6 +509,254 @@ public class RulesPresenter {
         int end = description.indexOf("Important for:");
         String text = end > start ? description.substring(start + marker.length(), end) : description.substring(start + marker.length());
         return text.trim().replaceAll("\\.$", "");
+    }
+
+    private String abilityDisplayName(String englishName) {
+        return switch (englishName) {
+            case "STR" -> "Stärke";
+            case "Strength" -> "Stärke";
+            case "DEX" -> "Geschicklichkeit";
+            case "Dexterity" -> "Geschicklichkeit";
+            case "CON" -> "Konstitution";
+            case "Constitution" -> "Konstitution";
+            case "INT" -> "Intelligenz";
+            case "Intelligence" -> "Intelligenz";
+            case "WIS" -> "Weisheit";
+            case "Wisdom" -> "Weisheit";
+            case "CHA" -> "Charisma";
+            case "Charisma" -> "Charisma";
+            default -> englishName;
+        };
+    }
+
+    private String localizeSkillDescription(String skillName, String rawDescription) {
+        return switch (skillName) {
+            case "Acrobatics" -> "Deine Fähigkeit, in schwierigen Situationen auf den Beinen zu bleiben und akrobatische Kunststücke auszuführen.";
+            case "Animal Handling" -> "Deine Fähigkeit, domestizierte Tiere zu beruhigen, Reittiere zu kontrollieren und die Absichten eines Tieres zu erahnen.";
+            case "Arcana" -> "Deine Fähigkeit, Wissen über Zauber, magische Gegenstände, arkane Symbole und magische Traditionen abzurufen.";
+            case "Athletics" -> "Deine Fähigkeit, zu klettern, zu springen, zu schwimmen und andere körperliche Leistungen zu vollbringen.";
+            case "Deception" -> "Deine Fähigkeit, die Wahrheit überzeugend zu verbergen, ob durch Täuschung oder offenes Lügen.";
+            case "History" -> "Deine Fähigkeit, Wissen über historische Ereignisse, legendäre Personen, alte Königreiche und Kriege abzurufen.";
+            case "Insight" -> "Deine Fähigkeit, die wahren Absichten einer Kreatur zu erkennen, zum Beispiel wenn du eine Lüge aufdeckst.";
+            case "Intimidation" -> "Deine Fähigkeit, andere durch Drohungen, feindseliges Verhalten und körperliche Gewalt zu beeinflussen.";
+            case "Investigation" -> "Deine Fähigkeit, nach Hinweisen zu suchen und aus ihnen logische Schlüsse zu ziehen.";
+            case "Medicine" -> "Deine Fähigkeit, einen sterbenden Gefährten zu stabilisieren oder eine Krankheit zu diagnostizieren.";
+            case "Nature" -> "Deine Fähigkeit, Wissen über Tiere, Pflanzen, Jahreszeiten, Wetter und natürliche Kreisläufe abzurufen.";
+            case "Perception" -> "Deine Fähigkeit, deine Umgebung aufmerksam wahrzunehmen und versteckte Dinge zu bemerken.";
+            case "Performance" -> "Deine Fähigkeit, andere mit Musik, Schauspiel, Tanz oder anderen Darbietungen zu unterhalten.";
+            case "Persuasion" -> "Deine Fähigkeit, andere mit Diplomatie, Charme und überzeugenden Worten zu bewegen.";
+            case "Religion" -> "Deine Fähigkeit, Wissen über Götter, Rituale, heilige Symbole und religiöse Traditionen abzurufen.";
+            case "Sleight of Hand" -> "Deine Fingerfertigkeit für Taschenspielertricks, das Verstecken von Gegenständen und geschickte Handarbeit.";
+            case "Stealth" -> "Deine Fähigkeit, dich leise zu bewegen und unbemerkt zu bleiben.";
+            case "Survival" -> "Deine Fähigkeit, in der Wildnis zu überleben, Spuren zu lesen und dich in der Natur zurechtzufinden.";
+            default -> rawDescription;
+        };
+    }
+
+    private String localizeDatabaseText(String rawText) {
+        if (rawText == null || rawText.isBlank()) return rawText;
+        String text = rawText;
+        text = text.replace("Measures:", "Bedeutet:");
+        text = text.replace("Important for:", "Wichtig für:");
+        text = text.replace("Your ability to", "Deine Fähigkeit,");
+        text = text.replace("your ability to", "deine Fähigkeit,");
+        text = text.replace("You can", "Du kannst");
+        text = text.replace("you can", "du kannst");
+        text = text.replace("You have", "Du hast");
+        text = text.replace("you have", "du hast");
+        text = text.replace("When ", "Wenn ");
+        text = text.replace("when ", "wenn ");
+        text = text.replace("While ", "Solange ");
+        text = text.replace("while ", "solange ");
+        text = text.replace("short rest", "kurze Rast");
+        text = text.replace("long rest", "lange Rast");
+        text = text.replace("hit points", "Trefferpunkte");
+        text = text.replace("saving throw", "Rettungswurf");
+        text = text.replace("skill", "Fertigkeit");
+        text = text.replace("attack", "Angriff");
+        text = text.replace("damage", "Schaden");
+        text = text.replace("spell", "Zauber");
+        text = text.replace("weapon", "Waffe");
+        text = text.replace("tool", "Werkzeug");
+        text = text.replace("feet", "Fuß");
+        text = text.replace("Light Armor", "Leichte Rüstung");
+        text = text.replace("Medium Armor", "Mittlere Rüstung");
+        text = text.replace("Heavy Armor", "Schwere Rüstung");
+        text = text.replace("Shields", "Schilde");
+        text = text.replace("Simple Melee", "Einfache Nahkampfwaffen");
+        text = text.replace("Simple Ranged", "Einfache Fernkampfwaffen");
+        text = text.replace("Martial Melee", "Kriegsnahkampfwaffen");
+        text = text.replace("Martial Ranged", "Kriegsfernkampfwaffen");
+        return text;
+    }
+
+    private String abilityDisplayName(String englishName) {
+        return switch (englishName) {
+            case "Strength" -> "Stärke";
+            case "Dexterity" -> "Geschicklichkeit";
+            case "Constitution" -> "Konstitution";
+            case "Intelligence" -> "Intelligenz";
+            case "Wisdom" -> "Weisheit";
+            case "Charisma" -> "Charisma";
+            default -> englishName;
+        };
+    }
+
+    private String skillDisplayName(String englishName) {
+        return switch (englishName) {
+            case "Acrobatics" -> "Akrobatik";
+            case "Animal Handling" -> "Umgang mit Tieren";
+            case "Arcana" -> "Arkane Kunde";
+            case "Athletics" -> "Athletik";
+            case "Deception" -> "Täuschung";
+            case "History" -> "Geschichte";
+            case "Insight" -> "Motiv erkennen";
+            case "Intimidation" -> "Einschüchtern";
+            case "Investigation" -> "Nachforschung";
+            case "Medicine" -> "Heilkunde";
+            case "Nature" -> "Naturkunde";
+            case "Perception" -> "Wahrnehmung";
+            case "Performance" -> "Auftreten";
+            case "Persuasion" -> "Überzeugen";
+            case "Religion" -> "Religion";
+            case "Sleight of Hand" -> "Fingerfertigkeit";
+            case "Stealth" -> "Heimlichkeit";
+            case "Survival" -> "Überleben";
+            default -> englishName;
+        };
+    }
+
+    private String classDisplayName(String englishName) {
+        return switch (englishName) {
+            case "Barbarian" -> "Barbar";
+            case "Bard" -> "Barde";
+            case "Cleric" -> "Kleriker";
+            case "Druid" -> "Druide";
+            case "Fighter" -> "Kämpfer";
+            case "Monk" -> "Mönch";
+            case "Paladin" -> "Paladin";
+            case "Ranger" -> "Waldläufer";
+            case "Rogue" -> "Schurke";
+            case "Sorcerer" -> "Zauberer";
+            case "Warlock" -> "Hexenmeister";
+            case "Wizard" -> "Magier";
+            default -> englishName;
+        };
+    }
+
+    private String raceDisplayName(String englishName) {
+        return switch (englishName) {
+            case "Human" -> "Mensch";
+            case "Hill Dwarf" -> "Hügelzwerg";
+            case "Mountain Dwarf" -> "Bergzwerg";
+            case "High Elf" -> "Hochelf";
+            case "Wood Elf" -> "Waldelf";
+            case "Dark Elf" -> "Dunkelelf";
+            case "Lightfoot Halfling" -> "Leichtfuß-Halbling";
+            case "Stout Halfling" -> "Robust-Halbling";
+            case "Dragonborn" -> "Drachengeborener";
+            case "Gnome" -> "Gnom";
+            case "Half-Elf" -> "Halbelf";
+            case "Half-Orc" -> "Halbork";
+            case "Tiefling" -> "Tiefling";
+            default -> englishName;
+        };
+    }
+
+    private String raceSizeDisplayName(String size) {
+        return switch (size) {
+            case "Small" -> "Klein";
+            case "Medium" -> "Mittel";
+            case "Large" -> "Groß";
+            case "Tiny" -> "Winzig";
+            default -> size != null && !size.isBlank() ? size : "—";
+        };
+    }
+
+    private String languageDisplayName(String language) {
+        return switch (language) {
+            case "Common" -> "Gemeinsprache";
+            case "Dwarvish" -> "Zwergisch";
+            case "Elvish" -> "Elfisch";
+            case "Giant" -> "Riesisch";
+            case "Gnomish" -> "Gnomisch";
+            case "Goblin" -> "Goblinisch";
+            case "Halfling" -> "Halblingssprache";
+            case "Orc" -> "Orkisch";
+            case "Draconic" -> "Drachisch";
+            case "Deep Speech" -> "Tiefensprache";
+            case "Infernal" -> "Infernalisch";
+            case "Celestial" -> "Himmlisch";
+            case "Primordial" -> "Ursprache";
+            default -> language;
+        };
+    }
+
+    private String toEnglishName(String category, String displayName) {
+        return switch (category) {
+            case "Attribute" -> switch (displayName) {
+                case "Stärke" -> "Strength";
+                case "Geschicklichkeit" -> "Dexterity";
+                case "Konstitution" -> "Constitution";
+                case "Intelligenz" -> "Intelligence";
+                case "Weisheit" -> "Wisdom";
+                case "Charisma" -> "Charisma";
+                default -> displayName;
+            };
+            case "Fertigkeiten" -> switch (displayName) {
+                case "Akrobatik" -> "Acrobatics";
+                case "Umgang mit Tieren" -> "Animal Handling";
+                case "Arkane Kunde" -> "Arcana";
+                case "Athletik" -> "Athletics";
+                case "Täuschung" -> "Deception";
+                case "Geschichte" -> "History";
+                case "Motiv erkennen" -> "Insight";
+                case "Einschüchtern" -> "Intimidation";
+                case "Nachforschung" -> "Investigation";
+                case "Heilkunde" -> "Medicine";
+                case "Naturkunde" -> "Nature";
+                case "Wahrnehmung" -> "Perception";
+                case "Auftreten" -> "Performance";
+                case "Überzeugen" -> "Persuasion";
+                case "Religion" -> "Religion";
+                case "Fingerfertigkeit" -> "Sleight of Hand";
+                case "Heimlichkeit" -> "Stealth";
+                case "Überleben" -> "Survival";
+                default -> displayName;
+            };
+            case "Klassen" -> switch (displayName) {
+                case "Barbar" -> "Barbarian";
+                case "Barde" -> "Bard";
+                case "Kleriker" -> "Cleric";
+                case "Druide" -> "Druid";
+                case "Kämpfer" -> "Fighter";
+                case "Mönch" -> "Monk";
+                case "Paladin" -> "Paladin";
+                case "Waldläufer" -> "Ranger";
+                case "Schurke" -> "Rogue";
+                case "Zauberer" -> "Sorcerer";
+                case "Hexenmeister" -> "Warlock";
+                case "Magier" -> "Wizard";
+                default -> displayName;
+            };
+            case "Völker" -> switch (displayName) {
+                case "Mensch" -> "Human";
+                case "Hügelzwerg" -> "Hill Dwarf";
+                case "Bergzwerg" -> "Mountain Dwarf";
+                case "Hochelf" -> "High Elf";
+                case "Waldelf" -> "Wood Elf";
+                case "Dunkelelf" -> "Dark Elf";
+                case "Leichtfuß-Halbling" -> "Lightfoot Halfling";
+                case "Robust-Halbling" -> "Stout Halfling";
+                case "Drachengeborener" -> "Dragonborn";
+                case "Gnom" -> "Gnome";
+                case "Halbelf" -> "Half-Elf";
+                case "Halbork" -> "Half-Orc";
+                case "Tiefling" -> "Tiefling";
+                default -> displayName;
+            };
+            default -> displayName;
+        };
     }
 
     private String abilityIcon(String name) {
