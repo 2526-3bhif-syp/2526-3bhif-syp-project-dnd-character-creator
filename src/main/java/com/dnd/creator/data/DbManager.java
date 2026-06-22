@@ -161,6 +161,9 @@ public class DbManager {
         return result;
     }
 
+
+
+
     public Race getRaceByName(String raceName) {
         String query = "SELECT name, size, speed FROM race WHERE name = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -954,6 +957,60 @@ public class DbManager {
             while (rs.next())
                 result.add(new String[]{rs.getString("feature_name"), rs.getString("description")});
         } catch (SQLException e) {
+            System.err.println("Error loading class features at level: " + e.getMessage());
+        }
+        return result;
+    }
+
+    public List<Map<String, String>> getAbilities() {
+        List<Map<String, String>> result = new ArrayList<>();
+        String query = "SELECT name, description FROM ability ORDER BY name";
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+            while (rs.next()) {
+                Map<String, String> row = new HashMap<>();
+                row.put("name", rs.getString("name"));
+                row.put("description", rs.getString("description"));
+                result.add(row);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error loading abilities: " + e.getMessage());
+        }
+        return result;
+    }
+
+    public List<Map<String, String>> getSkillsWithAbilities() {
+        List<Map<String, String>> result = new ArrayList<>();
+        String query = "SELECT name, ability, description FROM skill ORDER BY name";
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+            while (rs.next()) {
+                Map<String, String> row = new HashMap<>();
+                row.put("name", rs.getString("name"));
+                row.put("ability", rs.getString("ability"));
+                row.put("description", rs.getString("description"));
+                result.add(row);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error loading skills with abilities: " + e.getMessage());
+        }
+        return result;
+    }
+
+    public List<Map<String, Object>> getClassFeatures(String className) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        String query = "SELECT level, feature_name, description FROM class_feature WHERE class_name = ? ORDER BY level, feature_name";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, className);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Map<String, Object> row = new HashMap<>();
+                row.put("level", rs.getInt("level"));
+                row.put("feature_name", rs.getString("feature_name"));
+                row.put("description", rs.getString("description"));
+                result.add(row);
+            }
+        } catch (SQLException e) {
             System.err.println("Error loading class features: " + e.getMessage());
         }
         return result;
@@ -971,6 +1028,21 @@ public class DbManager {
                 result.add(new String[]{rs.getString("feature_name"), rs.getString("description")});
         } catch (SQLException e) {
             System.err.println("Error loading subclass features: " + e.getMessage());
+        }
+        return result;
+    }
+
+    // ===== ABILITY & SKILL HELPERS =====
+    public List<String> getAllAbilities() {
+        List<String> result = new ArrayList<>();
+        String query = "SELECT name FROM ability ORDER BY name";
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+            while (rs.next()) {
+                result.add(rs.getString("name"));
+            }
+        } catch (SQLException e) {
+            System.err.println("Error loading abilities list: " + e.getMessage());
         }
         return result;
     }
@@ -1239,5 +1311,53 @@ public class DbManager {
             System.err.println("Error updating character background fields: " + e.getMessage());
             return false;
         }
+    }
+
+    public String getAbilityDescription(String abilityName) {
+        String query = "SELECT description FROM ability WHERE name = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, abilityName);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getString("description");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error loading ability description: " + e.getMessage());
+        }
+        return "";
+    }
+
+
+
+    public String getSkillDescription(String skillName) {
+        String query = "SELECT description FROM skill WHERE name = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, skillName);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getString("description");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error loading skill description: " + e.getMessage());
+        }
+        return "";
+    }
+
+    public List<Map<String, String>> getRaceTraits(String raceName) {
+        List<Map<String, String>> result = new ArrayList<>();
+        String query = "SELECT trait_name, description FROM race_trait WHERE race_name = ? ORDER BY trait_name";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, raceName);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Map<String, String> row = new HashMap<>();
+                row.put("trait_name", rs.getString("trait_name"));
+                row.put("description", rs.getString("description"));
+                result.add(row);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error loading race traits: " + e.getMessage());
+        }
+        return result;
     }
 }

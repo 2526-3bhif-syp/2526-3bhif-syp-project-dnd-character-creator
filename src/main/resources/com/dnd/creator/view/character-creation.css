@@ -856,3 +856,263 @@
     -fx-background-color: #AA2020;
     -fx-effect: dropshadow(gaussian, rgba(255,50,50,0.55), 12, 0, 0, 0);
 }
+
+/* ---------- Rules & Codex Screen ---------- */
+.rules-root {
+    -fx-padding: 0;
+    -fx-background-color: radial-gradient(center 50% 34%, radius 105%, #FFF8E9, #F1E0B7 55%, #D8BE7A 100%);
+}
+
+.rules-shell {
+    -fx-background-color: linear-gradient(to bottom, rgba(255,248,233,0.72), rgba(216,190,122,0.16));
+    -fx-padding: 0 44 14 44;
+    -fx-background-insets: 0;
+    -fx-box-border: transparent;
+}
+
+.rules-shell > .split-pane-divider {
+    -fx-background-color: linear-gradient(to bottom, rgba(212,175,55,0.18), rgba(107,0,0,0.10));
+    -fx-padding: 0 7 0 7;
+}
+
+.rules-sidebar,
+.rules-reader {
+    -fx-background-color: transparent;
+}
+
+.rules-sidebar {
+    -fx-padding: 0 0 0 0;
+}
+
+.rules-sidebar-header,
+.rules-reader-header {
+    -fx-background-color: linear-gradient(to bottom, rgba(255,252,243,0.99), rgba(248,232,191,0.94));
+    -fx-background-radius: 14;
+    -fx-border-color: rgba(198,166,100,0.95) rgba(138,106,32,0.85) rgba(138,106,32,0.85) rgba(198,166,100,0.95);
+    -fx-border-width: 1.5;
+    -fx-border-radius: 14;
+    -fx-padding: 12 14 12 14;
+    -fx-effect: dropshadow(gaussian, rgba(60,40,10,0.18), 12, 0.18, 0, 3);
+}
+
+.rules-sidebar-header {
+    -fx-background-insets: 0;
+}
+
+.rules-reader-header {
+    -fx-background-insets: 0;
+}
+
+.rules-sidebar-title,
+.rules-reader-title {
+    -fx-font-size: 19px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Serif";
+    -fx-text-fill: #6B0000;
+    -fx-effect: dropshadow(gaussian, rgba(255,255,255,0.55), 2, 0, 0, 1);
+}
+
+.rules-sidebar-note,
+.rules-reader-note {
+    -fx-font-size: 12px;
+    -fx-text-fill: #6B4A1A;
+}
+
+.rules-tree {
+    -fx-background-color: linear-gradient(to bottom, #FFFDF5, #F7EBC6);
+    -fx-border-color: rgba(198,166,100,0.95);
+    -fx-border-width: 2;
+    -fx-border-radius: 14;
+    -fx-background-radius: 14;
+    -fx-padding: 10;
+    -fx-font-family: "Serif";
+    -fx-font-size: 15px;
+    -fx-text-fill: #3A2410;
+    -fx-effect: dropshadow(gaussian, rgba(60,40,10,0.16), 10, 0.18, 0, 2);
+}
+
+.rules-tree .tree-cell:filled .tree-disclosure-node .arrow {
+    -fx-background-color: #8A6A20;
+}
+
+.rules-tree .tree-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #3A2410;
+    -fx-padding: 7 10 7 10;
+    -fx-cursor: default;
+}
+
+/* Only real (filled) rows are interactive — empty filler rows stay inert */
+.rules-tree .tree-cell:filled {
+    -fx-cursor: hand;
+}
+
+.rules-tree .tree-cell:filled:hover {
+    -fx-background-color: #F5E8C2;
+    -fx-text-fill: #6B0000;
+}
+
+.rules-tree .tree-cell:filled:selected {
+    -fx-background-color: linear-gradient(to bottom, #8B0000, #6B0000);
+    -fx-text-fill: #FFE08A;
+}
+
+.rules-tree .tree-cell.rules-tree-category {
+    -fx-background-color: linear-gradient(to right, rgba(212,175,55,0.24), rgba(255,251,237,0.88));
+    -fx-text-fill: #6B0000;
+    -fx-font-weight: bold;
+    -fx-font-size: 15.5px;
+    -fx-padding: 9 12 9 12;
+    -fx-border-color: rgba(198,166,100,0.55);
+    -fx-border-width: 0 0 1 0;
+    -fx-cursor: default;
+}
+
+.rules-tree .tree-cell.rules-tree-category:hover {
+    -fx-background-color: linear-gradient(to right, rgba(212,175,55,0.24), rgba(255,251,237,0.88));
+    -fx-text-fill: #6B0000;
+}
+
+.rules-tree .tree-cell.rules-tree-leaf {
+    -fx-background-color: transparent;
+    -fx-padding: 7 12 7 22;
+}
+
+.rules-tree .tree-cell.rules-tree-leaf:hover {
+    -fx-background-color: linear-gradient(to right, rgba(245,232,194,0.92), rgba(255,251,237,0.94));
+    -fx-text-fill: #6B0000;
+}
+
+.rules-scroll-pane {
+    -fx-background-color: linear-gradient(to bottom, #FFFDF5, #F7EBC6);
+    -fx-background: linear-gradient(to bottom, #FFFDF5, #F7EBC6);
+    -fx-border-color: rgba(198,166,100,0.95);
+    -fx-border-width: 2;
+    -fx-border-radius: 14;
+    -fx-background-radius: 14;
+    -fx-effect: dropshadow(gaussian, rgba(60,40,10,0.16), 10, 0.18, 0, 2);
+}
+
+.rules-scroll-pane > .viewport {
+    -fx-background-color: linear-gradient(to bottom, #FFFDF5, #F7EBC6);
+    -fx-background: linear-gradient(to bottom, #FFFDF5, #F7EBC6);
+}
+
+.rules-scroll-pane .content {
+    -fx-background-color: linear-gradient(to bottom, #FFFDF5, #F7EBC6);
+}
+
+.rules-scroll-pane .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 14;
+}
+
+.rules-scroll-pane .scroll-bar:vertical .track {
+    -fx-background-color: rgba(255,251,237,0.55);
+    -fx-background-radius: 999;
+}
+
+.rules-scroll-pane .scroll-bar:vertical .thumb {
+    -fx-background-color: linear-gradient(to bottom, #D4AF37, #8A6A20);
+    -fx-background-radius: 999;
+}
+
+.rules-scroll-pane .scroll-bar:vertical .increment-button,
+.rules-scroll-pane .scroll-bar:vertical .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.rules-content-pane {
+    -fx-background-color: linear-gradient(to bottom, rgba(255,253,245,0.98), rgba(247,235,198,0.98));
+    -fx-background-radius: 14;
+    -fx-padding: 8;
+}
+
+.rules-title {
+    -fx-font-size: 29px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Serif";
+    -fx-text-fill: #6B0000;
+    -fx-effect: dropshadow(gaussian, rgba(212,175,55,0.58), 10, 0.2, 0, 2);
+}
+
+.rules-subtitle {
+    -fx-font-size: 17px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #8A6A20;
+    -fx-font-family: "Serif";
+}
+
+.rules-body {
+    -fx-font-size: 14.5px;
+    -fx-text-fill: #3A2410;
+    -fx-line-spacing: 5;
+}
+
+.rules-card {
+    -fx-background-color:
+        linear-gradient(to bottom, #9B1A1A, #6B0000),
+        linear-gradient(to bottom, rgba(255,252,243,0.99), rgba(245,229,188,0.97));
+    -fx-background-insets: 0, 0 0 0 7;
+    -fx-background-radius: 16, 0 16 16 0;
+    -fx-border-color: rgba(198,166,100,0.95) rgba(138,106,32,0.92) rgba(138,106,32,0.92) transparent;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 16;
+    -fx-padding: 16 20 16 22;
+    -fx-effect: dropshadow(gaussian, rgba(60,40,10,0.22), 16, 0.20, 0, 5);
+}
+
+/* Hairline divider beneath a card's header row */
+.rules-card-header {
+    -fx-border-color: transparent transparent rgba(198,166,100,0.6) transparent;
+    -fx-border-width: 0 0 1.5 0;
+    -fx-padding: 0 0 8 0;
+}
+
+.rules-chip-row {
+    -fx-padding: 4 0 2 0;
+}
+
+.rules-chip {
+    -fx-background-color: linear-gradient(to bottom, #9B1A1A, #6B0000);
+    -fx-background-radius: 999;
+    -fx-text-fill: #FFE08A;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 4 10 4 10;
+    -fx-border-color: rgba(212,175,55,0.95);
+    -fx-border-radius: 999;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(107,0,0,0.28), 6, 0.18, 0, 1);
+}
+
+.rules-feature-card {
+    -fx-background-color:
+        linear-gradient(to bottom, #E6C25A, #A37E22),
+        linear-gradient(to bottom, rgba(255,255,255,0.55), rgba(255,247,227,0.85));
+    -fx-background-insets: 0, 0 0 0 5;
+    -fx-background-radius: 12, 0 12 12 0;
+    -fx-border-color: rgba(198,166,100,0.72) rgba(138,106,32,0.4) rgba(138,106,32,0.4) transparent;
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+    -fx-padding: 12 16 12 16;
+    -fx-effect: dropshadow(gaussian, rgba(60,40,10,0.12), 8, 0.16, 0, 2);
+}
+
+.rules-feature-card:hover {
+    -fx-translate-y: -1;
+    -fx-effect: dropshadow(gaussian, rgba(60,40,10,0.22), 12, 0.22, 0, 4);
+}
+
+.rules-feature-title {
+    -fx-font-size: 15.5px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Serif";
+    -fx-text-fill: #6B0000;
+}
+
+.rules-bold-label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #6B0000;
+}

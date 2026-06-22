@@ -9,6 +9,7 @@ public class MainView {
     private Parent root;
     private Runnable onShowOverviewRequested;
     private Runnable onCreateRequested;
+    private Runnable onShowRulesRequested;
 
     public MainView() {
         try {
@@ -28,6 +29,13 @@ public class MainView {
     }
 
     @FXML
+    private void handleShowRules() {
+        if (onShowRulesRequested != null) {
+            onShowRulesRequested.run();
+        }
+    }
+
+    @FXML
     private void handleCreate() {
         if (onCreateRequested != null) {
             onCreateRequested.run();
@@ -40,6 +48,10 @@ public class MainView {
 
     public void setOnCreateRequested(Runnable callback) {
         this.onCreateRequested = callback;
+    }
+
+    public void setOnShowRulesRequested(Runnable callback) {
+        this.onShowRulesRequested = callback;
     }
 
     public Parent getRoot() {

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      styleClass="creation-root rules-root"
+      style="-fx-background-color: radial-gradient(center 50% 38%, radius 90%, #FBF2D8, #E8D8A8);"
+      spacing="0" prefHeight="1080.0" prefWidth="1920.0">
+
+    <!-- Kopfbereich -->
+    <VBox alignment="CENTER" spacing="6">
+        <padding><Insets top="20" bottom="14" left="40" right="40"/></padding>
+        <HBox alignment="CENTER" spacing="18">
+            <Label text="⚔" style="-fx-font-size: 32px; -fx-text-fill: #6B0000; -fx-effect: dropshadow(gaussian, rgba(212,175,55,0.55), 8, 0, 0, 0);"/>
+            <Label text="Regelbuch &amp; Spielregeln" styleClass="section-title" style="-fx-font-size: 34px;"/>
+            <Label text="⚔" style="-fx-font-size: 32px; -fx-text-fill: #6B0000; -fx-effect: dropshadow(gaussian, rgba(212,175,55,0.55), 8, 0, 0, 0); -fx-rotate: 180;"/>
+        </HBox>
+        <Label text="Lies die Lehren und lerne die Regeln des Abenteuers" styleClass="section-subtitle"/>
+    </VBox>
+
+    <!-- SplitPane für Navigation und Inhalt -->
+    <SplitPane dividerPositions="0.27" VBox.vgrow="ALWAYS"
+               styleClass="rules-shell"
+               style="-fx-background-color: radial-gradient(center 50% 38%, radius 90%, #FBF2D8, #E8D8A8); -fx-background-insets: 0; -fx-box-border: transparent;">
+        <!-- Linke Seite: Baum-Navigation -->
+        <VBox spacing="12" styleClass="rules-sidebar" style="-fx-background-color: transparent;">
+            <VBox spacing="4" styleClass="rules-sidebar-header" style="-fx-background-color: linear-gradient(to bottom, rgba(255,251,237,0.98), rgba(245,232,194,0.92));">
+                <Label text="Regelbuch" styleClass="rules-sidebar-title"/>
+                <Label text="Kapitel wählen und rechts im Lesebereich nachschlagen" styleClass="rules-sidebar-note" wrapText="true"/>
+            </VBox>
+            <TreeView fx:id="rulesTree" VBox.vgrow="ALWAYS" styleClass="rules-tree"
+                      style="-fx-background-color: #FFFBED; -fx-control-inner-background: #FFFBED;"/>
+        </VBox>
+
+        <!-- Rechte Seite: Scrollbarer Lesebereich -->
+        <VBox spacing="12" styleClass="rules-reader" style="-fx-background-color: transparent;">
+            <VBox spacing="4" styleClass="rules-reader-header" style="-fx-background-color: linear-gradient(to bottom, rgba(255,251,237,0.98), rgba(245,232,194,0.92));">
+                <Label text="Lesebereich" styleClass="rules-reader-title"/>
+                <Label text="Hier erscheinen Regeln, Klassen, Völker und die passenden Details" styleClass="rules-reader-note" wrapText="true"/>
+            </VBox>
+            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"
+                        styleClass="rules-scroll-pane"
+                        style="-fx-background-color: #FFFBED; -fx-background: #FFFBED; -fx-control-inner-background: #FFFBED; -fx-padding: 0;">
+                <VBox fx:id="contentPane" spacing="16" styleClass="rules-content-pane"
+                      style="-fx-background-color: #FFFBED;">
+                    <padding><Insets top="20" bottom="20" left="30" right="30"/></padding>
+                </VBox>
+            </ScrollPane>
+        </VBox>
+    </SplitPane>
+
+    <!-- Untere Navigation -->
+    <HBox alignment="CENTER" spacing="40">
+        <padding><Insets top="10" bottom="20" left="40" right="40"/></padding>
+        <Button fx:id="btnBack" text="◀ Zurück" onAction="#handleBack" styleClass="nav-button-back" prefWidth="160" prefHeight="42"/>
+    </HBox>
+</VBox>

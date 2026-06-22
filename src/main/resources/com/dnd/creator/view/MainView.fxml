@@ -28,7 +28,7 @@
             <Button onAction="#handleShowOverview" text="✦  Deck  ✦"
                     style="-fx-background-color: linear-gradient(to bottom, #FFFBED, #F5E8C2); -fx-border-color: #D4AF37 #8A6A20 #8A6A20 #D4AF37; -fx-border-radius: 12; -fx-background-radius: 12; -fx-text-fill: #6B0000; -fx-border-width: 3; -fx-font-size: 24px; -fx-font-family: 'Serif'; -fx-font-weight: bold; -fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(60,40,10,0.3), 10, 0, 0, 4);"
                     prefWidth="320" prefHeight="70"/>
-            <Button text="✦  Rules  ✦"
+            <Button text="✦  Rules  ✦" onAction="#handleShowRules"
                     style="-fx-background-color: linear-gradient(to bottom, #FFFBED, #F5E8C2); -fx-border-color: #D4AF37 #8A6A20 #8A6A20 #D4AF37; -fx-border-radius: 12; -fx-background-radius: 12; -fx-text-fill: #6B0000; -fx-border-width: 3; -fx-font-size: 24px; -fx-font-family: 'Serif'; -fx-font-weight: bold; -fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(60,40,10,0.3), 10, 0, 0, 4);"
                     prefWidth="320" prefHeight="70"/>
         </VBox>
