@@ -887,4 +887,22 @@ public class DbManager {
         }
         return result;
     }
+
+    public List<Map<String, String>> getRaceTraits(String raceName) {
+        List<Map<String, String>> result = new ArrayList<>();
+        String query = "SELECT trait_name, description FROM race_trait WHERE race_name = ? ORDER BY trait_name";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, raceName);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Map<String, String> row = new HashMap<>();
+                row.put("trait_name", rs.getString("trait_name"));
+                row.put("description", rs.getString("description"));
+                result.add(row);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error loading race traits: " + e.getMessage());
+        }
+        return result;
+    }
 }
