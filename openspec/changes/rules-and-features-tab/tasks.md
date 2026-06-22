@@ -7,9 +7,9 @@
 
 ## 2. UI Layout & View Creation
 
-- [ ] 2.1 Create the FXML structure `RulesView.fxml` in `src/main/resources/com/dnd/creator/view/` with a SplitPane containing a TreeView on the left and a ScrollPane wrapping a VBox/TextFlow on the right.
-- [ ] 2.2 Create `RulesView.java` in `src/main/java/com/dnd/creator/view/` to load `RulesView.fxml`, bind UI components, and expose event callbacks (e.g., node selection, back button action).
-- [ ] 2.3 Add parchment-themed styles for the Rules TreeView, titles, and text rendering inside `character-creation.css`.
+- [x] 2.1 Create the FXML structure `RulesView.fxml` in `src/main/resources/com/dnd/creator/view/` with a SplitPane containing a TreeView on the left and a ScrollPane wrapping a VBox/TextFlow on the right.
+- [x] 2.2 Create `RulesView.java` in `src/main/java/com/dnd/creator/view/` to load `RulesView.fxml`, bind UI components, and expose event callbacks (e.g., node selection, back button action).
+- [x] 2.3 Add parchment-themed styles for the Rules TreeView, titles, and text rendering inside `character-creation.css`.
 
 ## 3. Presenter & Navigation Wiring
 
