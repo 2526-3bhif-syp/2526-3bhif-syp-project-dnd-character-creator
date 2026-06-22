@@ -58,7 +58,7 @@ public class RulesPresenter {
             "• 16–17 = +3\n" +
             "• 18–19 = +4\n" +
             "• 20 = +5",
-            "💡 Der Übungsbonus wird zusätzlich addiert, wenn dein Charakter mit einer Waffe, Fertigkeit, einem Rettungswurf oder einem Tool geübt ist. Auf Stufe 1 beträgt er +2."
+            "💡 Der Übungsbonus wird zusätzlich addiert, wenn dein Charakter mit einer Waffe, Fertigkeit, einem Rettungswurf oder einem Werkzeug geübt ist. Auf Stufe 1 beträgt er +2."
         });
         CORE_RULES.put("Kampf & Erholung", new String[]{
             "⚔️ Kampf & Erholung",
@@ -86,7 +86,7 @@ public class RulesPresenter {
     }
 
     private void initTreeView() {
-        TreeItem<String> rootItem = new TreeItem<>("DnD Codex");
+        TreeItem<String> rootItem = new TreeItem<>("Regelcodex");
         rootItem.setExpanded(true);
 
         // Core Rules
@@ -98,7 +98,7 @@ public class RulesPresenter {
         rootItem.getChildren().add(coreRulesItem);
 
         // Ability Scores from DB
-        TreeItem<String> abilitiesItem = new TreeItem<>("Fähigkeiten");
+        TreeItem<String> abilitiesItem = new TreeItem<>("Attribute");
         for (String ability : dbManager.getAllAbilities()) {
             abilitiesItem.getChildren().add(new TreeItem<>(ability));
         }
@@ -167,7 +167,7 @@ public class RulesPresenter {
 
         VBox introCard = createCard();
         introCard.getChildren().addAll(
-            createCardHeader("📖", "Willkommen im DnD Codex"),
+            createCardHeader("📖", "Willkommen im Regelcodex"),
             createBodyLabel(
                 "Hier findest du die wichtigsten Regeln, Attribute, Fertigkeiten, Klassen und Völker für Dungeons & Dragons 5e."
             ),
@@ -176,7 +176,7 @@ public class RulesPresenter {
 
         VBox categoriesCard = createCard();
         categoriesCard.getChildren().add(createCardHeader("🗂", "Kategorien"));
-        categoriesCard.getChildren().add(createChipRow(List.of("Grundregeln", "Fähigkeiten", "Fertigkeiten", "Klassen", "Völker")));
+        categoriesCard.getChildren().add(createChipRow(List.of("Grundregeln", "Attribute", "Fertigkeiten", "Klassen", "Völker")));
         categoriesCard.getChildren().add(createBodyLabel("Die Inhalte werden direkt aus der Datenbank geladen und sauber im Lesebereich dargestellt."));
 
         container.getChildren().addAll(introCard, categoriesCard);
@@ -190,7 +190,7 @@ public class RulesPresenter {
             case "Grundregeln":
                 showCoreRule(name);
                 break;
-            case "Fähigkeiten":
+            case "Attribute":
                 showAbility(name);
                 break;
             case "Fertigkeiten":
@@ -240,9 +240,9 @@ public class RulesPresenter {
 
         VBox summary = createCard();
         summary.getChildren().add(createCardHeader("📊", "Attributsübersicht"));
-        summary.getChildren().add(createChipRow(List.of("Attributswert", "Modifikator", "Übungsbonus")));
+        summary.getChildren().add(createChipRow(List.of("Attribut", "Modifikator", "Übungsbonus")));
         if (!measures.isBlank()) {
-            addLabeledBlock(summary, "Wofür steht es?", measures);
+            addLabeledBlock(summary, "Bedeutung", measures);
         }
         if (!importantFor.isBlank()) {
             addLabeledBlock(summary, "Wichtig für", importantFor);
@@ -351,7 +351,7 @@ public class RulesPresenter {
             List<Map<String, String>> traits = dbManager.getRaceTraits(name);
             if (!traits.isEmpty()) {
                 VBox traitsCard = createCard();
-                traitsCard.getChildren().add(createCardHeader("✦", "Rassenmerkmale"));
+                traitsCard.getChildren().add(createCardHeader("✦", "Volksmerkmale"));
                 for (Map<String, String> trait : traits) {
                     VBox traitBox = new VBox(6);
                     traitBox.getStyleClass().add("rules-feature-card");
