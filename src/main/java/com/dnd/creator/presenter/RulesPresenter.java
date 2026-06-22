@@ -22,7 +22,7 @@ public class RulesPresenter {
     private final RulesView view;
     private final DbManager dbManager;
 
-    // Static D&D core rules content
+    // Statische Kernregeln für D&D
     private static final Map<String, String[]> CORE_RULES = new LinkedHashMap<>();
     static {
         CORE_RULES.put("Würfeln mit dem d20", new String[]{
@@ -89,7 +89,7 @@ public class RulesPresenter {
         TreeItem<String> rootItem = new TreeItem<>("Regelcodex");
         rootItem.setExpanded(true);
 
-        // Core Rules
+        // Kernregeln
         TreeItem<String> coreRulesItem = new TreeItem<>("Grundregeln");
         coreRulesItem.setExpanded(true);
         for (String key : CORE_RULES.keySet()) {
@@ -97,28 +97,28 @@ public class RulesPresenter {
         }
         rootItem.getChildren().add(coreRulesItem);
 
-        // Ability Scores from DB
+        // Attribute aus der Datenbank
         TreeItem<String> abilitiesItem = new TreeItem<>("Attribute");
         for (String ability : dbManager.getAllAbilities()) {
             abilitiesItem.getChildren().add(new TreeItem<>(ability));
         }
         rootItem.getChildren().add(abilitiesItem);
 
-        // Skills from DB
+        // Fertigkeiten aus der Datenbank
         TreeItem<String> skillsItem = new TreeItem<>("Fertigkeiten");
         for (String skill : dbManager.getAllSkills()) {
             skillsItem.getChildren().add(new TreeItem<>(skill));
         }
         rootItem.getChildren().add(skillsItem);
 
-        // Classes from DB
+        // Klassen aus der Datenbank
         TreeItem<String> classesItem = new TreeItem<>("Klassen");
         for (String clazz : dbManager.getAllClasses()) {
             classesItem.getChildren().add(new TreeItem<>(clazz));
         }
         rootItem.getChildren().add(classesItem);
 
-        // Races from DB
+        // Völker aus der Datenbank
         TreeItem<String> racesItem = new TreeItem<>("Völker");
         for (String race : dbManager.getAllRaces()) {
             racesItem.getChildren().add(new TreeItem<>(race));
@@ -369,7 +369,7 @@ public class RulesPresenter {
         }
     }
 
-    // ===== HELPER METHODS =====
+    // ===== HILFSMETHODEN =====
 
     private void addTitle(VBox container, String text, String icon) {
         HBox titleBox = new HBox(10);
