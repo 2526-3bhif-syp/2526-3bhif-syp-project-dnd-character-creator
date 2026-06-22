@@ -19,7 +19,7 @@
         <padding><Insets top="20" bottom="14" left="40" right="40"/></padding>
         <HBox alignment="CENTER" spacing="18">
             <Label text="⚔" style="-fx-font-size: 32px; -fx-text-fill: #6B0000; -fx-effect: dropshadow(gaussian, rgba(212,175,55,0.55), 8, 0, 0, 0);"/>
-            <Label text="Codex &amp; Spielregeln" styleClass="section-title" style="-fx-font-size: 34px;"/>
+            <Label text="Regelbuch &amp; Spielregeln" styleClass="section-title" style="-fx-font-size: 34px;"/>
             <Label text="⚔" style="-fx-font-size: 32px; -fx-text-fill: #6B0000; -fx-effect: dropshadow(gaussian, rgba(212,175,55,0.55), 8, 0, 0, 0); -fx-rotate: 180;"/>
         </HBox>
         <Label text="Lies die Lehren und lerne die Regeln des Abenteuers" styleClass="section-subtitle"/>

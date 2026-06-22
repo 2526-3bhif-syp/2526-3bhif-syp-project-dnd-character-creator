@@ -22,11 +22,11 @@ public class RulesPresenter {
     private final RulesView view;
     private final DbManager dbManager;
 
-    // Statische Kernregeln für D&D
+    // Statische Kernregeln für das Spiel
     private static final Map<String, String[]> CORE_RULES = new LinkedHashMap<>();
     static {
         CORE_RULES.put("Würfeln mit dem d20", new String[]{
-            "🎲 Das Herzstück von D&D",
+            "🎲 Das Herzstück des Spiels",
             "Wenn der Ausgang einer Aktion unsicher ist, wirfst du in der Regel einen d20 und addierst passende Boni oder Mali. Der Spielleiter sagt dir, welche Probe nötig ist und welche Schwelle du erreichen musst.",
             "Typische Würfe:\n" +
             "• Angriff: d20 + Angriffsbonus gegen die Rüstungsklasse (RK)\n" +
@@ -86,7 +86,7 @@ public class RulesPresenter {
     }
 
     private void initTreeView() {
-        TreeItem<String> rootItem = new TreeItem<>("Regelcodex");
+        TreeItem<String> rootItem = new TreeItem<>("Regelbuch");
         rootItem.setExpanded(true);
 
         // Kernregeln
@@ -167,9 +167,9 @@ public class RulesPresenter {
 
         VBox introCard = createCard();
         introCard.getChildren().addAll(
-            createCardHeader("📖", "Willkommen im Regelcodex"),
+            createCardHeader("📖", "Willkommen im Regelbuch"),
             createBodyLabel(
-                "Hier findest du die wichtigsten Regeln, Attribute, Fertigkeiten, Klassen und Völker für Dungeons & Dragons 5e."
+                "Hier findest du die wichtigsten Regeln, Attribute, Fertigkeiten, Klassen und Völker für Dungeons & Dragons, fünfte Edition."
             ),
             createBodyLabel("Wähle links ein Kapitel oder einen Eintrag aus, um die Details rechts zu lesen.")
         );
