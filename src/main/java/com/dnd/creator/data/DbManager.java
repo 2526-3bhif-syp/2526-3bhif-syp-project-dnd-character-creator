@@ -833,4 +833,21 @@ public class DbManager {
         }
         return result;
     }
+
+    public List<Map<String, String>> getAbilities() {
+        List<Map<String, String>> result = new ArrayList<>();
+        String query = "SELECT name, description FROM ability ORDER BY name";
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+            while (rs.next()) {
+                Map<String, String> row = new HashMap<>();
+                row.put("name", rs.getString("name"));
+                row.put("description", rs.getString("description"));
+                result.add(row);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error loading abilities: " + e.getMessage());
+        }
+        return result;
+    }
 }
