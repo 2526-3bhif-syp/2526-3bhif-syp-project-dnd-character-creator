@@ -83,14 +83,13 @@
                 <padding><Insets top="14" bottom="16" left="20" right="20"/></padding>
                 <Button fx:id="btnDelete" text="🗑  Delete" styleClass="sheet-btn-delete"
                         prefWidth="130" prefHeight="46"/>
-                <Button fx:id="btnEdit" text="✎  Edit"
-                        style="-fx-background-color: #FFF8E2; -fx-border-color: #D4AF37; -fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10; -fx-text-fill: #6B0000; -fx-font-size: 14px; -fx-font-weight: bold; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(212,175,55,0.45), 10, 0, 0, 0);"
+                <Button fx:id="btnEdit" text="✎  Edit" styleClass="sheet-btn-edit"
                         prefWidth="130" prefHeight="46"/>
-                <Button fx:id="btnLevelUp" text="⬆  Level Up"
-                        style="-fx-background-color: #2d5a3d; -fx-border-color: #1d3d28; -fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10; -fx-text-fill: #FFF8E2; -fx-font-size: 14px; -fx-font-weight: bold; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(45,90,61,0.5), 10, 0, 0, 0);"
+                <Button fx:id="btnLevelUp" text="⬆  Level Up" styleClass="sheet-btn-levelup"
                         prefWidth="150" prefHeight="46"/>
-                <Button fx:id="btnClose" text="Close"
-                        style="-fx-background-color: #FFFBED; -fx-border-color: #C6A664; -fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10; -fx-text-fill: #6B4A1A; -fx-font-size: 14px; -fx-cursor: hand;"
+                <Button fx:id="btnExport" text="⬇  Export PDF" styleClass="sheet-btn-export"
+                        prefWidth="150" prefHeight="46"/>
+                <Button fx:id="btnClose" text="Close" styleClass="sheet-btn-close"
                         prefWidth="130" prefHeight="46"/>
             </HBox>
         </VBox>

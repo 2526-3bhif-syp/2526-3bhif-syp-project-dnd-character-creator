@@ -56,6 +56,9 @@ public class CharacterSummaryView {
     private Button btnSave;
 
     @FXML
+    private Button btnExport;
+
+    @FXML
     private VBox leftColumn;
 
     @FXML
@@ -76,6 +79,7 @@ public class CharacterSummaryView {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/dnd/creator/view/CharacterSummaryView.fxml"));
             loader.setController(this);
             root = loader.load();
+            CreationStyles.attach(root);
 
             dbManager.connect();
             loadCharacterData();
@@ -584,6 +588,19 @@ public class CharacterSummaryView {
     private void setupButtonHandlers() {
         btnBack.setOnAction(e -> navigateBack());
         btnSave.setOnAction(e -> saveCharacter());
+        btnExport.setOnAction(e -> exportCharacter());
+    }
+
+    private void exportCharacter() {
+        var character = CharacterSession.getInstance().getCurrentCharacter();
+        // Capture the background free-text the user may have entered on this step.
+        character.setPersonalityTraits(txtPersonality.getText());
+        character.setIdeals(txtIdeals.getText());
+        character.setBonds(txtBonds.getText());
+        character.setFlaws(txtFlaws.getText());
+
+        javafx.stage.Window owner = btnExport.getScene() != null ? btnExport.getScene().getWindow() : null;
+        new com.dnd.creator.presenter.ExportPresenter().exportToPdf(character, owner);
     }
 
     private void navigateBack() {

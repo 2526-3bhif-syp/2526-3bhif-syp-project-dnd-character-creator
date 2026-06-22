@@ -38,6 +38,7 @@ public class CharacterSheetPopupView {
     @FXML private Button btnEdit;
     @FXML private Button btnClose;
     @FXML private Button btnLevelUp;
+    @FXML private Button btnExport;
     @FXML private VBox leftColumn;
     @FXML private VBox middleColumn;
     @FXML private VBox rightColumn;
@@ -485,6 +486,14 @@ public class CharacterSheetPopupView {
                 onEditCallback.accept(character);
             }
             ((Stage) btnEdit.getScene().getWindow()).close();
+        });
+
+        // Export button — persist any background edits first, then export to PDF.
+        // The sheet stays open and the character is left unchanged.
+        btnExport.setOnAction(e -> {
+            saveBackgroundFields();
+            new com.dnd.creator.presenter.ExportPresenter()
+                    .exportToPdf(character, btnExport.getScene().getWindow());
         });
 
         // Level Up button

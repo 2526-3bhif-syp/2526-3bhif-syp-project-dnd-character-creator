@@ -29,3 +29,96 @@
 .sheet-btn-delete:pressed {
     -fx-background-color: #6B0000;
 }
+
+/* Edit button — light by default, fills gold on hover */
+.sheet-btn-edit {
+    -fx-background-color: #FFF8E2;
+    -fx-border-color: #D4AF37;
+    -fx-border-width: 2;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-text-fill: #6B0000;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(212,175,55,0.45), 10, 0, 0, 0);
+}
+
+.sheet-btn-edit:hover {
+    -fx-background-color: #D4AF37;
+    -fx-text-fill: #FFF8E2;
+    -fx-effect: dropshadow(gaussian, rgba(212,175,55,0.7), 14, 0, 0, 0);
+}
+
+.sheet-btn-edit:pressed {
+    -fx-background-color: #B8912A;
+}
+
+/* Level Up button — green, brightens on hover */
+.sheet-btn-levelup {
+    -fx-background-color: #2d5a3d;
+    -fx-border-color: #1d3d28;
+    -fx-border-width: 2;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-text-fill: #FFF8E2;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(45,90,61,0.5), 10, 0, 0, 0);
+}
+
+.sheet-btn-levelup:hover {
+    -fx-background-color: #3d7a52;
+    -fx-effect: dropshadow(gaussian, rgba(45,90,61,0.8), 14, 0, 0, 0);
+}
+
+.sheet-btn-levelup:pressed {
+    -fx-background-color: #1d3d28;
+}
+
+/* Export button — light by default, fills brass on hover */
+.sheet-btn-export {
+    -fx-background-color: #FFF8E2;
+    -fx-border-color: #8A6A20;
+    -fx-border-width: 2;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-text-fill: #6B4A1A;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(138,106,32,0.4), 10, 0, 0, 0);
+}
+
+.sheet-btn-export:hover {
+    -fx-background-color: #8A6A20;
+    -fx-text-fill: #FFF8E2;
+    -fx-effect: dropshadow(gaussian, rgba(138,106,32,0.7), 14, 0, 0, 0);
+}
+
+.sheet-btn-export:pressed {
+    -fx-background-color: #6B4A1A;
+}
+
+/* Close button — neutral, fills brass on hover */
+.sheet-btn-close {
+    -fx-background-color: #FFFBED;
+    -fx-border-color: #C6A664;
+    -fx-border-width: 2;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-text-fill: #6B4A1A;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+}
+
+.sheet-btn-close:hover {
+    -fx-background-color: #C6A664;
+    -fx-text-fill: #FFFBED;
+    -fx-effect: dropshadow(gaussian, rgba(198,166,100,0.6), 12, 0, 0, 0);
+}
+
+.sheet-btn-close:pressed {
+    -fx-background-color: #A88A4A;
+}
