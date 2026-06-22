@@ -850,4 +850,22 @@ public class DbManager {
         }
         return result;
     }
+
+    public List<Map<String, String>> getSkillsWithAbilities() {
+        List<Map<String, String>> result = new ArrayList<>();
+        String query = "SELECT name, ability, description FROM skill ORDER BY name";
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+            while (rs.next()) {
+                Map<String, String> row = new HashMap<>();
+                row.put("name", rs.getString("name"));
+                row.put("ability", rs.getString("ability"));
+                row.put("description", rs.getString("description"));
+                result.add(row);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error loading skills with abilities: " + e.getMessage());
+        }
+        return result;
+    }
 }
