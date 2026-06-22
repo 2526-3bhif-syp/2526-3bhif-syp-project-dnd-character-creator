@@ -868,4 +868,23 @@ public class DbManager {
         }
         return result;
     }
+
+    public List<Map<String, Object>> getClassFeatures(String className) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        String query = "SELECT level, feature_name, description FROM class_feature WHERE class_name = ? ORDER BY level, feature_name";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, className);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Map<String, Object> row = new HashMap<>();
+                row.put("level", rs.getInt("level"));
+                row.put("feature_name", rs.getString("feature_name"));
+                row.put("description", rs.getString("description"));
+                result.add(row);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error loading class features: " + e.getMessage());
+        }
+        return result;
+    }
 }
