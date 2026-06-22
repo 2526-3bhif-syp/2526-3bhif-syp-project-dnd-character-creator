@@ -3,6 +3,8 @@ package com.dnd.creator.presenter;
 import com.dnd.creator.view.CharactersOverviewView;
 import com.dnd.creator.view.CreateCharacterView;
 import com.dnd.creator.view.MainView;
+import com.dnd.creator.view.RulesView;
+import com.dnd.creator.presenter.RulesPresenter;
 import javafx.stage.Stage;
 
 public class MainPresenter {
@@ -15,12 +17,20 @@ public class MainPresenter {
 
         this.mainView.setOnCreateRequested(this::showCreateStep);
         this.mainView.setOnShowOverviewRequested(this::showOverview);
+        this.mainView.setOnShowRulesRequested(this::showRules);
     }
 
     private void showCreateStep() {
         com.dnd.creator.model.CharacterSession.getInstance().reset();
         CreateCharacterView createCharacterView = new CreateCharacterView();
         stage.getScene().setRoot(createCharacterView.getRoot());
+    }
+
+    private void showRules() {
+        RulesView rulesView = new RulesView();
+        rulesView.setOnBackRequested(this::showMain);
+        new RulesPresenter(rulesView);
+        stage.getScene().setRoot(rulesView.getRoot());
     }
 
     private void showOverview() {

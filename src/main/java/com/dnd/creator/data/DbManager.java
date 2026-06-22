@@ -142,6 +142,9 @@ public class DbManager {
         return result;
     }
 
+
+
+
     public Race getRaceByName(String raceName) {
         String query = "SELECT name, size, speed FROM race WHERE name = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -886,6 +889,50 @@ public class DbManager {
             System.err.println("Error loading class features: " + e.getMessage());
         }
         return result;
+    }
+    // ===== ABILITY & SKILL HELPERS =====
+    public List<String> getAllAbilities() {
+        List<String> result = new ArrayList<>();
+        String query = "SELECT name FROM ability ORDER BY name";
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+            while (rs.next()) {
+                result.add(rs.getString("name"));
+            }
+        } catch (SQLException e) {
+            System.err.println("Error loading abilities list: " + e.getMessage());
+        }
+        return result;
+    }
+
+    public String getAbilityDescription(String abilityName) {
+        String query = "SELECT description FROM ability WHERE name = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, abilityName);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getString("description");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error loading ability description: " + e.getMessage());
+        }
+        return "";
+    }
+
+
+
+    public String getSkillDescription(String skillName) {
+        String query = "SELECT description FROM skill WHERE name = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, skillName);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getString("description");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error loading skill description: " + e.getMessage());
+        }
+        return "";
     }
 
     public List<Map<String, String>> getRaceTraits(String raceName) {
