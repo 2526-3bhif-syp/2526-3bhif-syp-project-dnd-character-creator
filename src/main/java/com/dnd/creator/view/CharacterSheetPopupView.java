@@ -47,6 +47,8 @@ public class CharacterSheetPopupView {
     private final CharacterModel character;
     private java.util.function.Consumer<CharacterModel> onEditCallback;
     private java.util.function.Consumer<CharacterModel> onDeleteCallback;
+    private Runnable onCloseCallback;
+    private boolean actionTriggered = false;
     private Window ownerWindow;
 
     private final TextArea txtPersonality = new TextArea();
@@ -95,6 +97,11 @@ public class CharacterSheetPopupView {
         stage.setMinHeight(600);
 
         stage.setOnCloseRequest(e -> saveBackgroundFields());
+        stage.setOnHidden(e -> {
+            if (!actionTriggered && onCloseCallback != null) {
+                onCloseCallback.run();
+            }
+        });
 
         stage.show();
     }
@@ -105,6 +112,10 @@ public class CharacterSheetPopupView {
 
     public void setOnDeleteCallback(java.util.function.Consumer<CharacterModel> callback) {
         this.onDeleteCallback = callback;
+    }
+
+    public void setOnCloseCallback(Runnable callback) {
+        this.onCloseCallback = callback;
     }
 
     private void populate() {
@@ -482,6 +493,7 @@ public class CharacterSheetPopupView {
 
         btnEdit.setOnAction(e -> {
             saveBackgroundFields();
+            actionTriggered = true;
             if (onEditCallback != null) {
                 onEditCallback.accept(character);
             }
@@ -539,6 +551,7 @@ public class CharacterSheetPopupView {
                 DbManager db = new DbManager();
                 db.connect();
                 if (db.deleteCharacter(character.getDbId())) {
+                    actionTriggered = true;
                     if (onDeleteCallback != null) {
                         onDeleteCallback.accept(character);
                     }
@@ -563,6 +576,9 @@ public class CharacterSheetPopupView {
                     .findFirst()
                     .ifPresent(refreshed -> {
                         CharacterSheetPopupView fresh = new CharacterSheetPopupView(refreshed);
+                        fresh.setOnEditCallback(this.onEditCallback);
+                        fresh.setOnDeleteCallback(this.onDeleteCallback);
+                        fresh.setOnCloseCallback(this.onCloseCallback);
                         fresh.showAsPopup(owner);
                     });
         } catch (Exception e) {
