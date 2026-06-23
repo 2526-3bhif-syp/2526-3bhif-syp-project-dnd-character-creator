@@ -78,6 +78,29 @@ public class RulesPresenter {
             "• Kurze Rast: mindestens 1 Stunde, Trefferwürfel können eingesetzt werden\n" +
             "• Lange Rast: mindestens 8 Stunden, alle Trefferpunkte werden wiederhergestellt, Trefferwürfel teilweise erholt und Zauberplätze vollständig zurückgesetzt"
         });
+        CORE_RULES.put("Gesinnung", new String[]{
+            "🧭 Gesinnung — der moralische Kompass",
+            "Die Gesinnung beschreibt, wie dein Charakter denkt und handelt. Sie ergibt sich aus zwei Achsen, die zusammen neun mögliche Gesinnungen bilden. Sie ist ein Leitfaden für das Rollenspiel, kein starres Regelkorsett.",
+            "Achse 1 — Gesetz gegen Chaos (wie du zu Regeln und Ordnung stehst):\n" +
+            "• Rechtschaffen (Lawful): folgt Regeln, Traditionen und einem festen Ehrenkodex.\n" +
+            "• Neutral: hält die Balance — mal Ordnung, mal Freiheit.\n" +
+            "• Chaotisch (Chaotic): folgt dem eigenen Gewissen und schätzt Freiheit über Regeln.",
+            "Achse 2 — Gut gegen Böse (wie du andere behandelst):\n" +
+            "• Gut (Good): schützt andere, zeigt Mitgefühl und Selbstlosigkeit.\n" +
+            "• Neutral: weder besonders selbstlos noch grausam.\n" +
+            "• Böse (Evil): stellt eigene Ziele über das Wohl anderer.",
+            "Die neun Gesinnungen (so heißen sie auch im Charakter-Assistenten):\n" +
+            "• Lawful Good — der ehrenhafte Held: tut Gutes auf geordnete Weise.\n" +
+            "• Neutral Good — der Wohltäter: hilft anderen, ohne auf Regeln zu achten.\n" +
+            "• Chaotic Good — der Rebell: kämpft für das Gute, aber nach eigenen Regeln.\n" +
+            "• Lawful Neutral — der Ordnungshüter: stellt Gesetz und Ordnung über alles.\n" +
+            "• True Neutral — der Ausgleichende: bleibt in allem neutral.\n" +
+            "• Chaotic Neutral — der Freigeist: tut, was er will — frei und unberechenbar.\n" +
+            "• Lawful Evil — der Tyrann: nutzt Regeln und Macht für eigene Zwecke.\n" +
+            "• Neutral Evil — der Egoist: tut Böses, wann immer es ihm nützt.\n" +
+            "• Chaotic Evil — der Zerstörer: handelt grausam und ohne Rücksicht.",
+            "💡 Tipp für Einsteiger: Wähle die Gesinnung, die am besten zu deiner Charaktervorstellung passt. Bist du unsicher, sind „Neutral Good“ oder „True Neutral“ unkomplizierte Startpunkte. Deine Gesinnung darf sich im Laufe des Abenteuers durch deine Entscheidungen auch verändern."
+        });
     }
 
     public RulesPresenter(RulesView view) {
