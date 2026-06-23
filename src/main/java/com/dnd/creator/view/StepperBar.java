@@ -1,5 +1,6 @@
 package com.dnd.creator.view;
 
+import com.dnd.creator.model.CharacterSession;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
@@ -19,10 +20,17 @@ public class StepperBar {
         root.getStyleClass().add("stepper-bar");
         root.setAlignment(Pos.CENTER);
 
-        for (int i = 0; i < STEP_LABELS.length; i++) {
+        // The final "Zauber" step only exists for spellcasters. Hide it for everyone
+        // else so the progress bar never promises a step that won't happen.
+        String classIndex = CharacterSession.getInstance().getCurrentCharacter().getClassIndex();
+        int stepCount = SpellSelectionView.isSpellcaster(classIndex)
+            ? STEP_LABELS.length
+            : STEP_LABELS.length - 1;
+
+        for (int i = 0; i < stepCount; i++) {
             int stepNumber = i + 1;
             root.getChildren().add(buildStep(stepNumber, STEP_LABELS[i], stepNumber, currentStep));
-            if (i < STEP_LABELS.length - 1) {
+            if (i < stepCount - 1) {
                 root.getChildren().add(buildConnector(stepNumber, currentStep));
             }
         }
