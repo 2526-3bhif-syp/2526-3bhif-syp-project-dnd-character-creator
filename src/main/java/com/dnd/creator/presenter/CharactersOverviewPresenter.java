@@ -47,6 +47,11 @@ public class CharactersOverviewPresenter {
                         updateView();
                     });
 
+                    popup.setOnCloseCallback(() -> {
+                        characters = dbManager.getAllSavedCharacters();
+                        updateView();
+                    });
+
                     popup.showAsPopup(view.getCardsPane().getScene().getWindow());
                 });
                 view.getCardsPane().getChildren().add(cardView.getRoot());
